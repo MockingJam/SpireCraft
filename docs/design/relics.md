@@ -88,3 +88,81 @@
 | 燃烧之血 | 血瓶 | 岩浆膏 |
 
 其他补充的配方：5 个 Boss 召唤道具；破裂核心水晶块、破裂墨石（熔炼）；巢脾（2 蜜脾 + 2 巢土 → 2）；巢蜜储藏（巢脾 + 蜂蜜瓶）；巢菌毯（2 巢菌土 → 3）；萤光苔毯（2 苔藓地毯 + 发光浆果 → 2）；自动机合金的锈蚀（合金块 + 水桶 → 锈蚀 → 废弃）；墨泡（黏液球 + 墨囊 → 2）。矿石、原木、植物、珊瑚、结构专属方块与原版一样不需要配方。
+
+## 还没做的遗物（#11，2026-11-20 对照）
+
+> 资料：slaythespire.wiki.gg 的 Slay_the_Spire_2:Relics_List，2026-11-19 版，共 315 件。比开头的 298 件多，是因为 beta 版新增了角色 Fool 和它的遗物。
+> 已做 14 件：燃烧之血、锚、金刚杵、意外光滑的石头、弹珠袋、红面具、铜制鳞片、小血瓶、红头骨、钢笔尖、水银沙漏、手里剑、蜥蜴尾巴、钨合金棍。下面是剩下的 301 件，名字先用英文原名，中文名在实现时再定。
+> 每件做之前要先定 MC 效果（挂到 `RelicEvents` 的哪个钩子）和获取途径。抽牌、能量、金币、卡组、药水栏、地图这类效果在 MC 里没有直接对应，要单独换算或跳过。
+
+### 初始（还差 11 / 共 12）
+
+- 铁甲战士：Black Blood
+- 静默猎手：Ring of the Snake、Ring of the Drake
+- 储君：Divine Right、Divine Destiny
+- 亡灵契约师：Bound Phylactery、Phylactery Unbound
+- 故障机器人：Cracked Core、Infused Core
+- Fool：Song Bow、Storyteller
+
+### 普通（还差 23 / 共 31）
+
+- 通用：Amethyst Aubergine、Bag of Preparation、Book of Five Rings、Centennial Puzzle、Festive Popper、Gorget、Happy Flower、Juzu Bracelet、Lantern、Meal Ticket、Pendulum、Potion Belt、Regal Pillow、Strawberry、Strike Dummy、Venerable Tea Set、War Paint、Whetstone
+- 静默猎手：Snecko Skull
+- 储君：Fencing Manual
+- 亡灵契约师：Bone Flute
+- 故障机器人：Data Disk
+- Fool：Exercise Mat
+
+### 罕见（还差 39 / 共 41）
+
+- 通用：Akabeko、Bowler Hat、Candelabra、Eternal Feather、Gremlin Horn、Horn Cleat、Joss Paper、Kusarigama、Lasting Candy、Letter Opener、Lucky Fysh、Miniature Cannon、Nunchaku、Orichalcum、Ornamental Fan、Pantograph、Parrying Shield、Pear、Permafrost、Petrified Toad、Planisphere、Reptile Trinket、Ripple Basin、Sparkling Rouge、Stone Cracker、Tiny Mailbox、Tuning Fork、Vambrace
+- 铁甲战士：Paper Phrog、Self-Forming Clay
+- 静默猎手：Tingsha、Twisted Funnel
+- 储君：Galactic Dust、Regalite
+- 亡灵契约师：Book Repair Knife、Funerary Mask
+- 故障机器人：Gold-Plated Cables、Symbiotic Virus
+- Fool：Ocarina
+
+### 稀有（还差 51 / 共 54）
+
+- 通用：Art of War、Beating Remnant、Bellows、Captain's Wheel、Chandelier、Cloak Clasp、Frozen Egg、Gambling Chip、Game Piece、Girya、Ice Cream、Intimidating Helmet、Kunai、Mango、Meat on the Bone、Molten Egg、Mummified Hand、Old Coin、Pocketwatch、Prayer Wheel、Rainbow Ring、Razor Tooth、Shovel、Stone Calendar、Sturdy Clamp、The Courier、Toxic Egg、Unceasing Top、Unsettling Lamp、Vexing Puzzlebox、White Beast Statue、White Star
+- 铁甲战士：Charon's Ashes、Demon Tongue、Ruined Helmet
+- 静默猎手：Helical Dart、Paper Krane、Tough Bandages
+- 储君：Lunar Pastry、Mini Regent、Orange Dough
+- 亡灵契约师：Big Hat、Bookmark、Ivory Tile
+- 故障机器人：Emotion Chip、Metronome、Power Cell
+- Fool：Conductor's Baton、Fertilizer、Twine、Whittling Knife
+
+### 商店（还差 31 / 共 31）
+
+商店遗物的获取途径要等阶段 10 的 NPC 交易。
+
+- 通用：Belt Buckle、Bread、Burning Sticks、Cauldron、Chemical X、Dingy Rug、Dolly's Mirror、Dragon Fruit、Ghost Seed、Gnarled Hammer、Kifuda、Lava Lamp、Lee's Waffle、Membership Card、Miniature Tent、Mystic Lighter、Orrery、Punch Dagger、Ringing Triangle、Royal Stamp、Screaming Flagon、Sling of Courage、The Abacus、Toolbox、Wing Charm
+- 铁甲战士：Brimstone（注册名会和已有的材料 `brimstone` 撞，需要另起名）
+- 静默猎手：Ninja Scroll
+- 储君：Vitruvian Minion
+- 亡灵契约师：Undying Sigil
+- 故障机器人：Runic Capacitor
+- Fool：Bizarre Lamp
+
+### 事件（还差 43 / 共 43）
+
+- Byrdpip、Byrdine、Pollinous Core、Bing Bong、Daughter of the Wind、Mr. Struggles、Fresnel Lens、Forgotten Soul、Big Mushroom、Fragrant Mushroom、Obsidian Vice、Thumbscrew、Tormentous Collar、The Chosen Cheese、Mighty Wings、Bone Tea、Ember Tea、Tea of Discourtesy、Lost Wisp、Royal Poison、Sword of Jade、Sword of Stone、Bath Robes、Bath Towel、Darkstone Periapt、Dream Catcher、Hand Drill、Maw Bank、The Boot、History Course、Wongo Customer Appreciation Badge、Wongo's Mystery Ticket、Wuppy
+- 带“???”的变种（原遗物的变体）：Anchor???、Blood Vial???、Happy Flower???、Lee's Waffle???、Mango???、Orichalcum???、Snecko Eye???、Strike Dummy???、The Merchant's Rug???、Venerable Tea Set???
+
+### 先古（还差 102 / 共 102）
+
+按给出遗物的先古之民分组。Boss 遗物（先古之民）的获取途径还没定。
+
+- **Neow**（30）：Arcane Scroll、Booming Conch、Cursed Pearl、Dowsing Rod、Fishing Rod、Golden Pearl、Hefty Tablet、Kaleidoscope、Large Capsule、Lava Rock、Lead Paperweight、Leafy Poultice、Lost Coffer、Massive Scroll、Neow's Bones、Neow's Sacrifice、Neow's Talisman、Neow's Torment、New Leaf、Nutritious Oyster、Phial Holster、Pomander、Precarious Shears、Precise Scissors、Scroll Boxes、Silken Tress、Silver Crucible、Small Capsule、Stone Humidifier、Winged Boots
+- **Orobas**（10）：Alchemical Coffer、Archaic Tooth、Driftwood、Electric Shrymp、Glass Eye、Prismatic Gem、Radiant Pearl、Sand Castle、Sea Glass、Touch of Orobas
+- **Pael**（10）：Pael's Blood、Pael's Claw、Pael's Eye、Pael's Flesh、Pael's Growth、Pael's Horn、Pael's Legion、Pael's Tears、Pael's Tooth、Pael's Wing
+- **Tezcatara**（10）：Biiig Hug、Golden Compass、Nutritious Soup、Pumpkin Candle、Seal of Gold、Storybook、Toasty Mittens、Toy Box、Very Hot Cocoa、Yummy Cookie
+- **Nonupeipe**（10）：Beautiful Bracelet、Blessed Antler、Brilliant Scarf、Delicate Frond、Diamond Diadem、Fur Coat、Glitter、Jewelry Box、Looming Fruit、Signet Ring
+- **Tanx**（10）：Claws、Crossbow、Iron Club、Meat Cleaver、Sai、Spiked Gauntlets、Tanx's Whistle、Throwing Axe、Tri-Boomerang、War Hammer
+- **Vakuu**（10）：Blood-Soaked Rose、Choices Paradox、Distinguished Cape、Fiddle、Jeweled Mask、Lord's Parasol、Music Box、Preserved Fog、Sere Talon、Whispering Earring
+- **Darv**（12）：Astrolabe、Black Star、Calling Bell、Dusty Tome、Ectoplasm、Empty Cage、Pandora's Box、Philosopher's Stone、Runic Pyramid、Snecko Eye、Sozu、Velvet Choker
+
+### 特殊（还差 1 / 共 1）
+
+- Circlet
