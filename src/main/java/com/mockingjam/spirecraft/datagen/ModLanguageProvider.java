@@ -67,7 +67,7 @@ public final class ModLanguageProvider {
                 { ModBlocks.CHISELED_RUIN_STONE_BRICKS, "Chiseled Ruin Stone Bricks", "雕纹遗迹石砖" },
                 { ModBlocks.PAVING_STONES, "Paving Stones", "铺路石" }, { ModBlocks.JUNK_BLOCK, "Junk Block", "垃圾块" },
                 { ModBlocks.HIVE_MYCELIUM_LAYER, "Mycelium Mat", "菌丝层" }, { ModBlocks.MYCELIUM_THREAD, "Mycelium Thread", "菌丝线" },
-                { ModBlocks.BUG_CARCASS, "Bug Carcass", "虫尸" }, { ModBlocks.BYRDONIS_EGG, "Byrdonis Egg", "异鸟蛋" }, { ModBlocks.GLOWVINE, "Glowvine", "萤光藤" },
+                { ModBlocks.BUG_CARCASS, "Bug Carcass", "虫尸" }, { ModBlocks.BYRDONIS_EGG, "Byrdonis Egg", "多尼斯异鸟蛋" }, { ModBlocks.GLOWVINE, "Glowvine", "萤光藤" },
                 { ModBlocks.GLOWVINE_PLANT, "Glowvine Plant", "萤光藤植株" }, { ModBlocks.FOGCAP, "Fogcap", "雾菇" },
                 { ModBlocks.FOGCAP_BLOCK, "Fogcap Block", "雾菇方块" }, { ModBlocks.SPIRE_FERN, "Spire Fern", "尖塔蕨" },
                 { ModBlocks.CRACKED_DOCK_BRICKS, "Cracked Dock Bricks", "裂纹港砖" }, { ModBlocks.DARK_SAND, "Dark Sand", "暗沙" },
@@ -77,7 +77,7 @@ public final class ModLanguageProvider {
                 { ModBlocks.CHISELED_HIVE_ROCK_BRICKS, "Chiseled Hive Rock Bricks", "錾制巢岩砖" }, { ModBlocks.SWORD_STATUE, "Statue's Sword", "雕像之剑" }, { ModBlocks.CRACKED_INK_STONE, "Cracked Ink Stone", "裂纹墨石" },
                 { ModBlocks.BARNACLES, "Barnacles", "藤壶" }, { ModBlocks.HIVE_MYCELIUM, "Hive Mycelium", "巢菌土" },
                 { ModBlocks.SLUDGE, "Sludge", "淤泥" }, { ModBlocks.HIVE_SOIL, "Hive Soil", "蜂蜡土" },
-                { ModBlocks.HIVE_EGG, "Tough Eggs", "硬壳虫卵" } };
+                { ModBlocks.HIVE_EGG, "Tough Eggs", "结实的卵" } };
         for (Object[] n : misc) block(add, n[0], (String) (zh ? n[2] : n[1]));
     }
 
@@ -492,7 +492,7 @@ public final class ModLanguageProvider {
             add("item.spirecraft.bag_of_marbles.desc", "战斗开始时：8 格内的敌对生物获得易伤（6 秒）。");
             add(ModItems.RED_MASK.get(), "红面具");
             add("item.spirecraft.red_mask.desc", "战斗开始时：8 格内的敌对生物获得虚弱（6 秒）。");
-            add(ModItems.BRONZE_SCALES.get(), "铜制鳞片");
+            add(ModItems.BRONZE_SCALES.get(), "铜质鳞片");
             add("item.spirecraft.bronze_scales.desc", "战斗开始时：+1 层荆棘（30 秒）。");
             add(ModItems.BLOOD_VIAL.get(), "小血瓶");
             add("item.spirecraft.blood_vial.desc", "战斗开始时：回复 2 点生命。");
@@ -535,9 +535,9 @@ public final class ModLanguageProvider {
             add(ModItems.PHOTON_CUT.get(), "光子切割刃");
             add("item.spirecraft.photon_cut.desc", "每次攻击有 30% 的伤害无视护甲。（光子切割）");
             add(ModItems.SCYTHE.get(), "镰刀");
-            add("item.spirecraft.scythe.desc", "每击施加 2 层灾厄并横扫周围敌人（一半伤害）。按住右键 1 秒松开：前方扇形 12 伤害并施加灾厄。（镰刀、收割）");
+            add("item.spirecraft.scythe.desc", "每击施加 2 层灾厄并横扫周围敌人（一半伤害）。按住右键 1 秒松开：前方扇形 12 伤害并施加灾厄。（巨镰、收割）");
             add(ModItems.SCOURGE.get(), "鞭子");
-            add("item.spirecraft.scourge.desc", "攻击距离 +2。每击施加 4 层灾厄。（鞭笞）");
+            add("item.spirecraft.scourge.desc", "攻击距离 +2。每击施加 4 层灾厄。（鞭打）");
             add(ModItems.FORBIDDEN_GRIMOIRE.get(), "亡灵召唤书");
             add("item.spirecraft.forbidden_grimoire.desc", "右键：消耗挽歌笛子里的 3 个灵魂，召唤一名骷髅仆从，持续 30 秒。（禁忌魔典）");
             add(ModItems.DIRGE_FLUTE.get(), "挽歌笛子");
@@ -547,13 +547,13 @@ public final class ModLanguageProvider {
             add(ModItems.POISON_FLASK.get(), "毒瓶");
             add("item.spirecraft.poison_flask.desc", "右键投掷，弹跳 3 次，每次给 3 格内的敌对生物 3 层中毒。（弹跳药瓶）");
             add(ModItems.POISONED_DAGGER.get(), "带毒匕首");
-            add("item.spirecraft.poisoned_dagger.desc", "每击施加 2 层中毒。（淬毒刺击）");
+            add("item.spirecraft.poisoned_dagger.desc", "每击施加 2 层中毒。（带毒刺击）");
             add(ModItems.INK_DAGGER.get(), "带墨匕首");
             add("item.spirecraft.ink_dagger.desc", "命中使目标虚弱 2 秒。右键：甩出 2 把墨迹飞刀（3 伤害、失明、虚弱）。（墨之刃）");
             add(ModItems.THROWING_KNIFE.get(), "飞刀");
-            add("item.spirecraft.throwing_knife.desc", "右键投出，4 伤害。命中后消耗，否则落在原地可捡回。（飞刀投掷）");
+            add("item.spirecraft.throwing_knife.desc", "右键投出，4 伤害。命中后消耗，否则落在原地可捡回。（投掷匕首）");
             add(ModItems.SLINGSHOT.get(), "精密瞄准弹弓");
-            add("item.spirecraft.slingshot.desc", "按住蓄力松开发射（最高 6 伤害，对虚弱目标 ×1.5）。弹药（优先副手）：石子；火焰弹（点燃）；雪球（减速，伤害减半，对烈焰人 ×3）；黏液球（击退并减速）；铁粒（伤害 +1/3）。（精准瞄准）");
+            add("item.spirecraft.slingshot.desc", "按住蓄力松开发射（最高 6 伤害，对虚弱目标 ×1.5）。弹药（优先副手）：石子；火焰弹（点燃）；雪球（减速，伤害减半，对烈焰人 ×3）；黏液球（击退并减速）；铁粒（伤害 +1/3）。（精密瞄准）");
             add(ModItems.SNAKEBITE.get(), "蛇形刀");
             add("item.spirecraft.snakebite.desc", "轻快趁手的匕首，没有特殊效果。（蛇咬）");
             add(ModItems.CLEAVER.get(), "刀");
@@ -563,17 +563,17 @@ public final class ModLanguageProvider {
             add(ModItems.INFERNAL_BLADE.get(), "地狱之刃");
             add("item.spirecraft.infernal_blade.desc", "命中点燃目标 4 秒。右键：5 秒内下一击 ×1.5 伤害并燃烧更久。（地狱之刃）");
             add(ModItems.TANK_SHIELD.get(), "肉盾");
-            add("item.spirecraft.tank_shield.desc", "盾牌。举盾时，8 格内的队友、驯服生物和村民受到的伤害减半。（坦克）");
+            add("item.spirecraft.tank_shield.desc", "盾牌。举盾时，8 格内的队友、驯服生物和村民受到的伤害减半。（肉盾）");
             add(ModItems.BLOODLETTING_DAGGER.get(), "带血匕首");
             add("item.spirecraft.bloodletting_dagger.desc", "右键：失去 3 点生命，获得急迫 I 和 1 层力量，持续 15 秒。（放血）");
             add(ModItems.BLUDGEON.get(), "重锤");
-            add("item.spirecraft.bludgeon.desc", "极慢极重，满蓄力一击 ×1.5 伤害。能破盾。（重击）");
+            add("item.spirecraft.bludgeon.desc", "极慢极重，满蓄力一击 ×1.5 伤害。能破盾。（重锤）");
             add(ModItems.ROCKET_PUNCH.get(), "火箭飞拳发射器");
             add("item.spirecraft.rocket_punch.desc", "右键：发射飞拳（8 伤害，强击退）。每次受伤冷却缩短 1 秒。（火箭飞拳）");
             add(ModItems.ENERGY_CORE.get(), "能量核心");
             add("item.spirecraft.energy_core.desc", "右键：生成闪电球；潜行右键：生成冰霜球。身上每带一个能量核心多一个球栏位；栏位满时再生成会先激发最早的球。激发键（R）：激发最早的球。（破损核心）");
             add(ModItems.FLAK_CANNON.get(), "散射炮");
-            add("item.spirecraft.flak_cannon.desc", "右键：发射 5 枚铁弹（各 2 伤害），每个充能球 +1 枚。每次消耗 1 发霰弹。（高射炮）");
+            add("item.spirecraft.flak_cannon.desc", "右键：发射 5 枚铁弹（各 2 伤害），每个充能球 +1 枚。每次消耗 1 发霰弹。（散射炮）");
             add(ModItems.TESLA_COIL.get(), "特斯拉线圈");
             add("item.spirecraft.tesla_coil.desc", "右键：闪电在 3 个敌对生物间跳跃（每个闪电球 +1 跳），各 3 伤害。（特斯拉线圈）");
             add(ModItems.SHADOW_SHIELD.get(), "暗影之盾投射器");
@@ -628,68 +628,68 @@ public final class ModLanguageProvider {
             add("entity.spirecraft.spire_bolt", "弹丸");
             add("entity.spirecraft.poison_flask", "毒瓶");
             add("entity.spirecraft.flak_pellet", "铁弹");
-            add("entity.spirecraft.leaf_slime", "叶史莱姆");
-            add(ModItems.LEAF_SLIME_SPAWN_EGG.get(), "叶史莱姆刷怪蛋");
-            add("entity.spirecraft.twig_slime", "枝史莱姆");
-            add(ModItems.TWIG_SLIME_SPAWN_EGG.get(), "枝史莱姆刷怪蛋");
+            add("entity.spirecraft.leaf_slime", "树叶史莱姆");
+            add(ModItems.LEAF_SLIME_SPAWN_EGG.get(), "树叶史莱姆刷怪蛋");
+            add("entity.spirecraft.twig_slime", "树枝史莱姆");
+            add(ModItems.TWIG_SLIME_SPAWN_EGG.get(), "树枝史莱姆刷怪蛋");
             add("entity.spirecraft.fuzzy_wurm_crawler", "毛绒伏地虫");
             add(ModItems.FUZZY_WURM_CRAWLER_SPAWN_EGG.get(), "毛绒伏地虫刷怪蛋");
-            add("entity.spirecraft.flyconid", "飞菇人");
-            add(ModItems.FLYCONID_SPAWN_EGG.get(), "飞菇人刷怪蛋");
-            add("entity.spirecraft.nibbit", "尼比特");
-            add(ModItems.NIBBIT_SPAWN_EGG.get(), "尼比特刷怪蛋");
+            add("entity.spirecraft.flyconid", "飞蝇菌子");
+            add(ModItems.FLYCONID_SPAWN_EGG.get(), "飞蝇菌子刷怪蛋");
+            add("entity.spirecraft.nibbit", "小啃兽");
+            add(ModItems.NIBBIT_SPAWN_EGG.get(), "小啃兽刷怪蛋");
             add("entity.spirecraft.shrinker_beetle", "缩小甲虫");
             add(ModItems.SHRINKER_BEETLE_SPAWN_EGG.get(), "缩小甲虫刷怪蛋");
-            add("entity.spirecraft.byrdonis", "伯多尼斯");
-            add(ModItems.BYRDONIS_SPAWN_EGG.get(), "伯多尼斯刷怪蛋");
+            add("entity.spirecraft.byrdonis", "多尼斯异鸟");
+            add(ModItems.BYRDONIS_SPAWN_EGG.get(), "多尼斯异鸟刷怪蛋");
             add("entity.spirecraft.ceremonial_beast", "仪式兽");
             add(ModItems.CEREMONIAL_BEAST_SPAWN_EGG.get(), "仪式兽刷怪蛋");
             add("entity.spirecraft.osty", "奥斯提");
             add(ModItems.OSTY_SPAWN_EGG.get(), "奥斯提刷怪蛋");
             add("effect.spirecraft.shrink", "缩小");
             add(ModItems.ROCKET_FIST.get(), "火箭拳头");
-            add("effect.spirecraft.ringing", "回响");
+            add("effect.spirecraft.ringing", "昏眩");
             add(ModItems.CEREMONIAL_BELL.get(), "仪式之铃");
             add("item.spirecraft.ceremonial_bell.desc", "在密林或雾菇谷中敲响，召唤仪式兽。");
             add("item.spirecraft.ceremonial_bell.wrong_place", "这里没有东西回应钟声。请在密林或雾菇谷中敲响。");
-            add("entity.spirecraft.corpse_slug", "尸蛞蝓");
-            add(ModItems.CORPSE_SLUG_SPAWN_EGG.get(), "尸蛞蝓刷怪蛋");
-            add("entity.spirecraft.toadpole", "蝌蚪蛙");
-            add(ModItems.TOADPOLE_SPAWN_EGG.get(), "蝌蚪蛙刷怪蛋");
+            add("entity.spirecraft.corpse_slug", "噬尸蛞蝓");
+            add(ModItems.CORPSE_SLUG_SPAWN_EGG.get(), "噬尸蛞蝓刷怪蛋");
+            add("entity.spirecraft.toadpole", "蟾蜍蝌蚪");
+            add(ModItems.TOADPOLE_SPAWN_EGG.get(), "蟾蜍蝌蚪刷怪蛋");
             add("entity.spirecraft.two_tailed_rat", "双尾鼠");
             add(ModItems.TWO_TAILED_RAT_SPAWN_EGG.get(), "双尾鼠刷怪蛋");
-            add("entity.spirecraft.seapunk", "海朋克");
-            add(ModItems.SEAPUNK_SPAWN_EGG.get(), "海朋克刷怪蛋");
-            add("entity.spirecraft.terror_eel", "恐怖鳗鱼");
-            add(ModItems.TERROR_EEL_SPAWN_EGG.get(), "恐怖鳗鱼刷怪蛋");
-            add("entity.spirecraft.soul_fysh", "灵魂鱼");
+            add("entity.spirecraft.seapunk", "海洋混混");
+            add(ModItems.SEAPUNK_SPAWN_EGG.get(), "海洋混混刷怪蛋");
+            add("entity.spirecraft.terror_eel", "骇鳗");
+            add(ModItems.TERROR_EEL_SPAWN_EGG.get(), "骇鳗刷怪蛋");
+            add("entity.spirecraft.soul_fysh", "灵魂异鱼");
             add("entity.spirecraft.merchant", "商人");
             add("spirecraft.merchant.purge_hint", "潜行 + 右键，让商人解除一个诅咒（%s 绿宝石，每次来访一次）");
             add("spirecraft.merchant.purged", "商人解除了%s");
             add("spirecraft.merchant.purge_used", "商人这次已经解除过诅咒了");
             add("spirecraft.merchant.purge_poor", "解除诅咒需要 %s 绿宝石");
-            add(ModItems.SOUL_FYSH_SPAWN_EGG.get(), "灵魂鱼刷怪蛋");
+            add(ModItems.SOUL_FYSH_SPAWN_EGG.get(), "灵魂异鱼刷怪蛋");
             add(ModItems.BECKONING_SOUL.get(), "招引之魂");
-            add("item.spirecraft.beckoning_soul.desc", "带在身上会不断损失生命。右键驱散（消耗 3 点饥饿值）；丢掉也会回来。（招引）");
+            add("item.spirecraft.beckoning_soul.desc", "带在身上会不断损失生命。右键驱散（消耗 3 点饥饿值）；丢掉也会回来。（呼唤）");
             add("item.spirecraft.beckoning_soul.hungry", "你太饿了，无法驱散它。");
-            add(ModItems.SOUL_BAIT.get(), "灵魂鱼饵");
-            add("item.spirecraft.soul_bait.desc", "在污染海域的水边使用，召唤灵魂鱼。");
+            add(ModItems.SOUL_BAIT.get(), "灵魂异鱼饵");
+            add("item.spirecraft.soul_bait.desc", "在污染海域的水边使用，召唤灵魂异鱼。");
             add("item.spirecraft.soul_bait.wrong_place", "没有动静。请在污染海域使用鱼饵。");
             // batch 3: 巢穴
             add(ModItems.BLACK_QUILL.get(), "乌羽笔");
-            add("item.spirecraft.black_quill.desc", "在密林或墨泉洞穴中使用，召唤墨魇。");
+            add("item.spirecraft.black_quill.desc", "在密林或墨泉洞穴中使用，召唤墨影幻灵。");
             add("item.spirecraft.black_quill.wrong_place", "这里的墨不会回应。请去密林或墨泉洞穴。");
             add(ModItems.KIN_IDOL.get(), "同族神像");
-            add("item.spirecraft.kin_idol.desc", "在密林中举起，召来同族祭司和他的信徒。");
+            add("item.spirecraft.kin_idol.desc", "在密林中举起，召来同族神官和他的信徒。");
             add("item.spirecraft.kin_idol.wrong_place", "这里没有同族听见。请在密林中举起神像。");
             add(ModItems.STEAM_WHISTLE.get(), "蒸汽汽笛");
-            add("item.spirecraft.steam_whistle.desc", "在瀑布或暗港边吹响，唤醒瀑布巨人。");
+            add("item.spirecraft.steam_whistle.desc", "在瀑布或暗港边吹响，唤醒瀑布巨兽。");
             add("item.spirecraft.steam_whistle.wrong_place", "没有动静。请在瀑布或暗港边吹响。");
             add(ModItems.SLUMBER_HORN.get(), "安眠号角");
-            add("item.spirecraft.slumber_horn.desc", "在暗港岸边吹响，唤醒拉格夫林女族长（她醒得很慢）。");
+            add("item.spirecraft.slumber_horn.desc", "在暗港岸边吹响，唤醒乐加维林族母（她醒得很慢）。");
             add("item.spirecraft.slumber_horn.wrong_place", "没有回应。请在暗港或污染海域吹响。");
             add(ModItems.SAND_LURE.get(), "流沙诱饵");
-            add("item.spirecraft.sand_lure.desc", "扔进流沙洞穴，引出贪食者。");
+            add("item.spirecraft.sand_lure.desc", "扔进流沙洞穴，引出无厌沙虫。");
             add("item.spirecraft.sand_lure.wrong_place", "流沙一动不动。请在流沙洞穴里使用。");
             add("item.spirecraft.boss_summon.busy", "它已经在附近了。");
             add(ModItems.RELIC_FRAGMENT.get(), "遗物残片");
@@ -698,8 +698,8 @@ public final class ModLanguageProvider {
                 add("entity.spirecraft." + d.name, d.zh);
                 add(ModItems.SCRIPTED_EGGS.get(d.name).get(), d.zh + "刷怪蛋");
             }
-            add("entity.spirecraft.bowlbug_rock", "盛碗虫（岩）");
-            add(ModItems.BOWLBUG_ROCK_SPAWN_EGG.get(), "盛碗虫（岩）刷怪蛋");
+            add("entity.spirecraft.bowlbug_rock", "盛碗虫（石）");
+            add(ModItems.BOWLBUG_ROCK_SPAWN_EGG.get(), "盛碗虫（石）刷怪蛋");
             add("entity.spirecraft.bowlbug_egg", "盛碗虫（卵）");
             add(ModItems.BOWLBUG_EGG_SPAWN_EGG.get(), "盛碗虫（卵）刷怪蛋");
             add("entity.spirecraft.bowlbug_silk", "盛碗虫（丝）");
@@ -708,12 +708,12 @@ public final class ModLanguageProvider {
             add(ModItems.BOWLBUG_NECTAR_SPAWN_EGG.get(), "盛碗虫（蜜）刷怪蛋");
             add("entity.spirecraft.exoskeleton", "外骨骼虫");
             add(ModItems.EXOSKELETON_SPAWN_EGG.get(), "外骨骼虫刷怪蛋");
-            add("entity.spirecraft.chomper", "咬咬机");
-            add(ModItems.CHOMPER_SPAWN_EGG.get(), "咬咬机刷怪蛋");
-            add("entity.spirecraft.myte", "螨");
-            add(ModItems.MYTE_SPAWN_EGG.get(), "螨刷怪蛋");
-            add("entity.spirecraft.entomancer", "驭虫师");
-            add(ModItems.ENTOMANCER_SPAWN_EGG.get(), "驭虫师刷怪蛋");
+            add("entity.spirecraft.chomper", "啃咬机");
+            add(ModItems.CHOMPER_SPAWN_EGG.get(), "啃咬机刷怪蛋");
+            add("entity.spirecraft.myte", "异螨");
+            add(ModItems.MYTE_SPAWN_EGG.get(), "异螨刷怪蛋");
+            add("entity.spirecraft.entomancer", "蜂群术士");
+            add(ModItems.ENTOMANCER_SPAWN_EGG.get(), "蜂群术士刷怪蛋");
             add("entity.spirecraft.kaiser_crab", "帝王蟹");
             add(ModItems.KAISER_CRAB_SPAWN_EGG.get(), "帝王蟹刷怪蛋");
             add("entity.spirecraft.knowledge_demon", "知识恶魔");
@@ -721,10 +721,10 @@ public final class ModLanguageProvider {
             add("entity.spirecraft.kaiser_crab.crusher", "帝王蟹·碾压者");
             add("entity.spirecraft.kaiser_crab.rocket", "帝王蟹·火箭");
             add("entity.spirecraft.knowledge_demon.curse", "知识诅咒！站着：%s  |  潜行：%s");
-            add("effect.spirecraft.disintegration", "崩解");
+            add("effect.spirecraft.disintegration", "瓦解");
             add("block.spirecraft.bug_carcass.no_demon", "知识恶魔已经在这里了。");
             add("item.spirecraft.soul_bait.no_water", "请面向开阔的水面抛出鱼饵。");
-            add(ModItems.SOUL_FYSH_BLADDER.get(), "灵魂鱼鳔");
+            add(ModItems.SOUL_FYSH_BLADDER.get(), "灵魂异鱼鳔");
 
             add(ModBlocks.WOLFRAMITE_ORE.get(), "黑钨矿石");
             add(ModBlocks.DEEPSLATE_WOLFRAMITE_ORE.get(), "深层黑钨矿石");
@@ -763,7 +763,7 @@ public final class ModLanguageProvider {
             add(ModItems.LAVA_ROCK.get(), "熔岩石");
             add(ModItems.GALACTIC_DUST.get(), "星系尘埃");
             add(ModItems.STRAWBERRY.get(), "草莓");
-            add(ModItems.PEAR.get(), "梨");
+            add(ModItems.PEAR.get(), "梨子");
             add(ModItems.MANGO.get(), "芒果");
             add(ModItems.MEAT_ON_THE_BONE.get(), "带骨肉");
             add(ModItems.AMETHYST_AUBERGINE.get(), "紫水晶茄子");
@@ -774,18 +774,18 @@ public final class ModLanguageProvider {
             add("item.minecraft.splash_potion.effect.spirecraft_strength", "喷溅型力量药水");
             add("item.minecraft.lingering_potion.effect.spirecraft_strength", "滞留型力量药水");
             add("item.minecraft.tipped_arrow.effect.spirecraft_strength", "力量药水之箭");
-            add("item.minecraft.potion.effect.spirecraft_flex", "爆发药水");
-            add("item.minecraft.splash_potion.effect.spirecraft_flex", "喷溅型爆发药水");
-            add("item.minecraft.lingering_potion.effect.spirecraft_flex", "滞留型爆发药水");
-            add("item.minecraft.tipped_arrow.effect.spirecraft_flex", "爆发药水之箭");
+            add("item.minecraft.potion.effect.spirecraft_flex", "肌肉药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_flex", "喷溅型肌肉药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_flex", "滞留型肌肉药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_flex", "肌肉药水之箭");
             add("item.minecraft.potion.effect.spirecraft_dexterity", "敏捷药水");
             add("item.minecraft.splash_potion.effect.spirecraft_dexterity", "喷溅型敏捷药水");
             add("item.minecraft.lingering_potion.effect.spirecraft_dexterity", "滞留型敏捷药水");
             add("item.minecraft.tipped_arrow.effect.spirecraft_dexterity", "敏捷药水之箭");
-            add("item.minecraft.potion.effect.spirecraft_fysh_oil", "鱼油");
-            add("item.minecraft.splash_potion.effect.spirecraft_fysh_oil", "喷溅型鱼油");
-            add("item.minecraft.lingering_potion.effect.spirecraft_fysh_oil", "滞留型鱼油");
-            add("item.minecraft.tipped_arrow.effect.spirecraft_fysh_oil", "鱼油之箭");
+            add("item.minecraft.potion.effect.spirecraft_fysh_oil", "异鱼之油");
+            add("item.minecraft.splash_potion.effect.spirecraft_fysh_oil", "喷溅型异鱼之油");
+            add("item.minecraft.lingering_potion.effect.spirecraft_fysh_oil", "滞留型异鱼之油");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_fysh_oil", "异鱼之油之箭");
             add("item.minecraft.potion.effect.spirecraft_weak", "虚弱药水");
             add("item.minecraft.splash_potion.effect.spirecraft_weak", "喷溅型虚弱药水");
             add("item.minecraft.lingering_potion.effect.spirecraft_weak", "滞留型虚弱药水");
@@ -794,10 +794,10 @@ public final class ModLanguageProvider {
             add("item.minecraft.splash_potion.effect.spirecraft_vulnerable", "喷溅型易伤药水");
             add("item.minecraft.lingering_potion.effect.spirecraft_vulnerable", "滞留型易伤药水");
             add("item.minecraft.tipped_arrow.effect.spirecraft_vulnerable", "易伤药水之箭");
-            add("item.minecraft.potion.effect.spirecraft_poison", "毒药");
-            add("item.minecraft.splash_potion.effect.spirecraft_poison", "喷溅型毒药");
-            add("item.minecraft.lingering_potion.effect.spirecraft_poison", "滞留型毒药");
-            add("item.minecraft.tipped_arrow.effect.spirecraft_poison", "毒药之箭");
+            add("item.minecraft.potion.effect.spirecraft_poison", "毒药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_poison", "喷溅型毒药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_poison", "滞留型毒药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_poison", "毒药水之箭");
             add("item.minecraft.potion.effect.spirecraft_doom", "灾厄药水");
             add("item.minecraft.splash_potion.effect.spirecraft_doom", "喷溅型灾厄药水");
             add("item.minecraft.lingering_potion.effect.spirecraft_doom", "滞留型灾厄药水");
@@ -806,10 +806,10 @@ public final class ModLanguageProvider {
             add("item.minecraft.splash_potion.effect.spirecraft_block", "喷溅型格挡药水");
             add("item.minecraft.lingering_potion.effect.spirecraft_block", "滞留型格挡药水");
             add("item.minecraft.tipped_arrow.effect.spirecraft_block", "格挡药水之箭");
-            add("item.minecraft.potion.effect.spirecraft_liquid_bronze", "液态青铜");
-            add("item.minecraft.splash_potion.effect.spirecraft_liquid_bronze", "喷溅型液态青铜");
-            add("item.minecraft.lingering_potion.effect.spirecraft_liquid_bronze", "滞留型液态青铜");
-            add("item.minecraft.tipped_arrow.effect.spirecraft_liquid_bronze", "液态青铜之箭");
+            add("item.minecraft.potion.effect.spirecraft_liquid_bronze", "流动铜液");
+            add("item.minecraft.splash_potion.effect.spirecraft_liquid_bronze", "喷溅型流动铜液");
+            add("item.minecraft.lingering_potion.effect.spirecraft_liquid_bronze", "滞留型流动铜液");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_liquid_bronze", "流动铜液之箭");
             add("item.minecraft.potion.effect.spirecraft_lucky_tonic", "幸运补剂");
             add("item.minecraft.splash_potion.effect.spirecraft_lucky_tonic", "喷溅型幸运补剂");
             add("item.minecraft.lingering_potion.effect.spirecraft_lucky_tonic", "滞留型幸运补剂");
@@ -818,10 +818,10 @@ public final class ModLanguageProvider {
             add("item.minecraft.splash_potion.effect.spirecraft_blood", "喷溅型鲜血药水");
             add("item.minecraft.lingering_potion.effect.spirecraft_blood", "滞留型鲜血药水");
             add("item.minecraft.tipped_arrow.effect.spirecraft_blood", "鲜血药水之箭");
-            add("item.minecraft.potion.effect.spirecraft_ghost_in_a_jar", "瓶中幽灵");
-            add("item.minecraft.splash_potion.effect.spirecraft_ghost_in_a_jar", "喷溅型瓶中幽灵");
-            add("item.minecraft.lingering_potion.effect.spirecraft_ghost_in_a_jar", "滞留型瓶中幽灵");
-            add("item.minecraft.tipped_arrow.effect.spirecraft_ghost_in_a_jar", "瓶中幽灵之箭");
+            add("item.minecraft.potion.effect.spirecraft_ghost_in_a_jar", "罐装幽灵");
+            add("item.minecraft.splash_potion.effect.spirecraft_ghost_in_a_jar", "喷溅型罐装幽灵");
+            add("item.minecraft.lingering_potion.effect.spirecraft_ghost_in_a_jar", "滞留型罐装幽灵");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_ghost_in_a_jar", "罐装幽灵之箭");
             add("itemGroup.spirecraft.consumables", "尖塔工艺：食物与药水");
             add("message.spirecraft.fruit_bonus", "%s：生命上限永久 +%s");
             add("item.spirecraft.galactic_dust.need_levels", "至少需要 %s 级经验");
