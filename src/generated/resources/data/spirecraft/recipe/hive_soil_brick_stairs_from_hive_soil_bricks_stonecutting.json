@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "spirecraft:hive_soil_bricks",
+  "result": {
+    "count": 1,
+    "id": "spirecraft:hive_soil_brick_stairs"
+  }
+}

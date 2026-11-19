@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "spirecraft:block/polluted_kelp_plant"
+  }
+}

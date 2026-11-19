@@ -1,0 +1,15 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/man_sized_holes",
+  "step": "underground_decoration",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:hive/holes_1",
+    "spirecraft:hive/holes_2"
+  ],
+  "mode": "cave_floor",
+  "sink": 9,
+  "min_y": -50,
+  "max_y": 40
+}

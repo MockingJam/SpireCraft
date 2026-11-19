@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "spirecraft:block/dock_bricks",
+    "side": "spirecraft:block/dock_bricks",
+    "top": "spirecraft:block/dock_bricks"
+  }
+}

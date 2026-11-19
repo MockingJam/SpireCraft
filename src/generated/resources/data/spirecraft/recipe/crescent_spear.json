@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": "minecraft:amethyst_shard",
+    "G": "minecraft:gold_ingot",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "  G",
+    " A ",
+    "S  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:crescent_spear"
+  }
+}

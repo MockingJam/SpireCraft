@@ -1,0 +1,139 @@
+{
+ "parent": "minecraft:block/block",
+ "textures": {
+  "blade": "minecraft:block/iron_block",
+  "guard": "minecraft:block/gold_block",
+  "grip": "minecraft:block/stripped_dark_oak_log",
+  "particle": "minecraft:block/iron_block"
+ },
+ "elements": [
+  {
+   "from": [
+    7,
+    1,
+    7.5
+   ],
+   "to": [
+    9,
+    11,
+    8.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#blade"
+    },
+    "south": {
+     "texture": "#blade"
+    },
+    "east": {
+     "texture": "#blade"
+    },
+    "west": {
+     "texture": "#blade"
+    },
+    "up": {
+     "texture": "#blade"
+    },
+    "down": {
+     "texture": "#blade"
+    }
+   }
+  },
+  {
+   "from": [
+    7.5,
+    0,
+    7.6
+   ],
+   "to": [
+    8.5,
+    1,
+    8.4
+   ],
+   "faces": {
+    "north": {
+     "texture": "#blade"
+    },
+    "south": {
+     "texture": "#blade"
+    },
+    "east": {
+     "texture": "#blade"
+    },
+    "west": {
+     "texture": "#blade"
+    },
+    "up": {
+     "texture": "#blade"
+    },
+    "down": {
+     "texture": "#blade"
+    }
+   }
+  },
+  {
+   "from": [
+    4,
+    11,
+    7
+   ],
+   "to": [
+    12,
+    12.5,
+    9
+   ],
+   "faces": {
+    "north": {
+     "texture": "#guard"
+    },
+    "south": {
+     "texture": "#guard"
+    },
+    "east": {
+     "texture": "#guard"
+    },
+    "west": {
+     "texture": "#guard"
+    },
+    "up": {
+     "texture": "#guard"
+    },
+    "down": {
+     "texture": "#guard"
+    }
+   }
+  },
+  {
+   "from": [
+    7.5,
+    12.5,
+    7.5
+   ],
+   "to": [
+    8.5,
+    16,
+    8.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grip"
+    },
+    "south": {
+     "texture": "#grip"
+    },
+    "east": {
+     "texture": "#grip"
+    },
+    "west": {
+     "texture": "#grip"
+    },
+    "up": {
+     "texture": "#grip"
+    },
+    "down": {
+     "texture": "#grip"
+    }
+   }
+  }
+ ]
+}

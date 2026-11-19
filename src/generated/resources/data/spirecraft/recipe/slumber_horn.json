@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:nautilus_shell",
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:soul_sand"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:slumber_horn"
+  }
+}

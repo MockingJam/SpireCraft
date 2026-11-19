@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "spirecraft:item/skulking_colony_spawn_egg"
+  }
+}

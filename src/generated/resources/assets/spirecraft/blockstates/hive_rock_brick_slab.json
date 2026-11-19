@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "spirecraft:block/hive_rock_brick_slab"
+    },
+    "type=double": {
+      "model": "spirecraft:block/hive_rock_bricks"
+    },
+    "type=top": {
+      "model": "spirecraft:block/hive_rock_brick_slab_top"
+    }
+  }
+}

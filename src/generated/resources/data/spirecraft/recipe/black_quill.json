@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:feather",
+    "minecraft:ink_sac",
+    "minecraft:ink_sac",
+    "spirecraft:ink_bubble",
+    "minecraft:gold_nugget"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:black_quill"
+  }
+}

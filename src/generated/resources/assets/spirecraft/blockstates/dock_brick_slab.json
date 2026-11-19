@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "spirecraft:block/dock_brick_slab"
+    },
+    "type=double": {
+      "model": "spirecraft:block/dock_bricks"
+    },
+    "type=top": {
+      "model": "spirecraft:block/dock_brick_slab_top"
+    }
+  }
+}

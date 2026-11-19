@@ -1,0 +1,8 @@
+{
+ "__comment": "v3.5: a mat of fungal threads on one face, like glow lichen",
+ "parent": "minecraft:block/glow_lichen",
+ "textures": {
+  "particle": "spirecraft:block/hive_mycelium_layer",
+  "glow_lichen": "spirecraft:block/hive_mycelium_layer"
+ }
+}

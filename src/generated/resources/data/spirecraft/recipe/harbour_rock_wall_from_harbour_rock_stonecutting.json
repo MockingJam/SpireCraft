@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "spirecraft:harbour_rock",
+  "result": {
+    "count": 1,
+    "id": "spirecraft:harbour_rock_wall"
+  }
+}

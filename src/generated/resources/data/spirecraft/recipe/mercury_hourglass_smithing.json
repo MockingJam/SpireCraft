@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:quartz",
+  "base": "minecraft:clock",
+  "result": {
+    "id": "spirecraft:mercury_hourglass"
+  },
+  "template": "spirecraft:relic_fragment"
+}

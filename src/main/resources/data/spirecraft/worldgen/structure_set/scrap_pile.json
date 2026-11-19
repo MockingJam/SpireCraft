@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "spirecraft:scrap_pile",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 8,
+    "separation": 3,
+    "salt": 935727143
+  }
+}

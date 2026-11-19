@@ -1,0 +1,8 @@
+{
+  "__comment": "Barnacles layer (v2.8): a thin plane on one face, like vanilla glow lichen; the blockstate (datagen) turns it to each face.",
+  "parent": "minecraft:block/glow_lichen",
+  "textures": {
+    "particle": "spirecraft:block/barnacles",
+    "glow_lichen": "spirecraft:block/barnacles"
+  }
+}

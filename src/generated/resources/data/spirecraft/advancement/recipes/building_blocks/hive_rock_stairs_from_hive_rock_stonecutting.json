@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_hive_rock": {
+      "conditions": {
+        "items": [
+          {
+            "items": "spirecraft:hive_rock"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "spirecraft:hive_rock_stairs_from_hive_rock_stonecutting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_hive_rock"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "spirecraft:hive_rock_stairs_from_hive_rock_stonecutting"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "spirecraft:dock_bricks",
+  "result": {
+    "count": 1,
+    "id": "spirecraft:dock_brick_wall"
+  }
+}

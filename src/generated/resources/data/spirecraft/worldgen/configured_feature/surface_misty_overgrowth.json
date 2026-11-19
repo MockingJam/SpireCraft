@@ -1,0 +1,51 @@
+{
+  "type": "spirecraft:biome_surface",
+  "config": {
+    "biome": "spirecraft:misty_overgrowth",
+    "depth": 0,
+    "top": {
+      "type": "minecraft:noise_threshold_provider",
+      "default_state": {
+        "Name": "minecraft:grass_block",
+        "Properties": {
+          "snowy": "false"
+        }
+      },
+      "high_chance": 1.0,
+      "high_states": [
+        {
+          "Name": "minecraft:moss_block"
+        },
+        {
+          "Name": "minecraft:podzol",
+          "Properties": {
+            "snowy": "false"
+          }
+        }
+      ],
+      "low_states": [
+        {
+          "Name": "minecraft:grass_block",
+          "Properties": {
+            "snowy": "false"
+          }
+        }
+      ],
+      "noise": {
+        "amplitudes": [
+          1.0
+        ],
+        "firstOctave": 0
+      },
+      "scale": 0.035,
+      "seed": 102,
+      "threshold": 0.05
+    },
+    "under": {
+      "type": "minecraft:simple_state_provider",
+      "state": {
+        "Name": "minecraft:dirt"
+      }
+    }
+  }
+}

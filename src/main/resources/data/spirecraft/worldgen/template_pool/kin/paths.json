@@ -1,0 +1,41 @@
+{
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 2,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "spirecraft:kin/path_1",
+        "projection": "terrain_matching",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "spirecraft:kin/path_2",
+        "projection": "terrain_matching",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "spirecraft:kin/path_3",
+        "projection": "terrain_matching",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 3,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "spirecraft:kin/path_4",
+        "projection": "terrain_matching",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}

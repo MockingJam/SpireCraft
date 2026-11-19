@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "spirecraft:block/rotten_slab"
+    },
+    "type=double": {
+      "model": "spirecraft:block/rotten_planks"
+    },
+    "type=top": {
+      "model": "spirecraft:block/rotten_slab_top"
+    }
+  }
+}

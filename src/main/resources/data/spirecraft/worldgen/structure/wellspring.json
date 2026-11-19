@@ -1,0 +1,15 @@
+{
+  "type": "spirecraft:dry_jigsaw",
+  "biomes": "#spirecraft:has_structure/wellspring",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_box",
+  "start_pool": "spirecraft:wellspring/start",
+  "size": 1,
+  "start_height": {
+    "absolute": -1
+  },
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "max_distance_from_center": 48,
+  "use_expansion_hack": false
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "spirecraft:block/ink_stained_stone_slab"
+    },
+    "type=double": {
+      "model": "spirecraft:block/ink_stained_stone"
+    },
+    "type=top": {
+      "model": "spirecraft:block/ink_stained_stone_slab_top"
+    }
+  }
+}

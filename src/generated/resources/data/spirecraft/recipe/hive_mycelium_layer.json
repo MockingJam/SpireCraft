@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "M": "spirecraft:hive_mycelium"
+  },
+  "pattern": [
+    "MM"
+  ],
+  "result": {
+    "count": 3,
+    "id": "spirecraft:hive_mycelium_layer"
+  }
+}

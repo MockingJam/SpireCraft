@@ -1,0 +1,10 @@
+{
+  "type": "spirecraft:carved",
+  "biomes": "#spirecraft:has_structure/web_nest",
+  "step": "underground_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "kind": "web_nest",
+  "min_y": -40,
+  "max_y": 30
+}

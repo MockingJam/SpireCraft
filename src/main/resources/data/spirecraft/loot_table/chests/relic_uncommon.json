@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:pen_nib",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:mercury_hourglass",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

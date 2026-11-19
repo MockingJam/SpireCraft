@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "spirecraft:block/bug_carcass",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "spirecraft:block/bug_carcass"
+    },
+    "facing=south": {
+      "model": "spirecraft:block/bug_carcass",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "spirecraft:block/bug_carcass",
+      "y": 270
+    }
+  }
+}

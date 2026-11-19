@@ -1,0 +1,46 @@
+{
+  "type": "spirecraft:biome_surface",
+  "config": {
+    "biome": "spirecraft:beach_docks",
+    "depth": 5,
+    "rock": true,
+    "top": {
+      "type": "minecraft:noise_threshold_provider",
+      "default_state": {
+        "Name": "minecraft:mud"
+      },
+      "high_chance": 0.95,
+      "high_states": [
+        {
+          "Name": "spirecraft:dark_sand"
+        },
+        {
+          "Name": "spirecraft:dark_sand"
+        },
+        {
+          "Name": "spirecraft:sludge"
+        }
+      ],
+      "low_states": [
+        {
+          "Name": "minecraft:mud"
+        }
+      ],
+      "noise": {
+        "amplitudes": [
+          1.0
+        ],
+        "firstOctave": 0
+      },
+      "scale": 0.04,
+      "seed": 104,
+      "threshold": -0.2
+    },
+    "under": {
+      "type": "minecraft:simple_state_provider",
+      "state": {
+        "Name": "minecraft:mud"
+      }
+    }
+  }
+}

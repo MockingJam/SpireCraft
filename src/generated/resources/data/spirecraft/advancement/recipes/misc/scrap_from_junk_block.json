@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_junk_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "spirecraft:junk_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "spirecraft:scrap_from_junk_block"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_junk_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "spirecraft:scrap_from_junk_block"
+    ]
+  }
+}

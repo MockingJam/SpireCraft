@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "G": "minecraft:glowstone_dust",
+    "I": "minecraft:iron_ingot",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "  I",
+    " G ",
+    "S  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:photon_cut"
+  }
+}

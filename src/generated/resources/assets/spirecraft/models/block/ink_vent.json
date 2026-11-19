@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "spirecraft:block/ink_vent_top",
+    "side": "spirecraft:block/ink_stained_stone"
+  }
+}

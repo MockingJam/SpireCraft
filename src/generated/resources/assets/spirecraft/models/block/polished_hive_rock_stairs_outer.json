@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "spirecraft:block/polished_hive_rock",
+    "side": "spirecraft:block/polished_hive_rock",
+    "top": "spirecraft:block/polished_hive_rock"
+  }
+}

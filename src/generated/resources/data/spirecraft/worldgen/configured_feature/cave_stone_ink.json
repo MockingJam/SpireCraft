@@ -1,0 +1,7 @@
+{
+  "type": "spirecraft:cave_stone",
+  "config": {
+    "biome": "spirecraft:ink_spring_caves",
+    "style": 0
+  }
+}

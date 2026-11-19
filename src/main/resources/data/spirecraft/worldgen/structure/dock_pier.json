@@ -1,0 +1,14 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/dock_pier",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:dock_pier/1",
+    "spirecraft:dock_pier/2",
+    "spirecraft:dock_pier/3"
+  ],
+  "mode": "shore",
+  "sink": 14
+}

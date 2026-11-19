@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": "spirecraft:automaton_alloy_ingot",
+    "C": "spirecraft:core_crystal_block"
+  },
+  "pattern": [
+    " A ",
+    "ACA",
+    " A "
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:energy_core"
+  }
+}

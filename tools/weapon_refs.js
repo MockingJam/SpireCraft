@@ -1,0 +1,37 @@
+// Crop boxes of every weapon in the user's reference sheets (docs/design/weapons.md, v2 roster), in source pixels.
+// Sheets live in art/refs/ (converted from webp). Round 1: 3 = Royal Armaments, 4 = Necrobinder, 5 = Silent, 6 = Ironclad,
+// 7 = Defect. Round 2 (user revisions): 9 = Royal, 10 = Necrobinder, 11 = Silent (pixel art on black, bg: 'dark'),
+// 12 = Ironclad (8 = Defect, unchanged). Kept from round 1 at the user's request: slingshot, grimoire, shield, bludgeon,
+// fan, bloodletting dagger, morning star, infernal blade.
+// axis: [pommel, tip] in sheet pixels for long weapons; they are rotated so this runs at 45° (tip up-right, like vanilla).
+// size: output sprite size. 32 for every weapon (detail, per the user); 16 for the small round items (flask, core).
+module.exports = {
+  sovereign_blade:     { sheet: 9, box: [140, 110, 565, 480], size: 32, noGrey: true, patch: [[24, 3, '#91f6fa'], [23, 4, '#91f6fa'], [24, 4, '#91f6fa'], [25, 4, '#53edf9'], [26, 4, '#23e0fb'], [25, 2, '#08080a'], [26, 2, '#91f6fa'], [27, 1, '#08080a'], [18, 13, '#11a3fb'], [25, 5, '#91f6fa'], [29, 6, '#0c0c0e'], [12, 14, '#08080a'], [11, 15, '#08080a']], axis: [[160,455],[548,125]] },
+  crescent_spear:      { sheet: 9, box: [575, 20, 1030, 492], size: 32, erase: [[575, 10, 695, 108]], axis: [[587,483],[1020,30]] },
+  heirloom_hammer:     { sheet: 9, box: [1060, 75, 1480, 488], size: 32, axis: [[1075,475],[1283,250]] },
+  regent_strike:       { sheet: 9, box: [212, 585, 600, 880], size: 32, axis: [[233,608],[583,863]] },
+  photon_cut:          { sheet: 9, box: [752, 585, 1365, 845], size: 32, bg: 'glow', peel: 5, fillNotches: 2, axis: [[770,815],[1353,597]] },
+  scythe:              { sheet: 10, box: [48, 100, 538, 698], size: 32, erase: [[290, 650, 400, 705]], axis: [[497,675],[375,150]] },
+  scourge:             { sheet: 10, box: [548, 145, 1002, 528], size: 32 },
+  forbidden_grimoire:  { sheet: 4, box: [1060, 135, 1505, 505], size: 32 },
+  dirge_flute:         { sheet: 10, box: [292, 650, 585, 885], size: 32, thinOutline: true, erase: [[455, 640, 545, 700]], axis: [[308,667],[570,870]] },
+  danse_macabre:       { sheet: 4, box: [855, 610, 1220, 895], size: 32 },
+  poison_flask:        { sheet: 11, box: [122, 105, 388, 452], size: 32, bg: 'dark' },
+  poisoned_dagger:     { sheet: 11, box: [580, 105, 978, 445], size: 32, bg: 'dark', axis: [[963,120],[592,430]] },
+  ink_dagger:          { sheet: 11, box: [1055, 105, 1455, 452], size: 32, bg: 'dark', axis: [[1438,120],[1067,442]] },
+  throwing_knife:      { sheet: 11, box: [105, 597, 420, 895], size: 32, bg: 'dark', patch: [[6, 22, '#20202b'], [7, 21, '#20202b'], [6, 21, '#101117'], [7, 20, '#101117'], [11, 12, '#282629'], [12, 12, '#7c7680'], [10, 13, '#282629'], [11, 13, '#666470']], axis: [[387,625],[117,883]] },
+  slingshot:           { sheet: 5, box: [560, 585, 920, 890], size: 32 },
+  snakebite:           { sheet: 11, box: [1047, 572, 1486, 895], size: 32, bg: 'dark', axis: [[1467,592],[1067,883]] },
+  cleaver:             { sheet: 6, box: [150, 135, 555, 395], size: 32, narrow: 0.72, patch: [[18, 8, '#504a3f'], [17, 9, '#504a3f'], [18, 9, '#fae8c6'], [19, 9, '#fae8c6']], axis: [[545,150],[165,380]] },
+  morning_star:        { sheet: 6, box: [660, 80, 1035, 385], size: 32 },
+  infernal_blade:      { sheet: 6, box: [1190, 15, 1660, 440], size: 32, erase: [[1270, 400, 1620, 445]], axis: [[1645,30],[1200,430]] },
+  tank_shield:         { sheet: 6, box: [205, 485, 475, 805], size: 32 },
+  bloodletting_dagger: { sheet: 6, box: [710, 515, 1005, 795], size: 32, axis: [[990,530],[725,775]] },
+  bludgeon:            { sheet: 6, box: [1215, 505, 1605, 805], size: 32, axis: [[1590,520],[1330,700]], mirrorAxis: true },
+  rocket_punch:        { sheet: 7, box: [105, 70, 645, 335], size: 32 },
+  energy_core:         { sheet: 8, box: [760, 55, 1035, 335], size: 32, patch: [[16, 8, '#36fafb'], [17, 8, '#36fafb'], [18, 8, '#36fafb'], [19, 8, '#36fafb'], [16, 9, '#6afbfc'], [17, 9, '#36fafb'], [18, 9, '#36fafb'], [19, 9, '#36fafb'], [20, 9, '#02fdfe'], [16, 10, '#6afbfc'], [17, 10, '#36fafb'], [18, 10, '#36fafb'], [19, 10, '#02fdfe'], [20, 10, '#02fdfe'], [16, 11, '#6afbfc'], [19, 11, '#02fdfe']] },
+  flak_cannon:         { sheet: 7, box: [1200, 25, 1685, 350], size: 32 },
+  tesla_coil:          { sheet: 8, box: [170, 425, 530, 772], size: 32 },
+  shadow_shield:       { sheet: 8, box: [645, 445, 1140, 780], size: 32, contrast: 1.3 },
+  lightning_rod:       { sheet: 7, box: [1275, 410, 1655, 795], size: 32, highlight: 1.6, shade: 0.3 },
+};

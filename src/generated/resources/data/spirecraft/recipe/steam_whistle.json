@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:goat_horn",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:water_bucket"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:steam_whistle"
+  }
+}

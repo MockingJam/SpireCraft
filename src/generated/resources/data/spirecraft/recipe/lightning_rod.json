@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "L": "minecraft:lightning_rod"
+  },
+  "pattern": [
+    "GLG",
+    "GGG",
+    " G "
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:lightning_rod"
+  }
+}

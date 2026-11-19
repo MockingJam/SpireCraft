@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "spirecraft:item/chomper_spawn_egg"
+  }
+}

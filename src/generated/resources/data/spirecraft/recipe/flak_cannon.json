@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": "minecraft:crossbow",
+    "D": "minecraft:dispenser",
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "IDI",
+    "RCR",
+    " I "
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:flak_cannon"
+  }
+}

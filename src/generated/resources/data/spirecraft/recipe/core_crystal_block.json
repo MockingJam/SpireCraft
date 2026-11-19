@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:prismarine_crystals",
+    "minecraft:prismarine_crystals",
+    "minecraft:prismarine_crystals",
+    "minecraft:prismarine_crystals",
+    "minecraft:glowstone_dust",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:core_crystal_block"
+  }
+}

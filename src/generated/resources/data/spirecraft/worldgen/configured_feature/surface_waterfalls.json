@@ -1,0 +1,45 @@
+{
+  "type": "spirecraft:biome_surface",
+  "config": {
+    "biome": "spirecraft:waterfalls",
+    "depth": 0,
+    "top": {
+      "type": "minecraft:noise_threshold_provider",
+      "default_state": {
+        "Name": "minecraft:grass_block",
+        "Properties": {
+          "snowy": "false"
+        }
+      },
+      "high_chance": 0.8,
+      "high_states": [
+        {
+          "Name": "minecraft:moss_block"
+        }
+      ],
+      "low_states": [
+        {
+          "Name": "minecraft:grass_block",
+          "Properties": {
+            "snowy": "false"
+          }
+        }
+      ],
+      "noise": {
+        "amplitudes": [
+          1.0
+        ],
+        "firstOctave": 0
+      },
+      "scale": 0.09,
+      "seed": 108,
+      "threshold": 0.3
+    },
+    "under": {
+      "type": "minecraft:simple_state_provider",
+      "state": {
+        "Name": "minecraft:dirt"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:gold_ingot",
+    "minecraft:quartz"
+  ],
+  "result": {
+    "count": 3,
+    "id": "spirecraft:automaton_alloy_ingot"
+  }
+}

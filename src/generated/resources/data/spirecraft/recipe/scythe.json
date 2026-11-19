@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": "minecraft:bone_block",
+    "I": "minecraft:iron_ingot",
+    "S": "minecraft:stick",
+    "W": "minecraft:wither_rose"
+  },
+  "pattern": [
+    "III",
+    " SW",
+    "S B"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:scythe"
+  }
+}

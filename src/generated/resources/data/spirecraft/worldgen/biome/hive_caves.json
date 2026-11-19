@@ -1,0 +1,300 @@
+{
+  "carvers": [
+    "minecraft:cave",
+    "minecraft:cave_extra_underground",
+    "minecraft:canyon"
+  ],
+  "downfall": 0.4,
+  "effects": {
+    "dry_foliage_color": 9079340,
+    "fog_color": 6965792,
+    "foliage_color": 9079340,
+    "grass_color": 11575360,
+    "mood_sound": {
+      "block_search_extent": 8,
+      "offset": 2.0,
+      "sound": "minecraft:ambient.cave",
+      "tick_delay": 6000
+    },
+    "music_volume": 1.0,
+    "particle": {
+      "options": {
+        "type": "minecraft:falling_nectar"
+      },
+      "probability": 0.004
+    },
+    "sky_color": 9071152,
+    "water_color": 8030778,
+    "water_fog_color": 2763276
+  },
+  "features": [
+    [],
+    [
+      "minecraft:lake_lava_underground",
+      "minecraft:lake_lava_surface"
+    ],
+    [
+      "minecraft:amethyst_geode",
+      "spirecraft:hive_nests",
+      "spirecraft:egg_clutches"
+    ],
+    [
+      "minecraft:monster_room",
+      "minecraft:monster_room_deep"
+    ],
+    [],
+    [],
+    [
+      "minecraft:ore_dirt",
+      "minecraft:ore_gravel",
+      "minecraft:ore_granite_upper",
+      "minecraft:ore_granite_lower",
+      "minecraft:ore_diorite_upper",
+      "minecraft:ore_diorite_lower",
+      "minecraft:ore_andesite_upper",
+      "minecraft:ore_andesite_lower",
+      "minecraft:ore_tuff",
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_coal_lower",
+      "minecraft:ore_iron_upper",
+      "minecraft:ore_iron_middle",
+      "minecraft:ore_iron_small",
+      "minecraft:ore_gold",
+      "minecraft:ore_gold_lower",
+      "minecraft:ore_redstone",
+      "minecraft:ore_redstone_lower",
+      "minecraft:ore_diamond",
+      "minecraft:ore_diamond_medium",
+      "minecraft:ore_diamond_large",
+      "minecraft:ore_diamond_buried",
+      "minecraft:ore_lapis",
+      "minecraft:ore_lapis_buried",
+      "minecraft:ore_copper_large",
+      "minecraft:underwater_magma",
+      "minecraft:disk_sand",
+      "minecraft:disk_clay",
+      "minecraft:disk_gravel"
+    ],
+    [
+      "spirecraft:cave_stone_hive"
+    ],
+    [
+      "minecraft:spring_water",
+      "minecraft:spring_lava"
+    ],
+    [
+      "minecraft:glow_lichen",
+      "minecraft:brown_mushroom_normal",
+      "minecraft:red_mushroom_normal",
+      "minecraft:patch_pumpkin",
+      "spirecraft:patch_hive_egg",
+      "spirecraft:patch_hive_shroom_few"
+    ],
+    [
+      "minecraft:freeze_top_layer",
+      "spirecraft:mycelium_patches"
+    ]
+  ],
+  "has_precipitation": true,
+  "spawn_costs": {},
+  "spawners": {
+    "ambient": [
+      {
+        "type": "minecraft:bat",
+        "maxCount": 8,
+        "minCount": 8,
+        "weight": 10
+      }
+    ],
+    "axolotls": [],
+    "creature": [],
+    "misc": [],
+    "monster": [
+      {
+        "type": "minecraft:spider",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 100
+      },
+      {
+        "type": "minecraft:zombie",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 95
+      },
+      {
+        "type": "minecraft:zombie_villager",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 5
+      },
+      {
+        "type": "minecraft:skeleton",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 100
+      },
+      {
+        "type": "minecraft:creeper",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 100
+      },
+      {
+        "type": "minecraft:slime",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 100
+      },
+      {
+        "type": "minecraft:enderman",
+        "maxCount": 4,
+        "minCount": 1,
+        "weight": 10
+      },
+      {
+        "type": "minecraft:witch",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 5
+      },
+      {
+        "type": "minecraft:spider",
+        "maxCount": 4,
+        "minCount": 2,
+        "weight": 20
+      },
+      {
+        "type": "minecraft:cave_spider",
+        "maxCount": 4,
+        "minCount": 2,
+        "weight": 10
+      },
+      {
+        "type": "minecraft:silverfish",
+        "maxCount": 4,
+        "minCount": 2,
+        "weight": 10
+      },
+      {
+        "type": "spirecraft:bowlbug_rock",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 30
+      },
+      {
+        "type": "spirecraft:bowlbug_egg",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 20
+      },
+      {
+        "type": "spirecraft:bowlbug_silk",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 20
+      },
+      {
+        "type": "spirecraft:bowlbug_nectar",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 20
+      },
+      {
+        "type": "spirecraft:exoskeleton",
+        "maxCount": 4,
+        "minCount": 3,
+        "weight": 35
+      },
+      {
+        "type": "spirecraft:chomper",
+        "maxCount": 2,
+        "minCount": 2,
+        "weight": 25
+      },
+      {
+        "type": "spirecraft:myte",
+        "maxCount": 2,
+        "minCount": 2,
+        "weight": 25
+      },
+      {
+        "type": "spirecraft:entomancer",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 3
+      },
+      {
+        "type": "spirecraft:ovicopter",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 12
+      },
+      {
+        "type": "spirecraft:tunneler",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 10
+      },
+      {
+        "type": "spirecraft:thieving_hopper",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 8
+      },
+      {
+        "type": "spirecraft:hunter_killer",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 8
+      },
+      {
+        "type": "spirecraft:louse_progenitor",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 8
+      },
+      {
+        "type": "spirecraft:slumbering_beetle",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 8
+      },
+      {
+        "type": "spirecraft:spiny_toad",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 10
+      },
+      {
+        "type": "spirecraft:obscura",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 8
+      },
+      {
+        "type": "spirecraft:decimillipede",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 3
+      },
+      {
+        "type": "spirecraft:infested_prism",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 3
+      }
+    ],
+    "underground_water_creature": [
+      {
+        "type": "minecraft:glow_squid",
+        "maxCount": 6,
+        "minCount": 4,
+        "weight": 10
+      }
+    ],
+    "water_ambient": [],
+    "water_creature": []
+  },
+  "temperature": 0.8
+}

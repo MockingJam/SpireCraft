@@ -1,0 +1,208 @@
+{
+  "variants": {
+    "eggs=1,hatch=0": [
+      {
+        "model": "spirecraft:block/hive_egg"
+      },
+      {
+        "model": "spirecraft:block/hive_egg",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/hive_egg",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/hive_egg",
+        "y": 270
+      }
+    ],
+    "eggs=1,hatch=1": [
+      {
+        "model": "spirecraft:block/hive_egg"
+      },
+      {
+        "model": "spirecraft:block/hive_egg",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/hive_egg",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/hive_egg",
+        "y": 270
+      }
+    ],
+    "eggs=1,hatch=2": [
+      {
+        "model": "spirecraft:block/hive_egg"
+      },
+      {
+        "model": "spirecraft:block/hive_egg",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/hive_egg",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/hive_egg",
+        "y": 270
+      }
+    ],
+    "eggs=2,hatch=0": [
+      {
+        "model": "spirecraft:block/two_hive_eggs"
+      },
+      {
+        "model": "spirecraft:block/two_hive_eggs",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/two_hive_eggs",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/two_hive_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=2,hatch=1": [
+      {
+        "model": "spirecraft:block/two_hive_eggs"
+      },
+      {
+        "model": "spirecraft:block/two_hive_eggs",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/two_hive_eggs",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/two_hive_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=2,hatch=2": [
+      {
+        "model": "spirecraft:block/two_hive_eggs"
+      },
+      {
+        "model": "spirecraft:block/two_hive_eggs",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/two_hive_eggs",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/two_hive_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=3,hatch=0": [
+      {
+        "model": "spirecraft:block/three_hive_eggs"
+      },
+      {
+        "model": "spirecraft:block/three_hive_eggs",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/three_hive_eggs",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/three_hive_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=3,hatch=1": [
+      {
+        "model": "spirecraft:block/three_hive_eggs"
+      },
+      {
+        "model": "spirecraft:block/three_hive_eggs",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/three_hive_eggs",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/three_hive_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=3,hatch=2": [
+      {
+        "model": "spirecraft:block/three_hive_eggs"
+      },
+      {
+        "model": "spirecraft:block/three_hive_eggs",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/three_hive_eggs",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/three_hive_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=4,hatch=0": [
+      {
+        "model": "spirecraft:block/four_hive_eggs"
+      },
+      {
+        "model": "spirecraft:block/four_hive_eggs",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/four_hive_eggs",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/four_hive_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=4,hatch=1": [
+      {
+        "model": "spirecraft:block/four_hive_eggs"
+      },
+      {
+        "model": "spirecraft:block/four_hive_eggs",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/four_hive_eggs",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/four_hive_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=4,hatch=2": [
+      {
+        "model": "spirecraft:block/four_hive_eggs"
+      },
+      {
+        "model": "spirecraft:block/four_hive_eggs",
+        "y": 90
+      },
+      {
+        "model": "spirecraft:block/four_hive_eggs",
+        "y": 180
+      },
+      {
+        "model": "spirecraft:block/four_hive_eggs",
+        "y": 270
+      }
+    ]
+  }
+}

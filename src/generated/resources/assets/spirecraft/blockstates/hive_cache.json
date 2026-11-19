@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "spirecraft:block/hive_cache"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/beekeeper",
+  "step": "underground_decoration",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:hive/beekeeper_1",
+    "spirecraft:hive/beekeeper_2"
+  ],
+  "mode": "cave_floor",
+  "sink": 1,
+  "min_y": -40,
+  "max_y": 40
+}

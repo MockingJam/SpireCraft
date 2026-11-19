@@ -1,0 +1,313 @@
+{
+  "carvers": [
+    "minecraft:cave",
+    "minecraft:cave_extra_underground",
+    "minecraft:canyon"
+  ],
+  "downfall": 0.9,
+  "effects": {
+    "dry_foliage_color": 3964714,
+    "fog_color": 14673636,
+    "foliage_color": 3964714,
+    "grass_color": 5148468,
+    "mood_sound": {
+      "block_search_extent": 8,
+      "offset": 2.0,
+      "sound": "minecraft:ambient.cave",
+      "tick_delay": 6000
+    },
+    "music_volume": 1.0,
+    "particle": {
+      "options": {
+        "type": "minecraft:white_ash"
+      },
+      "probability": 0.02
+    },
+    "sky_color": 13161680,
+    "water_color": 3832412,
+    "water_fog_color": 797214
+  },
+  "features": [
+    [
+      "spirecraft:surface_misty_overgrowth"
+    ],
+    [
+      "minecraft:lake_lava_underground",
+      "minecraft:lake_lava_surface"
+    ],
+    [
+      "minecraft:amethyst_geode",
+      "spirecraft:overgrowth_mud_disks",
+      "spirecraft:ruin_pillar"
+    ],
+    [
+      "minecraft:monster_room",
+      "minecraft:monster_room_deep"
+    ],
+    [],
+    [],
+    [
+      "minecraft:ore_dirt",
+      "minecraft:ore_gravel",
+      "minecraft:ore_granite_upper",
+      "minecraft:ore_granite_lower",
+      "minecraft:ore_diorite_upper",
+      "minecraft:ore_diorite_lower",
+      "minecraft:ore_andesite_upper",
+      "minecraft:ore_andesite_lower",
+      "minecraft:ore_tuff",
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_coal_lower",
+      "minecraft:ore_iron_upper",
+      "minecraft:ore_iron_middle",
+      "minecraft:ore_iron_small",
+      "minecraft:ore_gold",
+      "minecraft:ore_gold_lower",
+      "minecraft:ore_redstone",
+      "minecraft:ore_redstone_lower",
+      "minecraft:ore_diamond",
+      "minecraft:ore_diamond_medium",
+      "minecraft:ore_diamond_large",
+      "minecraft:ore_diamond_buried",
+      "minecraft:ore_lapis",
+      "minecraft:ore_lapis_buried",
+      "minecraft:ore_copper",
+      "minecraft:underwater_magma",
+      "minecraft:disk_sand",
+      "minecraft:disk_clay",
+      "minecraft:disk_gravel"
+    ],
+    [],
+    [
+      "minecraft:spring_water",
+      "minecraft:spring_lava"
+    ],
+    [
+      "minecraft:glow_lichen",
+      "minecraft:patch_grass_jungle",
+      "minecraft:brown_mushroom_normal",
+      "minecraft:red_mushroom_normal",
+      "minecraft:patch_pumpkin",
+      "minecraft:patch_sugar_cane",
+      "minecraft:patch_firefly_bush_near_water",
+      "minecraft:vines",
+      "spirecraft:trees_tall_gnarlwood",
+      "spirecraft:huge_fogcaps",
+      "spirecraft:patch_spire_fern",
+      "spirecraft:patch_fogcap",
+      "spirecraft:patch_lantern_cap",
+      "spirecraft:patch_coral_cap",
+      "spirecraft:patch_bluebell_cap",
+      "spirecraft:patch_glow_shrub",
+      "spirecraft:patch_glow_moss",
+      "spirecraft:patch_moss_carpet",
+      "spirecraft:hanging_glowvines"
+    ],
+    [
+      "minecraft:freeze_top_layer"
+    ]
+  ],
+  "has_precipitation": true,
+  "spawn_costs": {},
+  "spawners": {
+    "ambient": [
+      {
+        "type": "minecraft:bat",
+        "maxCount": 8,
+        "minCount": 8,
+        "weight": 10
+      }
+    ],
+    "axolotls": [],
+    "creature": [
+      {
+        "type": "minecraft:sheep",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 12
+      },
+      {
+        "type": "minecraft:pig",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 10
+      },
+      {
+        "type": "minecraft:chicken",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 10
+      },
+      {
+        "type": "minecraft:cow",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 8
+      },
+      {
+        "type": "minecraft:chicken",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 10
+      },
+      {
+        "type": "minecraft:parrot",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 30
+      }
+    ],
+    "misc": [],
+    "monster": [
+      {
+        "type": "minecraft:spider",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 100
+      },
+      {
+        "type": "minecraft:zombie",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 95
+      },
+      {
+        "type": "minecraft:zombie_villager",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 5
+      },
+      {
+        "type": "minecraft:skeleton",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 100
+      },
+      {
+        "type": "minecraft:creeper",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 100
+      },
+      {
+        "type": "minecraft:slime",
+        "maxCount": 4,
+        "minCount": 4,
+        "weight": 100
+      },
+      {
+        "type": "minecraft:enderman",
+        "maxCount": 4,
+        "minCount": 1,
+        "weight": 10
+      },
+      {
+        "type": "minecraft:witch",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 5
+      },
+      {
+        "type": "spirecraft:leaf_slime",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 40
+      },
+      {
+        "type": "spirecraft:twig_slime",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 40
+      },
+      {
+        "type": "spirecraft:fuzzy_wurm_crawler",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 35
+      },
+      {
+        "type": "spirecraft:nibbit",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 35
+      },
+      {
+        "type": "spirecraft:shrinker_beetle",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 30
+      },
+      {
+        "type": "spirecraft:flyconid",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 60
+      },
+      {
+        "type": "spirecraft:byrdonis",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 3
+      },
+      {
+        "type": "spirecraft:inklet",
+        "maxCount": 3,
+        "minCount": 3,
+        "weight": 20
+      },
+      {
+        "type": "spirecraft:fogmog",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 25
+      },
+      {
+        "type": "spirecraft:snapping_jaxfruit",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 20
+      },
+      {
+        "type": "spirecraft:slithering_strangler",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 20
+      },
+      {
+        "type": "spirecraft:vine_shambler",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 15
+      },
+      {
+        "type": "spirecraft:cubex_construct",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 8
+      },
+      {
+        "type": "spirecraft:bygone_effigy",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 2
+      },
+      {
+        "type": "spirecraft:living_fog",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 10
+      }
+    ],
+    "underground_water_creature": [
+      {
+        "type": "minecraft:glow_squid",
+        "maxCount": 6,
+        "minCount": 4,
+        "weight": 10
+      }
+    ],
+    "water_ambient": [],
+    "water_creature": []
+  },
+  "temperature": 0.95
+}

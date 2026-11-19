@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "spirecraft:block/hive_rock_bricks"
+  }
+}

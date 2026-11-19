@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_nether",
+  "features": ["spirecraft:ore_nether_brimstone"],
+  "step": "underground_ores"
+}

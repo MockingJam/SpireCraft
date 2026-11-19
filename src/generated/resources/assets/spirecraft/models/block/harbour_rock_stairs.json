@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "spirecraft:block/harbour_rock",
+    "side": "spirecraft:block/harbour_rock",
+    "top": "spirecraft:block/harbour_rock"
+  }
+}

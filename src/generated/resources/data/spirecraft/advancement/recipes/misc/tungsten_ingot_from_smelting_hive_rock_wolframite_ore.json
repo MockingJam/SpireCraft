@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_hive_rock_wolframite_ore": {
+      "conditions": {
+        "items": [
+          {
+            "items": "spirecraft:hive_rock_wolframite_ore"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "spirecraft:tungsten_ingot_from_smelting_hive_rock_wolframite_ore"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_hive_rock_wolframite_ore"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "spirecraft:tungsten_ingot_from_smelting_hive_rock_wolframite_ore"
+    ]
+  }
+}

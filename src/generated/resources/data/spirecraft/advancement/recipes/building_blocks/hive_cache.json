@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_hive_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "spirecraft:hive_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "spirecraft:hive_cache"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_hive_comb"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "spirecraft:hive_cache"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:copper_ingot",
+    "minecraft:gunpowder"
+  ],
+  "result": {
+    "count": 4,
+    "id": "spirecraft:flak_shell"
+  }
+}

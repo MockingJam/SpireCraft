@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "M": "minecraft:magma_block",
+    "S": "spirecraft:lava_rock_shard"
+  },
+  "pattern": [
+    " S ",
+    "SMS",
+    " S "
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:lava_rock"
+  }
+}

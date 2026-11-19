@@ -1,0 +1,10 @@
+{
+  "type": "spirecraft:carved",
+  "biomes": "#spirecraft:has_structure/beekeeper_hollow",
+  "step": "underground_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "kind": "beekeeper_hollow",
+  "min_y": -30,
+  "max_y": 30
+}

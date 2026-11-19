@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "spirecraft:automaton_alloy_block"
+  ],
+  "result": {
+    "count": 9,
+    "id": "spirecraft:automaton_alloy_ingot"
+  }
+}

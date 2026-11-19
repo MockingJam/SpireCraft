@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": "minecraft:amethyst_shard"
+  },
+  "pattern": [
+    " A",
+    "AA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:amethyst_aubergine"
+  }
+}
