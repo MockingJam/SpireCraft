@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "blocks",
+  "cookingtime": 200,
+  "experience": 0.1,
+  "ingredient": "spirecraft:ruin_stone_bricks",
+  "result": {
+    "id": "spirecraft:cracked_ruin_stone_bricks"
+  }
+}

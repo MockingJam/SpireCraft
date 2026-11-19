@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "spirecraft:deep_hive_rock",
+  "result": {
+    "count": 1,
+    "id": "spirecraft:deep_hive_rock_stairs"
+  }
+}

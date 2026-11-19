@@ -1,0 +1,44 @@
+{
+ "__comment": "v3.6 (user): smaller than a sniffer egg, square in section; a 10x10 body and a narrower crown",
+ "texture_size": [16, 16],
+ "textures": {
+  "particle": "spirecraft:block/byrdonis_egg_side",
+  "side": "spirecraft:block/byrdonis_egg_side",
+  "top": "spirecraft:block/byrdonis_egg_top"
+ },
+ "elements": [
+  {
+   "from": [3, 0, 3], "to": [13, 11, 13],
+   "faces": {
+    "north": {"uv": [3, 5, 13, 16], "texture": "#side"},
+    "south": {"uv": [3, 5, 13, 16], "texture": "#side"},
+    "east": {"uv": [3, 5, 13, 16], "texture": "#side"},
+    "west": {"uv": [3, 5, 13, 16], "texture": "#side"},
+    "down": {"uv": [3, 3, 13, 13], "texture": "#top", "cullface": "down"}
+   }
+  },
+  {
+   "from": [4, 11, 4], "to": [12, 13, 12],
+   "faces": {
+    "north": {"uv": [4, 3, 12, 5], "texture": "#side"},
+    "south": {"uv": [4, 3, 12, 5], "texture": "#side"},
+    "east": {"uv": [4, 3, 12, 5], "texture": "#side"},
+    "west": {"uv": [4, 3, 12, 5], "texture": "#side"},
+    "up": {"uv": [4, 4, 12, 12], "texture": "#top"}
+   }
+  },
+  {
+   "from": [3.01, 11, 3.01], "to": [12.99, 11.01, 12.99],
+   "faces": {
+    "up": {"uv": [3, 3, 13, 13], "texture": "#top"}
+   }
+  }
+ ],
+ "display": {
+  "gui": {"rotation": [30, 225, 0], "translation": [0, 1.5, 0], "scale": [0.9, 0.9, 0.9]},
+  "ground": {"rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.5, 0.5, 0.5]},
+  "fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [0.8, 0.8, 0.8]},
+  "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.5, 0.5, 0.5]},
+  "firstperson_righthand": {"rotation": [0, 45, 0], "translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]}
+ }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "spirecraft:ruin_stone",
+  "result": {
+    "count": 3,
+    "id": "spirecraft:paving_stones"
+  }
+}

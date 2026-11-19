@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "spirecraft:block/reed_bottom"
+    },
+    "half=upper": {
+      "model": "spirecraft:block/reed_top"
+    }
+  }
+}

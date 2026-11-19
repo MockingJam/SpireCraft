@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 1.0,
+  "group": "orichalcum_ingot",
+  "ingredient": "spirecraft:raw_orichalcum",
+  "result": {
+    "id": "spirecraft:orichalcum_ingot"
+  }
+}

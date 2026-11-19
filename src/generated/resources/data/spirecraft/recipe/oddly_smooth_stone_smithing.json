@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:honeycomb",
+  "base": "minecraft:smooth_stone",
+  "result": {
+    "id": "spirecraft:oddly_smooth_stone"
+  },
+  "template": "spirecraft:relic_fragment"
+}

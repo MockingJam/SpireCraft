@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "#spirecraft:rotten_logs"
+  ],
+  "result": {
+    "count": 4,
+    "id": "spirecraft:rotten_planks"
+  }
+}

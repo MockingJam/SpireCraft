@@ -1,0 +1,7 @@
+{
+  "type": "spirecraft:cave_stone",
+  "config": {
+    "biome": "spirecraft:hive_caves",
+    "style": 1
+  }
+}

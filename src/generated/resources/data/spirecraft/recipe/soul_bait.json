@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:rotten_flesh",
+    "minecraft:ink_sac",
+    "minecraft:ghast_tear"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:soul_bait"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "spirecraft:hive_soil",
+    "minecraft:wheat"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:packed_hive_soil"
+  }
+}

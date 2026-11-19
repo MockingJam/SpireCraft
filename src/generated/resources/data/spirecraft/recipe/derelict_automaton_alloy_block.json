@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "spirecraft:tarnished_automaton_alloy_block",
+    "minecraft:water_bucket"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:derelict_automaton_alloy_block"
+  }
+}

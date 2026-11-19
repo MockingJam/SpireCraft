@@ -1,0 +1,16 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/bowlbug_nest",
+  "step": "underground_decoration",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:hive/bowlbug_nest_1",
+    "spirecraft:hive/bowlbug_nest_2",
+    "spirecraft:hive/bowlbug_nest_3"
+  ],
+  "mode": "cave_floor",
+  "sink": 1,
+  "min_y": -50,
+  "max_y": 40
+}

@@ -1,0 +1,65 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build/
+.gradle/
+**/build/
+**/.gradle/
+.gradle_repo/
+run/
+bin/
+out/
+.idea/
+*.log
+
+
+# runtime / local dev output
+run/
+run-data/
+run-selftest/
+runtime/
+**/run/
+**/run-data/
+**/runtime/
+
+# generated / local-only files
+# src/generated is committed: it ships in the jar
+
+*.log
+*.tmp
+*.bak
+*.orig
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# other
+eclipse
+
+# Files from Forge MDK
+forge*changelog.txt
+
+# SpireCraft local-only (2026-11-19)
+run-selftest/
+.first_run_lock
+.vscode/
+.mcp.json
+# stray preview images saved without an extension
+/-
+/bludgeon
+# STS2 reference screenshots (game art, not ours to redistribute)
+art/refs/

@@ -1,0 +1,27 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "cases": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "spirecraft:item/poisoned_dagger_icon"
+        },
+        "when": "gui"
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:condition",
+      "on_false": {
+        "type": "minecraft:model",
+        "model": "spirecraft:item/poisoned_dagger"
+      },
+      "on_true": {
+        "type": "minecraft:model",
+        "model": "spirecraft:item/poisoned_dagger_drip"
+      },
+      "property": "spirecraft:dripping"
+    },
+    "property": "minecraft:display_context"
+  }
+}

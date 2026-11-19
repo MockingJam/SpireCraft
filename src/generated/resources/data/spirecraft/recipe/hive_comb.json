@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "H": "minecraft:honeycomb",
+    "S": "spirecraft:hive_soil"
+  },
+  "pattern": [
+    "HS",
+    "SH"
+  ],
+  "result": {
+    "count": 2,
+    "id": "spirecraft:hive_comb"
+  }
+}

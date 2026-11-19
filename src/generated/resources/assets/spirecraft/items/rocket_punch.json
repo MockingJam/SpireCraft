@@ -1,0 +1,53 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "entries": [
+      {
+        "model": {
+          "type": "minecraft:select",
+          "cases": [
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "spirecraft:item/rocket_punch_empty"
+              },
+              "when": [
+                "gui",
+                "ground",
+                "fixed"
+              ]
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "spirecraft:item/rocket_punch_empty_held"
+          },
+          "property": "minecraft:display_context"
+        },
+        "threshold": 1.0E-4
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:select",
+      "cases": [
+        {
+          "model": {
+            "type": "minecraft:model",
+            "model": "spirecraft:item/rocket_punch"
+          },
+          "when": [
+            "gui",
+            "ground",
+            "fixed"
+          ]
+        }
+      ],
+      "fallback": {
+        "type": "minecraft:model",
+        "model": "spirecraft:item/rocket_punch_held"
+      },
+      "property": "minecraft:display_context"
+    },
+    "property": "minecraft:cooldown"
+  }
+}

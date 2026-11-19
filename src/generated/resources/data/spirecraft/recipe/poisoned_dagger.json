@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "E": "minecraft:spider_eye",
+    "I": "minecraft:iron_ingot",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "I",
+    "E",
+    "S"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:poisoned_dagger"
+  }
+}

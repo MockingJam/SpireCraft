@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:red_dye",
+  "base": "minecraft:leather_helmet",
+  "result": {
+    "id": "spirecraft:red_mask"
+  },
+  "template": "spirecraft:relic_fragment"
+}

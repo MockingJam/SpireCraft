@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": ["spirecraft:ore_wolframite", "spirecraft:ore_orichalcum"],
+  "step": "underground_ores"
+}

@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "minecraft:basalt_deltas",
+  "features": ["spirecraft:ore_lava_rock"],
+  "step": "underground_ores"
+}

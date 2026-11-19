@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:blaze_powder",
+  "base": "minecraft:skeleton_skull",
+  "result": {
+    "id": "spirecraft:red_skull"
+  },
+  "template": "spirecraft:relic_fragment"
+}

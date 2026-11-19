@@ -1,0 +1,14 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "spirecraft:item/dirge_flute"
+    },
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "spirecraft:item/dirge_flute_playing"
+    },
+    "property": "minecraft:using_item"
+  }
+}

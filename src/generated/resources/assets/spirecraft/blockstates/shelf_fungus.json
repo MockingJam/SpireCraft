@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "spirecraft:block/shelf_fungus",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "spirecraft:block/shelf_fungus"
+    },
+    "facing=south": {
+      "model": "spirecraft:block/shelf_fungus",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "spirecraft:block/shelf_fungus",
+      "y": 270
+    }
+  }
+}

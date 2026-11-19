@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:tungsten_rod",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:shuriken",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:lizard_tail",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

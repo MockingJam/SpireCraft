@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "spirecraft:block/hiveshroom_slab"
+    },
+    "type=double": {
+      "model": "spirecraft:block/hiveshroom_planks"
+    },
+    "type=top": {
+      "model": "spirecraft:block/hiveshroom_slab_top"
+    }
+  }
+}

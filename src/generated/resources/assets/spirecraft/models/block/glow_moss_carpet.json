@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/carpet",
+  "textures": {
+    "wool": "spirecraft:block/glow_moss_carpet"
+  }
+}

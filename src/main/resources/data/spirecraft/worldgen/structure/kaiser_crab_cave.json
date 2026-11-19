@@ -1,0 +1,10 @@
+{
+  "type": "spirecraft:carved",
+  "biomes": "#spirecraft:has_structure/kaiser_crab_cave",
+  "step": "underground_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "kind": "kaiser_cave",
+  "min_y": -36,
+  "max_y": 0
+}

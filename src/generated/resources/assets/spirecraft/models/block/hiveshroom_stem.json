@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "spirecraft:block/hiveshroom_stem_top",
+    "side": "spirecraft:block/hiveshroom_stem"
+  }
+}

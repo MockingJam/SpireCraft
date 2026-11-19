@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:bone",
+    "minecraft:bone",
+    "minecraft:bone",
+    "minecraft:soul_soil"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:dirge_flute"
+  }
+}

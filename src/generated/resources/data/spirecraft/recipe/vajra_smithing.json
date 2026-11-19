@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:gold_block",
+  "base": "minecraft:lightning_rod",
+  "result": {
+    "id": "spirecraft:vajra"
+  },
+  "template": "spirecraft:relic_fragment"
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "spirecraft:tungsten_alloy_ingot",
+    "minecraft:gunpowder"
+  ],
+  "result": {
+    "count": 12,
+    "id": "spirecraft:flak_shell"
+  }
+}

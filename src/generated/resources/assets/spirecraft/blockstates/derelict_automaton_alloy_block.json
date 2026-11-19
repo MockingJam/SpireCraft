@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "spirecraft:block/derelict_automaton_alloy_block"
+    }
+  }
+}

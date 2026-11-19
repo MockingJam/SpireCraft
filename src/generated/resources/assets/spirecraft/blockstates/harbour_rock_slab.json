@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "spirecraft:block/harbour_rock_slab"
+    },
+    "type=double": {
+      "model": "spirecraft:block/harbour_rock"
+    },
+    "type=top": {
+      "model": "spirecraft:block/harbour_rock_slab_top"
+    }
+  }
+}

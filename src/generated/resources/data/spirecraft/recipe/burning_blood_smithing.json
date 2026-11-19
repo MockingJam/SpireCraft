@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:magma_cream",
+  "base": "spirecraft:blood_vial",
+  "result": {
+    "id": "spirecraft:burning_blood"
+  },
+  "template": "spirecraft:relic_fragment"
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_lava_rock_shard": {
+      "conditions": {
+        "items": [
+          {
+            "items": "spirecraft:lava_rock_shard"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "spirecraft:lava_rock"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_lava_rock_shard"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "spirecraft:lava_rock"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:green_stained_glass",
+  "base": "minecraft:bundle",
+  "result": {
+    "id": "spirecraft:bag_of_marbles"
+  },
+  "template": "spirecraft:relic_fragment"
+}

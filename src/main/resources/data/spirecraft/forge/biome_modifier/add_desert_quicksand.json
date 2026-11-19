@@ -1,0 +1,8 @@
+{
+  "type": "forge:add_features",
+  "biomes": "minecraft:desert",
+  "features": [
+    "spirecraft:surface_quicksand"
+  ],
+  "step": "local_modifications"
+}

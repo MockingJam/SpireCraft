@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "spirecraft:block/spire_fern_bottom"
+    },
+    "half=upper": {
+      "model": "spirecraft:block/spire_fern_top"
+    }
+  }
+}

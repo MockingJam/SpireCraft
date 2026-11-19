@@ -1,0 +1,60 @@
+{
+  "__comment": "Rocket Punch fist (v2.1): a clenched fist flying knuckles-first along +X, a metal cuff, and a glowing rocket flame behind. Texture tools/rocket_fist.js.",
+  "textures": { "fist": "spirecraft:item/rocket_fist", "particle": "spirecraft:item/rocket_fist" },
+  "elements": [
+    { "__comment": "fist: fingers curled, knuckles at +X",
+      "from": [4, 5, 5], "to": [11, 11, 11],
+      "faces": {
+        "east":  { "uv": [0, 1, 6, 7], "texture": "#fist" },
+        "west":  { "uv": [0, 2, 6, 8], "texture": "#fist" },
+        "north": { "uv": [0, 2, 7, 8], "texture": "#fist" },
+        "south": { "uv": [0, 2, 7, 8], "texture": "#fist" },
+        "up":    { "uv": [0, 0, 7, 6], "texture": "#fist", "rotation": 90 },
+        "down":  { "uv": [0, 5, 7, 8], "texture": "#fist" }
+      } },
+    { "__comment": "knuckle ridge",
+      "from": [11, 8, 5.5], "to": [12, 11, 10.5],
+      "faces": {
+        "east":  { "uv": [0, 0, 5, 3], "texture": "#fist" },
+        "north": { "uv": [0, 0, 1, 3], "texture": "#fist" },
+        "south": { "uv": [0, 0, 1, 3], "texture": "#fist" },
+        "up":    { "uv": [0, 0, 5, 1], "texture": "#fist", "rotation": 90 },
+        "down":  { "uv": [0, 6, 5, 7], "texture": "#fist" }
+      } },
+    { "__comment": "thumb across the fingers",
+      "from": [7, 4, 10.5], "to": [11, 7, 12],
+      "faces": {
+        "east":  { "uv": [1, 2, 3, 5], "texture": "#fist" },
+        "west":  { "uv": [1, 4, 3, 7], "texture": "#fist" },
+        "south": { "uv": [0, 2, 4, 5], "texture": "#fist" },
+        "north": { "uv": [0, 4, 4, 7], "texture": "#fist" },
+        "up":    { "uv": [0, 0, 4, 2], "texture": "#fist" },
+        "down":  { "uv": [0, 6, 4, 8], "texture": "#fist" }
+      } },
+    { "__comment": "metal cuff with cyan lights",
+      "from": [1, 4.5, 4.5], "to": [4, 11.5, 11.5],
+      "faces": {
+        "east":  { "uv": [0, 8, 7, 12], "texture": "#fist" },
+        "west":  { "uv": [0, 8, 7, 12], "texture": "#fist" },
+        "north": { "uv": [0, 8, 3, 12], "texture": "#fist" },
+        "south": { "uv": [5, 8, 8, 12], "texture": "#fist" },
+        "up":    { "uv": [0, 8, 3, 12], "texture": "#fist", "rotation": 90 },
+        "down":  { "uv": [0, 9, 3, 12], "texture": "#fist" }
+      } },
+    { "__comment": "rocket flame (crossed planes, full bright)",
+      "from": [-5, 5.5, 8], "to": [1, 10.5, 8], "light_emission": 15, "shade": false,
+      "faces": {
+        "north": { "uv": [3, 12, 13, 16], "texture": "#fist" },
+        "south": { "uv": [3, 12, 13, 16], "texture": "#fist" }
+      } },
+    { "from": [-5, 8, 5.5], "to": [1, 8, 10.5], "light_emission": 15, "shade": false,
+      "faces": {
+        "up":   { "uv": [3, 12, 13, 16], "texture": "#fist", "rotation": 90 },
+        "down": { "uv": [3, 12, 13, 16], "texture": "#fist", "rotation": 90 }
+      } }
+  ],
+  "display": {
+    "gui": { "rotation": [30, 225, 0], "translation": [0, 0, 0], "scale": [0.8, 0.8, 0.8] },
+    "ground": { "rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5] }
+  }
+}

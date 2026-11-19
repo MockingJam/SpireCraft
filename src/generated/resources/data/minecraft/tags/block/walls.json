@@ -1,0 +1,15 @@
+{
+  "values": [
+    "spirecraft:ruin_stone_wall",
+    "spirecraft:ruin_stone_brick_wall",
+    "spirecraft:dock_brick_wall",
+    "spirecraft:harbour_rock_wall",
+    "spirecraft:polished_harbour_rock_wall",
+    "spirecraft:ink_stained_stone_wall",
+    "spirecraft:hive_rock_wall",
+    "spirecraft:deep_hive_rock_wall",
+    "spirecraft:polished_hive_rock_wall",
+    "spirecraft:hive_rock_brick_wall",
+    "spirecraft:hive_soil_brick_wall"
+  ]
+}

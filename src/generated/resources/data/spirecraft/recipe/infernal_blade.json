@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:iron_sword",
+    "minecraft:blaze_rod",
+    "minecraft:magma_cream",
+    "spirecraft:brimstone"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:infernal_blade"
+  }
+}

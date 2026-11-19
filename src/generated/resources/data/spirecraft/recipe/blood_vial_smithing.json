@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:glistering_melon_slice",
+  "base": "minecraft:glass_bottle",
+  "result": {
+    "id": "spirecraft:blood_vial"
+  },
+  "template": "spirecraft:relic_fragment"
+}

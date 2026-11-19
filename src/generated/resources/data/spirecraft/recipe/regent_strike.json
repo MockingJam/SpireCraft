@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "L": "minecraft:leather",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "G",
+    "L",
+    "S"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:regent_strike"
+  }
+}

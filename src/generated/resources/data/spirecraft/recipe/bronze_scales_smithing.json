@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:copper_block",
+  "base": "minecraft:armadillo_scute",
+  "result": {
+    "id": "spirecraft:bronze_scales"
+  },
+  "template": "spirecraft:relic_fragment"
+}

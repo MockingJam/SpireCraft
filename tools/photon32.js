@@ -1,0 +1,40 @@
+// Photon Cut: keeps the pixelized hilt (tools/pixelize.js output) and redraws the blade as a clean curved katana in the
+// reference's own colours (white edge, silver body, black bevel stripe near the hilt, darker back) — the painting's
+// thin stripe and glow break up when simply downscaled. A black lower edge row lines the blade up with the grip. Usage: node tools/photon32.js <in.png> <out.png>
+const { readPng, writePng } = require('./png');
+const [inp, out] = process.argv.slice(2);
+const img = readPng(inp);
+const N = img.w, C = 31;
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+// colours sampled from the pixelized blade (which come from the painting)
+const EDGE = '#f5f6fc', LIGHT = '#e2e3ee', BODY = '#c8cbdb', MID = '#a2a8be', BACK = '#6e708a', STRIPE = '#15141b', OUT = '#2c2d35';
+const T0 = -9, T1 = 29;
+// clear the old blade
+for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (x - y >= T0) img.d.fill(0, (y * N + x) * 4, (y * N + x) * 4 + 4);
+const grid = Array.from({ length: N }, () => Array(N).fill(null));
+const centre = t => C - Math.round(4.5 * Math.pow((t - T0) / (T1 - T0), 2));     // curves up toward the tip
+const width = t => t < 18 ? 4 : t < 24 ? 3 : t < 27 ? 2 : 1;
+for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+  const s = x + y, t = x - y;
+  if (t < T0 || t > T1) continue;
+  const c = centre(t), w = width(t), k = s - (c - 1);   // k = 0 is the upper-left (cutting) edge
+  // one extra black edge row along the lower side (aligns the blade with the grip, per review)
+  if ((k === w && t < T1 - 2) || (k === w + 1 && t < T1 - 7)) { grid[y][x] = STRIPE; continue; }   // 2 px on the lower half
+  if (k < 0 || k >= w) continue;
+  let col;
+  if (k === 0) col = t > T1 - 3 ? LIGHT : EDGE;
+  else if (k === w - 1 && w > 2) col = BACK;
+  else if (k === 2 && t < 9) col = STRIPE;                // bevel stripe on the hilt half
+  else col = k === 1 ? (t < 9 ? LIGHT : BODY) : MID;
+  grid[y][x] = col;
+}
+// outline around the new blade (only into empty pixels)
+const isEmpty = (x, y) => x >= 0 && y >= 0 && x < N && y < N && !grid[y][x] && img.d[(y * N + x) * 4 + 3] === 0;
+for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (grid[y][x]) {
+  const p = (y * N + x) * 4; img.d.set([...hex(grid[y][x]), 255], p);
+}
+for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+  if (!isEmpty(x, y)) continue;
+  if ([[0, -1], [1, 0], [0, 1], [-1, 0]].some(([dx, dy]) => grid[y + dy]?.[x + dx])) img.d.set([...hex(OUT), 255], (y * N + x) * 4);
+}
+writePng(out, img);

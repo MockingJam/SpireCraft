@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "minecraft:bell",
+    "G": "minecraft:gold_ingot",
+    "O": "minecraft:bone_block"
+  },
+  "pattern": [
+    "GOG",
+    " B "
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:ceremonial_bell"
+  }
+}

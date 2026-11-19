@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_core_crystal_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "spirecraft:core_crystal_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "spirecraft:cracked_core_crystal_block_from_smelting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_core_crystal_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "spirecraft:cracked_core_crystal_block_from_smelting"
+    ]
+  }
+}

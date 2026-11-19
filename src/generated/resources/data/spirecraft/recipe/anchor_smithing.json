@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:iron_chain",
+  "base": "minecraft:iron_block",
+  "result": {
+    "id": "spirecraft:anchor"
+  },
+  "template": "spirecraft:relic_fragment"
+}

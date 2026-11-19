@@ -1,0 +1,18 @@
+// 1.21.10	2026-11-17T01:06:30.9135744	Tags for minecraft:worldgen/biome mod id spirecraft
+e08d5fde1240c1c8f5943dea3974208fe70516e7 data/minecraft/tags/worldgen/biome/has_structure/buried_treasure.json
+a27bd35304bad93ecbf5e139092145e840a9606f data/minecraft/tags/worldgen/biome/has_structure/mineshaft.json
+aa6d6700186a9cf4f154e79f933ce22c8ea63d1b data/minecraft/tags/worldgen/biome/has_structure/ocean_ruin_warm.json
+04a3bcddef90cf0afa5617d5be1bb6363ffac66f data/minecraft/tags/worldgen/biome/has_structure/ruined_portal_jungle.json
+c4cccbb94e7d5d878d740c47fc74af576edf2e31 data/minecraft/tags/worldgen/biome/has_structure/ruined_portal_mountain.json
+aa6d6700186a9cf4f154e79f933ce22c8ea63d1b data/minecraft/tags/worldgen/biome/has_structure/ruined_portal_ocean.json
+280fad63c2e28e2b5cc5e317a4817d214b1a84f7 data/minecraft/tags/worldgen/biome/has_structure/ruined_portal_swamp.json
+aa6d6700186a9cf4f154e79f933ce22c8ea63d1b data/minecraft/tags/worldgen/biome/has_structure/shipwreck.json
+e08d5fde1240c1c8f5943dea3974208fe70516e7 data/minecraft/tags/worldgen/biome/has_structure/shipwreck_beached.json
+a27bd35304bad93ecbf5e139092145e840a9606f data/minecraft/tags/worldgen/biome/has_structure/stronghold.json
+a27bd35304bad93ecbf5e139092145e840a9606f data/minecraft/tags/worldgen/biome/has_structure/trial_chambers.json
+04a3bcddef90cf0afa5617d5be1bb6363ffac66f data/minecraft/tags/worldgen/biome/is_jungle.json
+c4cccbb94e7d5d878d740c47fc74af576edf2e31 data/minecraft/tags/worldgen/biome/is_mountain.json
+aa6d6700186a9cf4f154e79f933ce22c8ea63d1b data/minecraft/tags/worldgen/biome/is_ocean.json
+a27bd35304bad93ecbf5e139092145e840a9606f data/minecraft/tags/worldgen/biome/is_overworld.json
+a27bd35304bad93ecbf5e139092145e840a9606f data/minecraft/tags/worldgen/biome/stronghold_biased_to.json
+4bbe9f00de4fe35f0a9f356607ac1cffe181a8ab data/spirecraft/tags/worldgen/biome/polluted_water.json

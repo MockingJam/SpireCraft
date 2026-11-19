@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top_left",
+  "textures": {
+    "bottom": "spirecraft:block/hiveshroom_door_bottom",
+    "top": "spirecraft:block/hiveshroom_door_top"
+  }
+}

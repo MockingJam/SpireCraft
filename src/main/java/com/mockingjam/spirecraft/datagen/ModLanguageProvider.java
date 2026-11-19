@@ -1,0 +1,843 @@
+package com.mockingjam.spirecraft.datagen;
+
+import com.mockingjam.spirecraft.SpireCraft;
+import com.mockingjam.spirecraft.effect.ModEffects;
+import com.mockingjam.spirecraft.registry.ModBlocks;
+import com.mockingjam.spirecraft.registry.ModItems;
+import net.minecraft.data.PackOutput;
+import net.minecraftforge.common.data.LanguageProvider;
+
+/** en_us and zh_cn side by side, so every new entry gets both names at once. */
+public final class ModLanguageProvider {
+    private ModLanguageProvider() {}
+
+    /** Phase 7: biome names and every biome block (wood/stone families named the vanilla way). */
+    static void biomeNames(java.util.function.BiConsumer<String, String> add, boolean zh) {
+        add.accept("itemGroup.spirecraft.mobs", zh ? "尖塔工艺：生物" : "SpireCraft: Creatures");
+        add.accept("itemGroup.spirecraft.biome_blocks", zh ? "尖塔工艺：群系方块" : "SpireCraft: Biome Blocks");
+        String[][] biomes = { { "stone_forest_docks", "Stone Forest Underdocks", "石林暗港" }, { "beach_docks", "Beach Underdocks", "沙滩暗港" },
+                { "polluted_sea", "Polluted Sea", "污染海域" }, { "waterfalls", "Waterfalls", "瀑布" },
+                { "ink_spring_caves", "Ink Spring Caves", "墨泉洞穴" }, { "overgrowth", "Overgrowth", "密林" },
+                { "misty_overgrowth", "Misty Overgrowth", "迷雾密林" }, { "mushroom_overgrowth", "Mushroom Overgrowth", "蘑菇密林" },
+                { "hive_caves", "Hive Caves", "巢穴洞穴" }, { "sparse_hive_caves", "Sparse Hive Caves", "稀疏巢穴洞穴" },
+                { "egg_hive_caves", "Egg Hive Caves", "虫卵巢穴洞穴" }, { "quicksand_caves", "Quicksand Caves", "流沙洞" } };
+        for (String[] b : biomes) add.accept("biome.spirecraft." + b[0], zh ? b[2] : b[1]);
+
+        String[][] woods = { { "Gnarlwood", "盘根木" }, { "Hiveshroom", "巢菇" }, { "Rotten", "腐木" } };
+        var woodSets = com.mockingjam.spirecraft.block.BiomeBlocks.woods();
+        for (int i = 0; i < woodSets.size(); i++) {
+            var w = woodSets.get(i);
+            String en = woods[i][0], cn = woods[i][1];
+            boolean stem = !w.strippable;   // v3.5: a mushroom's stem and hyphae
+            Object[][] names = { { w.log, en + (stem ? " Stem" : " Log"), cn + (stem ? "柄" : "原木") }, { w.strippedLog, "Stripped " + en + " Log", "去皮" + cn + "原木" },
+                    { w.wood, en + (stem ? " Hyphae" : " Wood"), cn + (stem ? "菌丝体" : "") }, { w.strippedWood, "Stripped " + en + " Wood", "去皮" + cn },
+                    { w.planks, en + " Planks", cn + "木板" }, { w.slab, en + " Slab", cn + "台阶" }, { w.stairs, en + " Stairs", cn + "楼梯" },
+                    { w.fence, en + " Fence", cn + "栅栏" }, { w.fenceGate, en + " Fence Gate", cn + "栅栏门" }, { w.door, en + " Door", cn + "门" },
+                    { w.trapdoor, en + " Trapdoor", cn + "活板门" }, { w.button, en + " Button", cn + "按钮" },
+                    { w.pressurePlate, en + " Pressure Plate", cn + "压力板" }, { w.leaves, en + " Leaves", cn + "树叶" },
+                    { w.sapling, en + " Sapling", cn + "树苗" } };
+            for (Object[] n : names) if (n[0] != null) block(add, n[0], (String) (zh ? n[2] : n[1]));
+        }
+
+        String[][] stones = { { "Ruin Stone", "遗迹石" }, { "Ruin Stone Bricks", "遗迹石砖" }, { "Dock Bricks", "港砖" },
+                { "Harbour Rock", "港岩" }, { "Polished Harbour Rock", "磨制港岩" }, 
+                { "Ink-Stained Stone", "墨染石" }, { "Deep Ink Stone", "深层墨石" }, { "Hive Rock", "巢岩" }, { "Deep Hive Rock", "深层巢岩" }, { "Polished Hive Rock", "磨制巢岩" }, { "Hive Rock Bricks", "巢岩砖" }, { "Hive Soil Bricks", "巢土砖" } };
+        var stoneSets = com.mockingjam.spirecraft.block.BiomeBlocks.stones();
+        for (int i = 0; i < stoneSets.size(); i++) {
+            var set = stoneSets.get(i);
+            String en = stones[i][0], stem = en.replaceAll("Bricks$", "Brick").replaceAll("Tiles$", "Tile").replaceAll(" Block$", "");
+            String cn = stones[i][1], cnStem = cn.replaceAll("块$", "");
+            block(add, set.base, zh ? cn : en);
+            block(add, set.stairs, zh ? cnStem + "楼梯" : stem + " Stairs");
+            block(add, set.slab, zh ? cnStem + "台阶" : stem + " Slab");
+            block(add, set.wall, zh ? cnStem + "墙" : stem + " Wall");
+        }
+        // the cave stones' ores (block/CaveOres)
+        java.util.Map<String, String[]> families = java.util.Map.of("hive_rock", new String[] { "Hive Rock", "巢岩" },
+                "deep_hive_rock", new String[] { "Deep Hive Rock", "深层巢岩" }, "ink_stained_stone", new String[] { "Ink-Stained Stone", "墨染石" });
+        java.util.Map<String, String[]> kinds = java.util.Map.of("coal", new String[] { "Coal", "煤" }, "iron", new String[] { "Iron", "铁" },
+                "copper", new String[] { "Copper", "铜" }, "gold", new String[] { "Gold", "金" }, "redstone", new String[] { "Redstone", "红石" },
+                "lapis", new String[] { "Lapis Lazuli", "青金石" }, "diamond", new String[] { "Diamond", "钻石" }, "emerald", new String[] { "Emerald", "绿宝石" },
+                "wolframite", new String[] { "Wolframite", "黑钨" }, "orichalcum", new String[] { "Orichalcum", "奥利哈钢" });
+        for (var f : com.mockingjam.spirecraft.block.CaveOres.ALL) for (var e : f.ores.entrySet()) {
+            String[] fam = families.get(f.name), kind = kinds.get(e.getKey().id);
+            block(add, e.getValue(), zh ? fam[1] + kind[1] + "矿石" : fam[0] + " " + kind[0] + " Ore");
+        }
+        Object[][] misc = { { ModBlocks.CRACKED_RUIN_STONE_BRICKS, "Cracked Ruin Stone Bricks", "裂纹遗迹石砖" },
+                { ModBlocks.CHISELED_RUIN_STONE_BRICKS, "Chiseled Ruin Stone Bricks", "雕纹遗迹石砖" },
+                { ModBlocks.PAVING_STONES, "Paving Stones", "铺路石" }, { ModBlocks.JUNK_BLOCK, "Junk Block", "垃圾块" },
+                { ModBlocks.HIVE_MYCELIUM_LAYER, "Mycelium Mat", "菌丝层" }, { ModBlocks.MYCELIUM_THREAD, "Mycelium Thread", "菌丝线" },
+                { ModBlocks.BUG_CARCASS, "Bug Carcass", "虫尸" }, { ModBlocks.BYRDONIS_EGG, "Byrdonis Egg", "异鸟蛋" }, { ModBlocks.GLOWVINE, "Glowvine", "萤光藤" },
+                { ModBlocks.GLOWVINE_PLANT, "Glowvine Plant", "萤光藤植株" }, { ModBlocks.FOGCAP, "Fogcap", "雾菇" },
+                { ModBlocks.FOGCAP_BLOCK, "Fogcap Block", "雾菇方块" }, { ModBlocks.SPIRE_FERN, "Spire Fern", "尖塔蕨" },
+                { ModBlocks.CRACKED_DOCK_BRICKS, "Cracked Dock Bricks", "裂纹港砖" }, { ModBlocks.DARK_SAND, "Dark Sand", "暗沙" },
+                { ModBlocks.INK_VENT, "Ink Vent", "墨泉喷口" }, { ModBlocks.SILK_HIVE, "Silk Hive", "丝巢块" }, { ModBlocks.THATCH, "Thatch", "茅草块" }, { ModBlocks.THATCH_STAIRS, "Thatch Stairs", "茅草楼梯" },
+                { ModBlocks.THATCH_SLAB, "Thatch Slab", "茅草台阶" }, { ModBlocks.TWIG_NEST, "Twig Nest", "树枝巢块" }, { ModBlocks.WEBBED_HIVE_SOIL, "Webbed Hive Soil", "丝结巢土" },
+                { ModBlocks.PACKED_HIVE_SOIL, "Packed Hive Soil", "压实巢土" }, { ModBlocks.CRACKED_HIVE_ROCK_BRICKS, "Cracked Hive Rock Bricks", "裂纹巢岩砖" },
+                { ModBlocks.CHISELED_HIVE_ROCK_BRICKS, "Chiseled Hive Rock Bricks", "錾制巢岩砖" }, { ModBlocks.SWORD_STATUE, "Statue's Sword", "雕像之剑" }, { ModBlocks.CRACKED_INK_STONE, "Cracked Ink Stone", "裂纹墨石" },
+                { ModBlocks.BARNACLES, "Barnacles", "藤壶" }, { ModBlocks.HIVE_MYCELIUM, "Hive Mycelium", "巢菌土" },
+                { ModBlocks.SLUDGE, "Sludge", "淤泥" }, { ModBlocks.HIVE_SOIL, "Hive Soil", "蜂蜡土" },
+                { ModBlocks.HIVE_EGG, "Tough Eggs", "硬壳虫卵" } };
+        for (Object[] n : misc) block(add, n[0], (String) (zh ? n[2] : n[1]));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void block(java.util.function.BiConsumer<String, String> add, Object block, String name) {
+        add.accept(((net.minecraftforge.registries.RegistryObject<net.minecraft.world.level.block.Block>) block).get().getDescriptionId(), name);
+    }
+
+    public static final class English extends LanguageProvider {
+        public English(PackOutput output) {
+            super(output, SpireCraft.MODID, "en_us");
+        }
+
+        @Override
+        protected void addTranslations() {
+            add("itemGroup.spirecraft.relics", "SpireCraft: Relics");
+            biomeNames(this::add, false);
+            add("itemGroup.spirecraft.blocks", "SpireCraft: Blocks");
+            add("itemGroup.spirecraft.materials", "SpireCraft: Materials");
+            add("itemGroup.spirecraft.equipment", "SpireCraft: Equipment");
+            add(ModItems.BURNING_BLOOD.get(), "Burning Blood");
+            add(ModItems.TUNGSTEN_ROD.get(), "Tungsten Rod");
+            add("item.spirecraft.tungsten_rod.desc", "Whenever you would lose HP, lose 1 less.");
+            add("item.spirecraft.burning_blood.desc", "End of combat: if you killed a hostile mob, heal 4 HP.");
+            add(ModItems.RELIC_POUCH.get(), "Relic Pouch");
+            add("item.spirecraft.relic_pouch.desc", "Holds up to 9 relics (one of each). Relics only work inside a pouch you carry. Right-click to open.");
+            add(ModItems.ANCHOR.get(), "Anchor");
+            add("item.spirecraft.anchor.desc", "Start of combat: gain 4 Absorption (15 s).");
+            add(ModItems.VAJRA.get(), "Vajra");
+            add("item.spirecraft.vajra.desc", "Start of combat: +1 Strength (30 s).");
+            add(ModItems.ODDLY_SMOOTH_STONE.get(), "Oddly Smooth Stone");
+            add("item.spirecraft.oddly_smooth_stone.desc", "Start of combat: +1 Dexterity (30 s).");
+            add(ModItems.BAG_OF_MARBLES.get(), "Bag of Marbles");
+            add("item.spirecraft.bag_of_marbles.desc", "Start of combat: hostile mobs within 8 blocks become Vulnerable (6 s).");
+            add(ModItems.RED_MASK.get(), "Red Mask");
+            add("item.spirecraft.red_mask.desc", "Start of combat: hostile mobs within 8 blocks become Weak (6 s).");
+            add(ModItems.BRONZE_SCALES.get(), "Bronze Scales");
+            add("item.spirecraft.bronze_scales.desc", "Start of combat: +1 Thorns (30 s).");
+            add(ModItems.BLOOD_VIAL.get(), "Blood Vial");
+            add("item.spirecraft.blood_vial.desc", "Start of combat: heal 2 HP.");
+            add(ModItems.RED_SKULL.get(), "Red Skull");
+            add("item.spirecraft.red_skull.desc", "While at or below 50% health: attacks deal +2 damage (Strength).");
+            add(ModItems.PEN_NIB.get(), "Pen Nib");
+            add("item.spirecraft.pen_nib.desc", "Every 10th attack deals double damage.");
+            add(ModItems.MERCURY_HOURGLASS.get(), "Mercury Hourglass");
+            add("item.spirecraft.mercury_hourglass.desc", "In combat: every 3 s, deal 1 damage to all hostile mobs within 6 blocks.");
+            add(ModItems.SHURIKEN.get(), "Shuriken");
+            add("item.spirecraft.shuriken.desc", "Attack 3 times within 3 s: +1 Strength (30 s, max 3).");
+            add(ModItems.LIZARD_TAIL.get(), "Lizard Tail");
+            add("item.spirecraft.lizard_tail.desc", "When you would die, heal to 50% max health instead. Regrows after one day.");
+            add("relic.spirecraft.tier.starter", "Starter Relic");
+            add("relic.spirecraft.tier.common", "Common Relic");
+            add("relic.spirecraft.tier.uncommon", "Uncommon Relic");
+            add("relic.spirecraft.tier.rare", "Rare Relic");
+            add("relic.spirecraft.tier.shop", "Shop Relic");
+            add("relic.spirecraft.tier.event", "Event Relic");
+            add("relic.spirecraft.tier.ancient", "Ancient Relic");
+            add("relic.spirecraft.hint", "Works inside a carried Relic Pouch");
+            add("character.spirecraft.ironclad", "Ironclad");
+            add("character.spirecraft.silent", "Silent");
+            add("character.spirecraft.regent", "Regent");
+            add("character.spirecraft.necrobinder", "Necrobinder");
+            add("character.spirecraft.defect", "Defect");
+            add("item.spirecraft.sovereign_blade.forge", "Forge %s / %s  (+%s damage)");
+            add("item.spirecraft.dirge_flute.souls", "Souls %s / %s");
+            add("effect.spirecraft.lightning_orb", "Lightning Orb");
+            add("effect.spirecraft.frost_orb", "Frost Orb");
+            add("itemGroup.spirecraft.weapons", "SpireCraft: Weapons");
+            add(ModItems.SOVEREIGN_BLADE.get(), "Sovereign Blade");
+            add("item.spirecraft.sovereign_blade.desc", "Every hostile mob it slays adds 1 Forge; every 15 Forge: +1 damage (max +5). (Sovereign Blade)");
+            add(ModItems.CRESCENT_SPEAR.get(), "Crescent Spear");
+            add("item.spirecraft.crescent_spear.desc", "Reach +1. +0.5 damage for each other Regent weapon you carry (max +2). (Crescent Spear)");
+            add(ModItems.HEIRLOOM_HAMMER.get(), "Heirloom Hammer");
+            add("item.spirecraft.heirloom_hammer.desc", "Slow and heavy. A kill has a 25% chance to double one of its drops. (Heirloom Hammer)");
+            add(ModItems.REGENT_STRIKE.get(), "Regal Strike Sword");
+            add("item.spirecraft.regent_strike.desc", "The Regent's starter blade. A fully charged hit adds 1 Forge to a Sovereign Blade you carry. (Strike)");
+            add(ModItems.PHOTON_CUT.get(), "Photon Cut");
+            add("item.spirecraft.photon_cut.desc", "30% of each hit ignores armour. (Photon Cut)");
+            add(ModItems.SCYTHE.get(), "Scythe");
+            add("item.spirecraft.scythe.desc", "Each hit: 2 Doom, sweeps nearby foes for half. Hold right-click 1 s and release: 12 damage + Doom in a cone. (The Scythe, Reap)");
+            add(ModItems.SCOURGE.get(), "Scourge");
+            add("item.spirecraft.scourge.desc", "Reach +2. Each hit applies 4 Doom. (Scourge)");
+            add(ModItems.FORBIDDEN_GRIMOIRE.get(), "Forbidden Grimoire");
+            add("item.spirecraft.forbidden_grimoire.desc", "Right-click: spend 3 Souls from a carried Dirge Flute to raise a bone servant for 30 s. (Forbidden Grimoire)");
+            add(ModItems.DIRGE_FLUTE.get(), "Dirge Flute");
+            add("item.spirecraft.dirge_flute.desc", "Gathers a Soul whenever a creature dies within 8 blocks. Hold right-click to play it (2 s): the Souls are released and each strikes a hostile mob for 3. (Dirge)");
+            add(ModItems.DANSE_MACABRE.get(), "Danse Macabre");
+            add("item.spirecraft.danse_macabre.desc", "In the off-hand: a fully charged heavy blow or a long-cooldown ability gives +2 absorption (max 6). (Danse Macabre)");
+            add(ModItems.POISON_FLASK.get(), "Poison Flask");
+            add("item.spirecraft.poison_flask.desc", "Right-click: throw. Bounces 3 times; each bounce gives hostile mobs within 3 blocks 3 Poison. (Bouncing Flask)");
+            add(ModItems.POISONED_DAGGER.get(), "Poisoned Dagger");
+            add("item.spirecraft.poisoned_dagger.desc", "Each hit applies 2 Poison. (Poisoned Stab)");
+            add(ModItems.INK_DAGGER.get(), "Ink Dagger");
+            add("item.spirecraft.ink_dagger.desc", "Hits make the target Weak (2 s). Right-click: fling 2 inky knives (3 damage, Blindness, Weak). (Blade of Ink)");
+            add(ModItems.THROWING_KNIFE.get(), "Throwing Knife");
+            add("item.spirecraft.throwing_knife.desc", "Right-click: throw for 4 damage. Used up on a hit; drops where it lands otherwise. (Dagger Throw)");
+            add(ModItems.SLINGSHOT.get(), "Precise Slingshot");
+            add("item.spirecraft.slingshot.desc", "Hold and release to shoot (up to 6 damage, ×1.5 against Weak targets). Ammo, off hand first: pebbles; fire charges (set alight); snowballs (slow, half damage, ×3 on blazes); slime balls (knock back, slow); iron nuggets (+1/3 damage). (Pinpoint)");
+            add(ModItems.SNAKEBITE.get(), "Snakebite Kris");
+            add("item.spirecraft.snakebite.desc", "A quick, well-balanced blade with no special effect. (Snakebite)");
+            add(ModItems.CLEAVER.get(), "Cleaver");
+            add("item.spirecraft.cleaver.desc", "The Ironclad's starter blade. Chops through shields like an axe. (Strike)");
+            add(ModItems.MORNING_STAR.get(), "Morning Star");
+            add("item.spirecraft.morning_star.desc", "A fully charged hit makes the target Vulnerable (3 s) and knocks it back. (Bash)");
+            add(ModItems.INFERNAL_BLADE.get(), "Infernal Blade");
+            add("item.spirecraft.infernal_blade.desc", "Sets targets on fire (4 s). Right-click: your next hit within 5 s deals ×1.5 and burns longer. (Infernal Blade)");
+            add(ModItems.TANK_SHIELD.get(), "Meat Shield");
+            add("item.spirecraft.tank_shield.desc", "A shield. While you block with it, allies within 8 blocks take 50% less damage. (Tank)");
+            add(ModItems.BLOODLETTING_DAGGER.get(), "Bloodletting Dagger");
+            add("item.spirecraft.bloodletting_dagger.desc", "Right-click: lose 3 HP, gain Haste I and +1 Strength for 15 s. (Bloodletting)");
+            add(ModItems.BLUDGEON.get(), "Bludgeon");
+            add("item.spirecraft.bludgeon.desc", "Very slow and very heavy; a fully charged blow deals ×1.5. Breaks shields. (Bludgeon)");
+            add(ModItems.ROCKET_PUNCH.get(), "Rocket Punch Launcher");
+            add("item.spirecraft.rocket_punch.desc", "Right-click: launch the fist (8 damage, strong knockback). Taking damage shortens the cooldown by 1 s. (Rocket Punch)");
+            add(ModItems.ENERGY_CORE.get(), "Energy Core");
+            add("item.spirecraft.energy_core.desc", "Right-click: channel a Lightning orb; sneak + right-click: a Frost orb. Each Energy Core you carry adds an orb slot; channeling into full slots evokes the oldest orb. Evoke key (R): evoke the oldest orb. (Cracked Core, Zap, Cold Snap)");
+            add(ModItems.FLAK_CANNON.get(), "Flak Cannon");
+            add("item.spirecraft.flak_cannon.desc", "Right-click: fire 5 iron pellets (2 damage each), +1 per channeled orb. Uses 1 flak shell. (Flak Cannon)");
+            add(ModItems.TESLA_COIL.get(), "Tesla Coil");
+            add("item.spirecraft.tesla_coil.desc", "Right-click: lightning arcs through 3 hostile mobs (+1 per Lightning orb), 3 damage each. (Tesla Coil)");
+            add(ModItems.SHADOW_SHIELD.get(), "Shadow Shield Projector");
+            add("item.spirecraft.shadow_shield.desc", "Right-click: Absorption I (20 s) and channel a Dark orb, which bursts around you when evoked or when its time runs out. (Shadow Shield)");
+            add(ModItems.LIGHTNING_ROD.get(), "Lightning Rod Shield");
+            add("item.spirecraft.lightning_rod.desc", "A shield. While you block with it, channel a Lightning orb every 2 s. (Lightning Rod)");
+            add("effect.spirecraft.dark_orb", "Dark Orb");
+            add("effect.spirecraft.capacity", "Capacity");
+            add(ModItems.PEBBLE.get(), "Pebble");
+            add(ModBlocks.REED.get(), "Reeds");
+            add(ModBlocks.ROTTEN_SHRUB.get(), "Rotten Shrub");
+            add(ModBlocks.POLLUTED_CORAL_BLOCK.get(), "Polluted Coral Block");
+            add(ModBlocks.POLLUTED_TUBE_CORAL.get(), "Polluted Tube Coral");
+            add(ModBlocks.POLLUTED_HORN_CORAL.get(), "Polluted Horn Coral");
+            add(ModBlocks.POLLUTED_CORAL_FAN.get(), "Polluted Coral Fan");
+            add(ModBlocks.POLLUTED_CORAL_WALL_FAN.get(), "Polluted Coral Wall Fan");
+            add(ModBlocks.POLLUTED_SEAGRASS.get(), "Polluted Seagrass");
+            add(ModBlocks.POLLUTED_KELP.get(), "Polluted Kelp");
+            add(ModBlocks.POLLUTED_KELP_PLANT.get(), "Polluted Kelp Plant");
+            add(ModBlocks.LANTERN_CAP.get(), "Lantern Cap");
+            add(ModBlocks.CORAL_CAP.get(), "Coral Cap");
+            add(ModBlocks.BLUEBELL_CAP.get(), "Bluebell Cap");
+            add(ModBlocks.SHELF_FUNGUS.get(), "Shelf Fungus");
+            add(ModBlocks.GLOW_SHRUB.get(), "Glow Shrub");
+            add(ModBlocks.GLOW_MOSS_CARPET.get(), "Glow Moss Carpet");
+            add(ModBlocks.LANTERN_CAP_BLOCK.get(), "Lantern Cap Block");
+            add(ModBlocks.HIVE_SHROOM_BLOCK.get(), "Hive Shroom Block");
+            add(ModBlocks.CORAL_CAP_BLOCK.get(), "Coral Cap Block");
+            add(ModBlocks.BLUEBELL_CAP_BLOCK.get(), "Bluebell Cap Block");
+            add(ModBlocks.INK_BUBBLE.get(), "Ink Bubble");
+            add(ModBlocks.HIVE_COMB.get(), "Hive Comb");
+            add(ModBlocks.HIVE_CACHE.get(), "Hive Cache");
+            add(ModBlocks.HIVE_SHROOM.get(), "Hive Shroom");
+            add(ModBlocks.QUICKSAND.get(), "Quicksand");
+            add(ModItems.INK_BUBBLE.get(), "Ink Bubble");
+            add(com.mockingjam.spirecraft.fluid.ModFluids.INK_BUCKET.get(), "Ink Bucket");
+            add("block.spirecraft.ink", "Ink");
+            add(ModItems.SCRAP.get(), "Scrap");
+            add(ModItems.DOCK_BRICK.get(), "Dock Brick");
+            add(ModItems.FLAK_SHELL.get(), "Flak Shell");
+            add("item.minecraft.potion.effect.spirecraft_capacity", "Potion of Capacity");
+            add("item.minecraft.splash_potion.effect.spirecraft_capacity", "Splash Potion of Capacity");
+            add("item.minecraft.lingering_potion.effect.spirecraft_capacity", "Lingering Potion of Capacity");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_capacity", "Arrow of Capacity");
+            add("key.spirecraft.evoke_orb", "Evoke Orb");
+            add("entity.spirecraft.orb_wisp", "Lightning");
+            add("item.spirecraft.energy_core.orb.lightning", "Lightning orb: every %2$s s a homing bolt hits a nearby hostile mob for %1$s; evoked: %3$s. Lasts %4$s s.");
+            add("item.spirecraft.energy_core.orb.frost", "Frost orb: +%1$s armor while it lasts; evoked: Absorption I for %2$s s. Lasts %3$s s.");
+            add("item.spirecraft.energy_core.orb.dark", "Dark orb: bursts for %1$s on hostile mobs within %2$s blocks, when evoked or after %3$s s.");
+            add("item.spirecraft.energy_core.orb.slots", "Orbs that run out of time are evoked. Slots: 1 + Energy Cores + Capacity (max %s).");
+            add("entity.spirecraft.shiv", "Throwing Knife");
+            add("entity.spirecraft.spire_bolt", "Bolt");
+            add("entity.spirecraft.poison_flask", "Poison Flask");
+            add("entity.spirecraft.flak_pellet", "Flak Pellet");
+            add("entity.spirecraft.leaf_slime", "Leaf Slime");
+            add(ModItems.LEAF_SLIME_SPAWN_EGG.get(), "Leaf Slime Spawn Egg");
+            add("entity.spirecraft.twig_slime", "Twig Slime");
+            add(ModItems.TWIG_SLIME_SPAWN_EGG.get(), "Twig Slime Spawn Egg");
+            add("entity.spirecraft.fuzzy_wurm_crawler", "Fuzzy Wurm Crawler");
+            add(ModItems.FUZZY_WURM_CRAWLER_SPAWN_EGG.get(), "Fuzzy Wurm Crawler Spawn Egg");
+            add("entity.spirecraft.flyconid", "Flyconid");
+            add(ModItems.FLYCONID_SPAWN_EGG.get(), "Flyconid Spawn Egg");
+            add("entity.spirecraft.nibbit", "Nibbit");
+            add(ModItems.NIBBIT_SPAWN_EGG.get(), "Nibbit Spawn Egg");
+            add("entity.spirecraft.shrinker_beetle", "Shrinker Beetle");
+            add(ModItems.SHRINKER_BEETLE_SPAWN_EGG.get(), "Shrinker Beetle Spawn Egg");
+            add("entity.spirecraft.byrdonis", "Byrdonis");
+            add(ModItems.BYRDONIS_SPAWN_EGG.get(), "Byrdonis Spawn Egg");
+            add("entity.spirecraft.ceremonial_beast", "Ceremonial Beast");
+            add(ModItems.CEREMONIAL_BEAST_SPAWN_EGG.get(), "Ceremonial Beast Spawn Egg");
+            add("entity.spirecraft.osty", "Osty");
+            add(ModItems.OSTY_SPAWN_EGG.get(), "Osty Spawn Egg");
+            add("effect.spirecraft.shrink", "Shrink");
+            add(ModItems.ROCKET_FIST.get(), "Rocket Fist");
+            add("effect.spirecraft.ringing", "Ringing");
+            add(ModItems.CEREMONIAL_BELL.get(), "Ceremonial Bell");
+            add("item.spirecraft.ceremonial_bell.desc", "Ring it in the Overgrowth or Fog Hollow to summon the Ceremonial Beast.");
+            add("item.spirecraft.ceremonial_bell.wrong_place", "Nothing answers the bell here. Ring it in the Overgrowth or Fog Hollow.");
+            // batch 2: Underdocks
+            add("entity.spirecraft.corpse_slug", "Corpse Slug");
+            add(ModItems.CORPSE_SLUG_SPAWN_EGG.get(), "Corpse Slug Spawn Egg");
+            add("entity.spirecraft.toadpole", "Toadpole");
+            add(ModItems.TOADPOLE_SPAWN_EGG.get(), "Toadpole Spawn Egg");
+            add("entity.spirecraft.two_tailed_rat", "Two-Tailed Rat");
+            add(ModItems.TWO_TAILED_RAT_SPAWN_EGG.get(), "Two-Tailed Rat Spawn Egg");
+            add("entity.spirecraft.seapunk", "Seapunk");
+            add(ModItems.SEAPUNK_SPAWN_EGG.get(), "Seapunk Spawn Egg");
+            add("entity.spirecraft.terror_eel", "Terror Eel");
+            add(ModItems.TERROR_EEL_SPAWN_EGG.get(), "Terror Eel Spawn Egg");
+            add("entity.spirecraft.soul_fysh", "Soul Fysh");
+            add("entity.spirecraft.merchant", "Merchant");
+            add("spirecraft.merchant.purge_hint", "Sneak + right-click to have the Merchant lift a curse (%s emeralds, once per visit)");
+            add("spirecraft.merchant.purged", "The Merchant lifts %s");
+            add("spirecraft.merchant.purge_used", "The Merchant has already lifted a curse this visit");
+            add("spirecraft.merchant.purge_poor", "Lifting a curse costs %s emeralds");
+            add(ModItems.SOUL_FYSH_SPAWN_EGG.get(), "Soul Fysh Spawn Egg");
+            add(ModItems.BECKONING_SOUL.get(), "Beckoning Soul");
+            add("item.spirecraft.beckoning_soul.desc", "Drains your health while you carry it. Right-click to dispel it (costs 3 hunger); thrown away, it comes back. (Beckon)");
+            add("item.spirecraft.beckoning_soul.hungry", "You are too hungry to dispel the soul.");
+            add(ModItems.SOUL_BAIT.get(), "Soul Bait");
+            add("item.spirecraft.soul_bait.desc", "Use it at the water of the Polluted Sea to summon the Soul Fysh.");
+            add("item.spirecraft.soul_bait.wrong_place", "Nothing stirs. Use the bait in the Polluted Sea.");
+            // batch 3: the Hive
+            add(ModItems.BLACK_QUILL.get(), "Black Quill");
+            add("item.spirecraft.black_quill.desc", "Use it in the Overgrowth or the ink spring caves to call up Vantom.");
+            add("item.spirecraft.black_quill.wrong_place", "The ink will not answer here. Try the Overgrowth or the ink springs.");
+            add(ModItems.KIN_IDOL.get(), "Kin Idol");
+            add("item.spirecraft.kin_idol.desc", "Raise it in the Overgrowth to call the Kin Priest and his followers.");
+            add("item.spirecraft.kin_idol.wrong_place", "No Kin hear you here. Raise the idol in the Overgrowth.");
+            add(ModItems.STEAM_WHISTLE.get(), "Steam Whistle");
+            add("item.spirecraft.steam_whistle.desc", "Blow it by the waterfalls or the docks to wake the Waterfall Giant.");
+            add("item.spirecraft.steam_whistle.wrong_place", "Nothing stirs. Blow the whistle by the waterfalls or the docks.");
+            add(ModItems.SLUMBER_HORN.get(), "Slumber Horn");
+            add("item.spirecraft.slumber_horn.desc", "Sound it on the Underdocks shore to rouse the Lagavulin Matriarch (she wakes slowly).");
+            add("item.spirecraft.slumber_horn.wrong_place", "No answer. Sound the horn in the Underdocks or the polluted sea.");
+            add(ModItems.SAND_LURE.get(), "Sand Lure");
+            add("item.spirecraft.sand_lure.desc", "Throw it down in the quicksand caves to draw out the Insatiable.");
+            add("item.spirecraft.sand_lure.wrong_place", "The sand is still. Use the lure in the quicksand caves.");
+            add("item.spirecraft.boss_summon.busy", "It is already here.");
+            add(ModItems.RELIC_FRAGMENT.get(), "Relic Fragment");
+            add("item.spirecraft.relic_fragment.desc", "A smithing template: relics are forged from it. Dropped by elites and bosses.");
+            for (var d : com.mockingjam.spirecraft.mob.ScriptedDefs.ALL.values()) {
+                add("entity.spirecraft." + d.name, d.en);
+                add(ModItems.SCRIPTED_EGGS.get(d.name).get(), d.en + " Spawn Egg");
+            }
+            add("entity.spirecraft.bowlbug_rock", "Bowlbug (Rock)");
+            add(ModItems.BOWLBUG_ROCK_SPAWN_EGG.get(), "Bowlbug (Rock) Spawn Egg");
+            add("entity.spirecraft.bowlbug_egg", "Bowlbug (Egg)");
+            add(ModItems.BOWLBUG_EGG_SPAWN_EGG.get(), "Bowlbug (Egg) Spawn Egg");
+            add("entity.spirecraft.bowlbug_silk", "Bowlbug (Silk)");
+            add(ModItems.BOWLBUG_SILK_SPAWN_EGG.get(), "Bowlbug (Silk) Spawn Egg");
+            add("entity.spirecraft.bowlbug_nectar", "Bowlbug (Nectar)");
+            add(ModItems.BOWLBUG_NECTAR_SPAWN_EGG.get(), "Bowlbug (Nectar) Spawn Egg");
+            add("entity.spirecraft.exoskeleton", "Exoskeleton");
+            add(ModItems.EXOSKELETON_SPAWN_EGG.get(), "Exoskeleton Spawn Egg");
+            add("entity.spirecraft.chomper", "Chomper");
+            add(ModItems.CHOMPER_SPAWN_EGG.get(), "Chomper Spawn Egg");
+            add("entity.spirecraft.myte", "Myte");
+            add(ModItems.MYTE_SPAWN_EGG.get(), "Myte Spawn Egg");
+            add("entity.spirecraft.entomancer", "Entomancer");
+            add(ModItems.ENTOMANCER_SPAWN_EGG.get(), "Entomancer Spawn Egg");
+            add("entity.spirecraft.kaiser_crab", "Kaiser Crab");
+            add(ModItems.KAISER_CRAB_SPAWN_EGG.get(), "Kaiser Crab Spawn Egg");
+            add("entity.spirecraft.knowledge_demon", "Knowledge Demon");
+            add(ModItems.KNOWLEDGE_DEMON_SPAWN_EGG.get(), "Knowledge Demon Spawn Egg");
+            add("entity.spirecraft.kaiser_crab.crusher", "Kaiser Crab - Crusher");
+            add("entity.spirecraft.kaiser_crab.rocket", "Kaiser Crab - Rocket");
+            add("entity.spirecraft.knowledge_demon.curse", "Curse of Knowledge! Stand: %s  |  Sneak: %s");
+            add("effect.spirecraft.disintegration", "Disintegration");
+            add("block.spirecraft.bug_carcass.no_demon", "The Knowledge Demon is already here.");
+            add("item.spirecraft.soul_bait.no_water", "Face open water to cast the bait.");
+            add(ModItems.SOUL_FYSH_BLADDER.get(), "Soul Fysh Bladder");
+
+            add(ModBlocks.WOLFRAMITE_ORE.get(), "Wolframite Ore");
+            add(ModBlocks.DEEPSLATE_WOLFRAMITE_ORE.get(), "Deepslate Wolframite Ore");
+            add(ModBlocks.TUNGSTEN_ALLOY_BLOCK.get(), "Block of Tungsten Alloy");
+            add(ModBlocks.ORICHALCUM_ORE.get(), "Orichalcum Ore");
+            add(ModBlocks.ORICHALCUM_BLOCK.get(), "Block of Orichalcum");
+            add(ModItems.AUTOMATON_ALLOY_INGOT.get(), "Automaton Alloy Ingot");
+            add(ModBlocks.AUTOMATON_ALLOY_BLOCK.get(), "Block of Automaton Alloy");
+            add(ModBlocks.TARNISHED_AUTOMATON_ALLOY_BLOCK.get(), "Tarnished Automaton Alloy");
+            add(ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK.get(), "Derelict Automaton Alloy");
+            add(ModBlocks.CORE_CRYSTAL_BLOCK.get(), "Core Crystal Block");
+            add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), "Cracked Core Crystal Block");
+            add(ModBlocks.NETHER_BRIMSTONE_ORE.get(), "Nether Brimstone Ore");
+            add(ModBlocks.BRIMSTONE_BLOCK.get(), "Block of Brimstone");
+            add(ModBlocks.LAVA_ROCK_ORE.get(), "Lava Rock Ore");
+            add(ModItems.RAW_TUNGSTEN.get(), "Raw Tungsten");
+            add(ModItems.TUNGSTEN_INGOT.get(), "Tungsten Ingot");
+            add(ModItems.TUNGSTEN_ALLOY_INGOT.get(), "Tungsten Alloy Ingot");
+            add(ModItems.TUNGSTEN_HELMET.get(), "Tungsten Alloy Helmet");
+            add(ModItems.TUNGSTEN_CHESTPLATE.get(), "Tungsten Alloy Chestplate");
+            add(ModItems.TUNGSTEN_LEGGINGS.get(), "Tungsten Alloy Leggings");
+            add(ModItems.TUNGSTEN_BOOTS.get(), "Tungsten Alloy Boots");
+            add(ModItems.RAW_ORICHALCUM.get(), "Raw Orichalcum");
+            add(ModItems.ORICHALCUM_INGOT.get(), "Orichalcum Ingot");
+            add(ModItems.ORICHALCUM_SWORD.get(), "Orichalcum Sword");
+            add(ModItems.ORICHALCUM_PICKAXE.get(), "Orichalcum Pickaxe");
+            add(ModItems.ORICHALCUM_AXE.get(), "Orichalcum Axe");
+            add(ModItems.ORICHALCUM_SHOVEL.get(), "Orichalcum Shovel");
+            add(ModItems.ORICHALCUM_HOE.get(), "Orichalcum Hoe");
+            add(ModItems.ORICHALCUM_HELMET.get(), "Orichalcum Helmet");
+            add(ModItems.ORICHALCUM_CHESTPLATE.get(), "Orichalcum Chestplate");
+            add(ModItems.ORICHALCUM_LEGGINGS.get(), "Orichalcum Leggings");
+            add(ModItems.ORICHALCUM_BOOTS.get(), "Orichalcum Boots");
+            add(ModItems.BRIMSTONE.get(), "Brimstone");
+            add(ModItems.LAVA_ROCK_SHARD.get(), "Lava Rock Shard");
+            add(ModItems.LAVA_ROCK.get(), "Lava Rock");
+            add(ModItems.GALACTIC_DUST.get(), "Galactic Dust");
+            add(ModItems.STRAWBERRY.get(), "Strawberry");
+            add(ModItems.PEAR.get(), "Pear");
+            add(ModItems.MANGO.get(), "Mango");
+            add(ModItems.MEAT_ON_THE_BONE.get(), "Meat on the Bone");
+            add(ModItems.AMETHYST_AUBERGINE.get(), "Amethyst Aubergine");
+            add(ModEffects.INTANGIBLE.get(), "Intangible");
+            add(ModEffects.PROSPERITY.get(), "Prosperity");
+            add(ModEffects.BLOOD_HEAL.get(), "Blood Heal");
+            add("item.minecraft.potion.effect.spirecraft_strength", "Strength Potion");
+            add("item.minecraft.splash_potion.effect.spirecraft_strength", "Splash Strength Potion");
+            add("item.minecraft.lingering_potion.effect.spirecraft_strength", "Lingering Strength Potion");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_strength", "Arrow of Strength Potion");
+            add("item.minecraft.potion.effect.spirecraft_flex", "Flex Potion");
+            add("item.minecraft.splash_potion.effect.spirecraft_flex", "Splash Flex Potion");
+            add("item.minecraft.lingering_potion.effect.spirecraft_flex", "Lingering Flex Potion");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_flex", "Arrow of Flex Potion");
+            add("item.minecraft.potion.effect.spirecraft_dexterity", "Dexterity Potion");
+            add("item.minecraft.splash_potion.effect.spirecraft_dexterity", "Splash Dexterity Potion");
+            add("item.minecraft.lingering_potion.effect.spirecraft_dexterity", "Lingering Dexterity Potion");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_dexterity", "Arrow of Dexterity Potion");
+            add("item.minecraft.potion.effect.spirecraft_fysh_oil", "Fysh Oil");
+            add("item.minecraft.splash_potion.effect.spirecraft_fysh_oil", "Splash Fysh Oil");
+            add("item.minecraft.lingering_potion.effect.spirecraft_fysh_oil", "Lingering Fysh Oil");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_fysh_oil", "Arrow of Fysh Oil");
+            add("item.minecraft.potion.effect.spirecraft_weak", "Weak Potion");
+            add("item.minecraft.splash_potion.effect.spirecraft_weak", "Splash Weak Potion");
+            add("item.minecraft.lingering_potion.effect.spirecraft_weak", "Lingering Weak Potion");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_weak", "Arrow of Weak Potion");
+            add("item.minecraft.potion.effect.spirecraft_vulnerable", "Vulnerable Potion");
+            add("item.minecraft.splash_potion.effect.spirecraft_vulnerable", "Splash Vulnerable Potion");
+            add("item.minecraft.lingering_potion.effect.spirecraft_vulnerable", "Lingering Vulnerable Potion");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_vulnerable", "Arrow of Vulnerable Potion");
+            add("item.minecraft.potion.effect.spirecraft_poison", "Poison Potion");
+            add("item.minecraft.splash_potion.effect.spirecraft_poison", "Splash Poison Potion");
+            add("item.minecraft.lingering_potion.effect.spirecraft_poison", "Lingering Poison Potion");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_poison", "Arrow of Poison Potion");
+            add("item.minecraft.potion.effect.spirecraft_doom", "Potion of Doom");
+            add("item.minecraft.splash_potion.effect.spirecraft_doom", "Splash Potion of Doom");
+            add("item.minecraft.lingering_potion.effect.spirecraft_doom", "Lingering Potion of Doom");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_doom", "Arrow of Potion of Doom");
+            add("item.minecraft.potion.effect.spirecraft_block", "Block Potion");
+            add("item.minecraft.splash_potion.effect.spirecraft_block", "Splash Block Potion");
+            add("item.minecraft.lingering_potion.effect.spirecraft_block", "Lingering Block Potion");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_block", "Arrow of Block Potion");
+            add("item.minecraft.potion.effect.spirecraft_liquid_bronze", "Liquid Bronze");
+            add("item.minecraft.splash_potion.effect.spirecraft_liquid_bronze", "Splash Liquid Bronze");
+            add("item.minecraft.lingering_potion.effect.spirecraft_liquid_bronze", "Lingering Liquid Bronze");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_liquid_bronze", "Arrow of Liquid Bronze");
+            add("item.minecraft.potion.effect.spirecraft_lucky_tonic", "Lucky Tonic");
+            add("item.minecraft.splash_potion.effect.spirecraft_lucky_tonic", "Splash Lucky Tonic");
+            add("item.minecraft.lingering_potion.effect.spirecraft_lucky_tonic", "Lingering Lucky Tonic");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_lucky_tonic", "Arrow of Lucky Tonic");
+            add("item.minecraft.potion.effect.spirecraft_blood", "Blood Potion");
+            add("item.minecraft.splash_potion.effect.spirecraft_blood", "Splash Blood Potion");
+            add("item.minecraft.lingering_potion.effect.spirecraft_blood", "Lingering Blood Potion");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_blood", "Arrow of Blood Potion");
+            add("item.minecraft.potion.effect.spirecraft_ghost_in_a_jar", "Ghost in a Jar");
+            add("item.minecraft.splash_potion.effect.spirecraft_ghost_in_a_jar", "Splash Ghost in a Jar");
+            add("item.minecraft.lingering_potion.effect.spirecraft_ghost_in_a_jar", "Lingering Ghost in a Jar");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_ghost_in_a_jar", "Arrow of Ghost in a Jar");
+            add("itemGroup.spirecraft.consumables", "SpireCraft: Food & Potions");
+            add("message.spirecraft.fruit_bonus", "%s: max health +%s (permanent)");
+            add("item.spirecraft.galactic_dust.need_levels", "Needs at least %s experience levels");
+
+            add(ModEffects.STRENGTH.get(), "Strength");
+            add(ModEffects.DEXTERITY.get(), "Dexterity");
+            add(ModEffects.BUFFER.get(), "Buffer");
+            add(ModEffects.ARTIFACT.get(), "Artifact");
+            add(ModEffects.THORNS.get(), "Thorns");
+            add(ModEffects.WEAK.get(), "Weak");
+            add(ModEffects.VULNERABLE.get(), "Vulnerable");
+            add(ModEffects.FRAIL.get(), "Frail");
+            add(ModEffects.POISON.get(), "Poison");
+            add(ModEffects.DOOM.get(), "Doom");
+            add("death.attack.spirecraft.doom", "%1$s was claimed by Doom");
+            add("death.attack.spirecraft.doom.player", "%1$s was claimed by Doom while fighting %2$s");
+        }
+    }
+
+    public static final class Chinese extends LanguageProvider {
+        public Chinese(PackOutput output) {
+            super(output, SpireCraft.MODID, "zh_cn");
+        }
+
+        @Override
+        protected void addTranslations() {
+            add("itemGroup.spirecraft.relics", "尖塔工艺：遗物");
+            biomeNames(this::add, true);
+            add("itemGroup.spirecraft.blocks", "尖塔工艺：方块");
+            add("itemGroup.spirecraft.materials", "尖塔工艺：材料");
+            add("itemGroup.spirecraft.equipment", "尖塔工艺：装备");
+            add(ModItems.BURNING_BLOOD.get(), "燃烧之血");
+            add(ModItems.TUNGSTEN_ROD.get(), "钨合金棍");
+            add("item.spirecraft.tungsten_rod.desc", "每次将要失去生命时，少失去 1 点。");
+            add("item.spirecraft.burning_blood.desc", "战斗结束时：若击杀过敌对生物，回复 4 点生命。");
+            add(ModItems.RELIC_POUCH.get(), "遗物袋");
+            add("item.spirecraft.relic_pouch.desc", "可装 9 件遗物（同名只能一件）。遗物只有放在随身携带的遗物袋里才生效。右键打开。");
+            add(ModItems.ANCHOR.get(), "锚");
+            add("item.spirecraft.anchor.desc", "战斗开始时：获得 4 点伤害吸收（15 秒）。");
+            add(ModItems.VAJRA.get(), "金刚杵");
+            add("item.spirecraft.vajra.desc", "战斗开始时：+1 层力量（30 秒）。");
+            add(ModItems.ODDLY_SMOOTH_STONE.get(), "意外光滑的石头");
+            add("item.spirecraft.oddly_smooth_stone.desc", "战斗开始时：+1 层敏捷（30 秒）。");
+            add(ModItems.BAG_OF_MARBLES.get(), "弹珠袋");
+            add("item.spirecraft.bag_of_marbles.desc", "战斗开始时：8 格内的敌对生物获得易伤（6 秒）。");
+            add(ModItems.RED_MASK.get(), "红面具");
+            add("item.spirecraft.red_mask.desc", "战斗开始时：8 格内的敌对生物获得虚弱（6 秒）。");
+            add(ModItems.BRONZE_SCALES.get(), "铜制鳞片");
+            add("item.spirecraft.bronze_scales.desc", "战斗开始时：+1 层荆棘（30 秒）。");
+            add(ModItems.BLOOD_VIAL.get(), "小血瓶");
+            add("item.spirecraft.blood_vial.desc", "战斗开始时：回复 2 点生命。");
+            add(ModItems.RED_SKULL.get(), "红头骨");
+            add("item.spirecraft.red_skull.desc", "生命不高于 50% 时：攻击额外 +2 力量。");
+            add(ModItems.PEN_NIB.get(), "钢笔尖");
+            add("item.spirecraft.pen_nib.desc", "每第 10 次攻击造成双倍伤害。");
+            add(ModItems.MERCURY_HOURGLASS.get(), "水银沙漏");
+            add("item.spirecraft.mercury_hourglass.desc", "战斗中每 3 秒：对 6 格内所有敌对生物造成 1 点伤害。");
+            add(ModItems.SHURIKEN.get(), "手里剑");
+            add("item.spirecraft.shuriken.desc", "3 秒内攻击 3 次：+1 层力量（30 秒，最多 3 层）。");
+            add(ModItems.LIZARD_TAIL.get(), "蜥蜴尾巴");
+            add("item.spirecraft.lizard_tail.desc", "将要死亡时改为回复至 50% 生命上限。之后需要 1 个游戏日重新长出来。");
+            add("relic.spirecraft.tier.starter", "初始遗物");
+            add("relic.spirecraft.tier.common", "普通遗物");
+            add("relic.spirecraft.tier.uncommon", "罕见遗物");
+            add("relic.spirecraft.tier.rare", "稀有遗物");
+            add("relic.spirecraft.tier.shop", "商店遗物");
+            add("relic.spirecraft.tier.event", "事件遗物");
+            add("relic.spirecraft.tier.ancient", "先古遗物");
+            add("relic.spirecraft.hint", "放在随身的遗物袋里才生效");
+            add("character.spirecraft.ironclad", "铁甲战士");
+            add("character.spirecraft.silent", "静默猎手");
+            add("character.spirecraft.regent", "储君");
+            add("character.spirecraft.necrobinder", "亡灵契约师");
+            add("character.spirecraft.defect", "故障机器人");
+            add("item.spirecraft.sovereign_blade.forge", "锻造 %s / %s（+%s 伤害）");
+            add("item.spirecraft.dirge_flute.souls", "灵魂 %s / %s");
+            add("effect.spirecraft.lightning_orb", "闪电充能球");
+            add("effect.spirecraft.frost_orb", "冰霜充能球");
+            add("itemGroup.spirecraft.weapons", "尖塔工艺：武器");
+            add(ModItems.SOVEREIGN_BLADE.get(), "君王之剑");
+            add("item.spirecraft.sovereign_blade.desc", "每击杀一个敌对生物积累 1 点锻造，每 15 点永久 +1 伤害（最多 +5）。（君王之剑）");
+            add(ModItems.CRESCENT_SPEAR.get(), "新月长矛");
+            add("item.spirecraft.crescent_spear.desc", "攻击距离 +1。背包里每有一件其他储君武器，伤害 +0.5（最多 +2）。（新月长矛）");
+            add(ModItems.HEIRLOOM_HAMMER.get(), "传承之锤");
+            add("item.spirecraft.heirloom_hammer.desc", "慢而重。击杀时 25% 概率让一种掉落物翻倍。（传承之锤）");
+            add(ModItems.REGENT_STRIKE.get(), "剑（打击）");
+            add("item.spirecraft.regent_strike.desc", "储君的入门武器。满蓄力命中时为背包里的君王之剑增加 1 点锻造。（打击）");
+            add(ModItems.PHOTON_CUT.get(), "光子切割刃");
+            add("item.spirecraft.photon_cut.desc", "每次攻击有 30% 的伤害无视护甲。（光子切割）");
+            add(ModItems.SCYTHE.get(), "镰刀");
+            add("item.spirecraft.scythe.desc", "每击施加 2 层灾厄并横扫周围敌人（一半伤害）。按住右键 1 秒松开：前方扇形 12 伤害并施加灾厄。（镰刀、收割）");
+            add(ModItems.SCOURGE.get(), "鞭子");
+            add("item.spirecraft.scourge.desc", "攻击距离 +2。每击施加 4 层灾厄。（鞭笞）");
+            add(ModItems.FORBIDDEN_GRIMOIRE.get(), "亡灵召唤书");
+            add("item.spirecraft.forbidden_grimoire.desc", "右键：消耗挽歌笛子里的 3 个灵魂，召唤一名骷髅仆从，持续 30 秒。（禁忌魔典）");
+            add(ModItems.DIRGE_FLUTE.get(), "挽歌笛子");
+            add("item.spirecraft.dirge_flute.desc", "8 格内有生物死亡时收集 1 个灵魂。按住右键吹奏 2 秒：放出全部灵魂，每个对一个敌对生物造成 3 伤害。（挽歌）");
+            add(ModItems.DANSE_MACABRE.get(), "死亡之舞扇子");
+            add("item.spirecraft.danse_macabre.desc", "放在副手：满蓄力的重击或长冷却技能后获得 2 点伤害吸收（最多 6）。（死亡之舞）");
+            add(ModItems.POISON_FLASK.get(), "毒瓶");
+            add("item.spirecraft.poison_flask.desc", "右键投掷，弹跳 3 次，每次给 3 格内的敌对生物 3 层中毒。（弹跳药瓶）");
+            add(ModItems.POISONED_DAGGER.get(), "带毒匕首");
+            add("item.spirecraft.poisoned_dagger.desc", "每击施加 2 层中毒。（淬毒刺击）");
+            add(ModItems.INK_DAGGER.get(), "带墨匕首");
+            add("item.spirecraft.ink_dagger.desc", "命中使目标虚弱 2 秒。右键：甩出 2 把墨迹飞刀（3 伤害、失明、虚弱）。（墨之刃）");
+            add(ModItems.THROWING_KNIFE.get(), "飞刀");
+            add("item.spirecraft.throwing_knife.desc", "右键投出，4 伤害。命中后消耗，否则落在原地可捡回。（飞刀投掷）");
+            add(ModItems.SLINGSHOT.get(), "精密瞄准弹弓");
+            add("item.spirecraft.slingshot.desc", "按住蓄力松开发射（最高 6 伤害，对虚弱目标 ×1.5）。弹药（优先副手）：石子；火焰弹（点燃）；雪球（减速，伤害减半，对烈焰人 ×3）；黏液球（击退并减速）；铁粒（伤害 +1/3）。（精准瞄准）");
+            add(ModItems.SNAKEBITE.get(), "蛇形刀");
+            add("item.spirecraft.snakebite.desc", "轻快趁手的匕首，没有特殊效果。（蛇咬）");
+            add(ModItems.CLEAVER.get(), "刀");
+            add("item.spirecraft.cleaver.desc", "战士的入门武器。像斧一样能劈开盾牌。（打击）");
+            add(ModItems.MORNING_STAR.get(), "流星锤");
+            add("item.spirecraft.morning_star.desc", "满蓄力命中使目标易伤 3 秒并击退。（痛击）");
+            add(ModItems.INFERNAL_BLADE.get(), "地狱之刃");
+            add("item.spirecraft.infernal_blade.desc", "命中点燃目标 4 秒。右键：5 秒内下一击 ×1.5 伤害并燃烧更久。（地狱之刃）");
+            add(ModItems.TANK_SHIELD.get(), "肉盾");
+            add("item.spirecraft.tank_shield.desc", "盾牌。举盾时，8 格内的队友、驯服生物和村民受到的伤害减半。（坦克）");
+            add(ModItems.BLOODLETTING_DAGGER.get(), "带血匕首");
+            add("item.spirecraft.bloodletting_dagger.desc", "右键：失去 3 点生命，获得急迫 I 和 1 层力量，持续 15 秒。（放血）");
+            add(ModItems.BLUDGEON.get(), "重锤");
+            add("item.spirecraft.bludgeon.desc", "极慢极重，满蓄力一击 ×1.5 伤害。能破盾。（重击）");
+            add(ModItems.ROCKET_PUNCH.get(), "火箭飞拳发射器");
+            add("item.spirecraft.rocket_punch.desc", "右键：发射飞拳（8 伤害，强击退）。每次受伤冷却缩短 1 秒。（火箭飞拳）");
+            add(ModItems.ENERGY_CORE.get(), "能量核心");
+            add("item.spirecraft.energy_core.desc", "右键：生成闪电球；潜行右键：生成冰霜球。身上每带一个能量核心多一个球栏位；栏位满时再生成会先激发最早的球。激发键（R）：激发最早的球。（破损核心）");
+            add(ModItems.FLAK_CANNON.get(), "散射炮");
+            add("item.spirecraft.flak_cannon.desc", "右键：发射 5 枚铁弹（各 2 伤害），每个充能球 +1 枚。每次消耗 1 发霰弹。（高射炮）");
+            add(ModItems.TESLA_COIL.get(), "特斯拉线圈");
+            add("item.spirecraft.tesla_coil.desc", "右键：闪电在 3 个敌对生物间跳跃（每个闪电球 +1 跳），各 3 伤害。（特斯拉线圈）");
+            add(ModItems.SHADOW_SHIELD.get(), "暗影之盾投射器");
+            add("item.spirecraft.shadow_shield.desc", "右键：获得伤害吸收 I（20 秒）并生成一个暗黑球；被激发或时间到时在你周围爆炸。（暗影之盾）");
+            add(ModItems.LIGHTNING_ROD.get(), "引雷针护盾");
+            add("item.spirecraft.lightning_rod.desc", "盾牌。举盾时每 2 秒生成一个闪电球。（引雷针）");
+            add("effect.spirecraft.dark_orb", "暗黑球");
+            add("effect.spirecraft.capacity", "扩容");
+            add(ModItems.PEBBLE.get(), "石子");
+            add(ModBlocks.REED.get(), "芦苇");
+            add(ModBlocks.ROTTEN_SHRUB.get(), "腐枯灌木");
+            add(ModBlocks.POLLUTED_CORAL_BLOCK.get(), "污染珊瑚块");
+            add(ModBlocks.POLLUTED_TUBE_CORAL.get(), "污染管珊瑚");
+            add(ModBlocks.POLLUTED_HORN_CORAL.get(), "污染鹿角珊瑚");
+            add(ModBlocks.POLLUTED_CORAL_FAN.get(), "污染珊瑚扇");
+            add(ModBlocks.POLLUTED_CORAL_WALL_FAN.get(), "墙上的污染珊瑚扇");
+            add(ModBlocks.POLLUTED_SEAGRASS.get(), "污染海草");
+            add(ModBlocks.POLLUTED_KELP.get(), "污染海带");
+            add(ModBlocks.POLLUTED_KELP_PLANT.get(), "污染海带植株");
+            add(ModBlocks.LANTERN_CAP.get(), "灯笼菇");
+            add(ModBlocks.CORAL_CAP.get(), "珊瑚菇");
+            add(ModBlocks.BLUEBELL_CAP.get(), "蓝铃菇");
+            add(ModBlocks.SHELF_FUNGUS.get(), "层孔菇");
+            add(ModBlocks.GLOW_SHRUB.get(), "发光灌木");
+            add(ModBlocks.GLOW_MOSS_CARPET.get(), "萤苔地毯");
+            add(ModBlocks.LANTERN_CAP_BLOCK.get(), "灯笼菇方块");
+            add(ModBlocks.HIVE_SHROOM_BLOCK.get(), "巢菇方块");
+            add(ModBlocks.CORAL_CAP_BLOCK.get(), "珊瑚菇方块");
+            add(ModBlocks.BLUEBELL_CAP_BLOCK.get(), "蓝铃菇方块");
+            add(ModBlocks.INK_BUBBLE.get(), "墨泡");
+            add(ModBlocks.HIVE_COMB.get(), "巢块");
+            add(ModBlocks.HIVE_CACHE.get(), "巢穴储藏块");
+            add(ModBlocks.HIVE_SHROOM.get(), "巢菇");
+            add(ModBlocks.QUICKSAND.get(), "流沙");
+            add(ModItems.INK_BUBBLE.get(), "墨泡");
+            add(com.mockingjam.spirecraft.fluid.ModFluids.INK_BUCKET.get(), "墨桶");
+            add("block.spirecraft.ink", "墨");
+            add(ModItems.SCRAP.get(), "废料");
+            add(ModItems.DOCK_BRICK.get(), "港砖");
+            add(ModItems.FLAK_SHELL.get(), "霰弹");
+            add("item.minecraft.potion.effect.spirecraft_capacity", "扩容药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_capacity", "喷溅型扩容药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_capacity", "滞留型扩容药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_capacity", "扩容之箭");
+            add("key.spirecraft.evoke_orb", "激发充能球");
+            add("entity.spirecraft.orb_wisp", "闪电");
+            add("item.spirecraft.energy_core.orb.lightning", "闪电球：每 %2$s 秒放出一道追踪闪电，击中附近敌对生物造成 %1$s；激发：%3$s。持续 %4$s 秒。");
+            add("item.spirecraft.energy_core.orb.frost", "冰霜球：存在时 +%1$s 护甲；激发：伤害吸收 I %2$s 秒。持续 %3$s 秒。");
+            add("item.spirecraft.energy_core.orb.dark", "暗黑球：被激发或 %3$s 秒后爆炸，对 %2$s 格内敌对生物造成 %1$s。");
+            add("item.spirecraft.energy_core.orb.slots", "时间耗尽的球会自动激发。栏位：1 + 能量核心数 + 扩容（最多 %s）。");
+            add("entity.spirecraft.shiv", "飞刀");
+            add("entity.spirecraft.spire_bolt", "弹丸");
+            add("entity.spirecraft.poison_flask", "毒瓶");
+            add("entity.spirecraft.flak_pellet", "铁弹");
+            add("entity.spirecraft.leaf_slime", "叶史莱姆");
+            add(ModItems.LEAF_SLIME_SPAWN_EGG.get(), "叶史莱姆刷怪蛋");
+            add("entity.spirecraft.twig_slime", "枝史莱姆");
+            add(ModItems.TWIG_SLIME_SPAWN_EGG.get(), "枝史莱姆刷怪蛋");
+            add("entity.spirecraft.fuzzy_wurm_crawler", "毛绒伏地虫");
+            add(ModItems.FUZZY_WURM_CRAWLER_SPAWN_EGG.get(), "毛绒伏地虫刷怪蛋");
+            add("entity.spirecraft.flyconid", "飞菇人");
+            add(ModItems.FLYCONID_SPAWN_EGG.get(), "飞菇人刷怪蛋");
+            add("entity.spirecraft.nibbit", "尼比特");
+            add(ModItems.NIBBIT_SPAWN_EGG.get(), "尼比特刷怪蛋");
+            add("entity.spirecraft.shrinker_beetle", "缩小甲虫");
+            add(ModItems.SHRINKER_BEETLE_SPAWN_EGG.get(), "缩小甲虫刷怪蛋");
+            add("entity.spirecraft.byrdonis", "伯多尼斯");
+            add(ModItems.BYRDONIS_SPAWN_EGG.get(), "伯多尼斯刷怪蛋");
+            add("entity.spirecraft.ceremonial_beast", "仪式兽");
+            add(ModItems.CEREMONIAL_BEAST_SPAWN_EGG.get(), "仪式兽刷怪蛋");
+            add("entity.spirecraft.osty", "奥斯提");
+            add(ModItems.OSTY_SPAWN_EGG.get(), "奥斯提刷怪蛋");
+            add("effect.spirecraft.shrink", "缩小");
+            add(ModItems.ROCKET_FIST.get(), "火箭拳头");
+            add("effect.spirecraft.ringing", "回响");
+            add(ModItems.CEREMONIAL_BELL.get(), "仪式之铃");
+            add("item.spirecraft.ceremonial_bell.desc", "在密林或雾菇谷中敲响，召唤仪式兽。");
+            add("item.spirecraft.ceremonial_bell.wrong_place", "这里没有东西回应钟声。请在密林或雾菇谷中敲响。");
+            add("entity.spirecraft.corpse_slug", "尸蛞蝓");
+            add(ModItems.CORPSE_SLUG_SPAWN_EGG.get(), "尸蛞蝓刷怪蛋");
+            add("entity.spirecraft.toadpole", "蝌蚪蛙");
+            add(ModItems.TOADPOLE_SPAWN_EGG.get(), "蝌蚪蛙刷怪蛋");
+            add("entity.spirecraft.two_tailed_rat", "双尾鼠");
+            add(ModItems.TWO_TAILED_RAT_SPAWN_EGG.get(), "双尾鼠刷怪蛋");
+            add("entity.spirecraft.seapunk", "海朋克");
+            add(ModItems.SEAPUNK_SPAWN_EGG.get(), "海朋克刷怪蛋");
+            add("entity.spirecraft.terror_eel", "恐怖鳗鱼");
+            add(ModItems.TERROR_EEL_SPAWN_EGG.get(), "恐怖鳗鱼刷怪蛋");
+            add("entity.spirecraft.soul_fysh", "灵魂鱼");
+            add("entity.spirecraft.merchant", "商人");
+            add("spirecraft.merchant.purge_hint", "潜行 + 右键，让商人解除一个诅咒（%s 绿宝石，每次来访一次）");
+            add("spirecraft.merchant.purged", "商人解除了%s");
+            add("spirecraft.merchant.purge_used", "商人这次已经解除过诅咒了");
+            add("spirecraft.merchant.purge_poor", "解除诅咒需要 %s 绿宝石");
+            add(ModItems.SOUL_FYSH_SPAWN_EGG.get(), "灵魂鱼刷怪蛋");
+            add(ModItems.BECKONING_SOUL.get(), "招引之魂");
+            add("item.spirecraft.beckoning_soul.desc", "带在身上会不断损失生命。右键驱散（消耗 3 点饥饿值）；丢掉也会回来。（招引）");
+            add("item.spirecraft.beckoning_soul.hungry", "你太饿了，无法驱散它。");
+            add(ModItems.SOUL_BAIT.get(), "灵魂鱼饵");
+            add("item.spirecraft.soul_bait.desc", "在污染海域的水边使用，召唤灵魂鱼。");
+            add("item.spirecraft.soul_bait.wrong_place", "没有动静。请在污染海域使用鱼饵。");
+            // batch 3: 巢穴
+            add(ModItems.BLACK_QUILL.get(), "乌羽笔");
+            add("item.spirecraft.black_quill.desc", "在密林或墨泉洞穴中使用，召唤墨魇。");
+            add("item.spirecraft.black_quill.wrong_place", "这里的墨不会回应。请去密林或墨泉洞穴。");
+            add(ModItems.KIN_IDOL.get(), "同族神像");
+            add("item.spirecraft.kin_idol.desc", "在密林中举起，召来同族祭司和他的信徒。");
+            add("item.spirecraft.kin_idol.wrong_place", "这里没有同族听见。请在密林中举起神像。");
+            add(ModItems.STEAM_WHISTLE.get(), "蒸汽汽笛");
+            add("item.spirecraft.steam_whistle.desc", "在瀑布或暗港边吹响，唤醒瀑布巨人。");
+            add("item.spirecraft.steam_whistle.wrong_place", "没有动静。请在瀑布或暗港边吹响。");
+            add(ModItems.SLUMBER_HORN.get(), "安眠号角");
+            add("item.spirecraft.slumber_horn.desc", "在暗港岸边吹响，唤醒拉格夫林女族长（她醒得很慢）。");
+            add("item.spirecraft.slumber_horn.wrong_place", "没有回应。请在暗港或污染海域吹响。");
+            add(ModItems.SAND_LURE.get(), "流沙诱饵");
+            add("item.spirecraft.sand_lure.desc", "扔进流沙洞穴，引出贪食者。");
+            add("item.spirecraft.sand_lure.wrong_place", "流沙一动不动。请在流沙洞穴里使用。");
+            add("item.spirecraft.boss_summon.busy", "它已经在附近了。");
+            add(ModItems.RELIC_FRAGMENT.get(), "遗物残片");
+            add("item.spirecraft.relic_fragment.desc", "锻造模板：遗物要用它在锻造台上锻造。精英和 Boss 会掉落。");
+            for (var d : com.mockingjam.spirecraft.mob.ScriptedDefs.ALL.values()) {
+                add("entity.spirecraft." + d.name, d.zh);
+                add(ModItems.SCRIPTED_EGGS.get(d.name).get(), d.zh + "刷怪蛋");
+            }
+            add("entity.spirecraft.bowlbug_rock", "盛碗虫（岩）");
+            add(ModItems.BOWLBUG_ROCK_SPAWN_EGG.get(), "盛碗虫（岩）刷怪蛋");
+            add("entity.spirecraft.bowlbug_egg", "盛碗虫（卵）");
+            add(ModItems.BOWLBUG_EGG_SPAWN_EGG.get(), "盛碗虫（卵）刷怪蛋");
+            add("entity.spirecraft.bowlbug_silk", "盛碗虫（丝）");
+            add(ModItems.BOWLBUG_SILK_SPAWN_EGG.get(), "盛碗虫（丝）刷怪蛋");
+            add("entity.spirecraft.bowlbug_nectar", "盛碗虫（蜜）");
+            add(ModItems.BOWLBUG_NECTAR_SPAWN_EGG.get(), "盛碗虫（蜜）刷怪蛋");
+            add("entity.spirecraft.exoskeleton", "外骨骼虫");
+            add(ModItems.EXOSKELETON_SPAWN_EGG.get(), "外骨骼虫刷怪蛋");
+            add("entity.spirecraft.chomper", "咬咬机");
+            add(ModItems.CHOMPER_SPAWN_EGG.get(), "咬咬机刷怪蛋");
+            add("entity.spirecraft.myte", "螨");
+            add(ModItems.MYTE_SPAWN_EGG.get(), "螨刷怪蛋");
+            add("entity.spirecraft.entomancer", "驭虫师");
+            add(ModItems.ENTOMANCER_SPAWN_EGG.get(), "驭虫师刷怪蛋");
+            add("entity.spirecraft.kaiser_crab", "帝王蟹");
+            add(ModItems.KAISER_CRAB_SPAWN_EGG.get(), "帝王蟹刷怪蛋");
+            add("entity.spirecraft.knowledge_demon", "知识恶魔");
+            add(ModItems.KNOWLEDGE_DEMON_SPAWN_EGG.get(), "知识恶魔刷怪蛋");
+            add("entity.spirecraft.kaiser_crab.crusher", "帝王蟹·碾压者");
+            add("entity.spirecraft.kaiser_crab.rocket", "帝王蟹·火箭");
+            add("entity.spirecraft.knowledge_demon.curse", "知识诅咒！站着：%s  |  潜行：%s");
+            add("effect.spirecraft.disintegration", "崩解");
+            add("block.spirecraft.bug_carcass.no_demon", "知识恶魔已经在这里了。");
+            add("item.spirecraft.soul_bait.no_water", "请面向开阔的水面抛出鱼饵。");
+            add(ModItems.SOUL_FYSH_BLADDER.get(), "灵魂鱼鳔");
+
+            add(ModBlocks.WOLFRAMITE_ORE.get(), "黑钨矿石");
+            add(ModBlocks.DEEPSLATE_WOLFRAMITE_ORE.get(), "深层黑钨矿石");
+            add(ModBlocks.TUNGSTEN_ALLOY_BLOCK.get(), "钨合金块");
+            add(ModBlocks.ORICHALCUM_ORE.get(), "奥利哈钢矿石");
+            add(ModBlocks.ORICHALCUM_BLOCK.get(), "奥利哈钢块");
+            add(ModItems.AUTOMATON_ALLOY_INGOT.get(), "机巧合金锭");
+            add(ModBlocks.AUTOMATON_ALLOY_BLOCK.get(), "机巧合金块");
+            add(ModBlocks.TARNISHED_AUTOMATON_ALLOY_BLOCK.get(), "氧化机巧合金块");
+            add(ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK.get(), "废弃机巧合金块");
+            add(ModBlocks.CORE_CRYSTAL_BLOCK.get(), "核心晶块");
+            add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), "破损核心晶块");
+            add(ModBlocks.NETHER_BRIMSTONE_ORE.get(), "下界硫磺矿石");
+            add(ModBlocks.BRIMSTONE_BLOCK.get(), "硫磺块");
+            add(ModBlocks.LAVA_ROCK_ORE.get(), "熔岩石矿");
+            add(ModItems.RAW_TUNGSTEN.get(), "粗钨");
+            add(ModItems.TUNGSTEN_INGOT.get(), "钨锭");
+            add(ModItems.TUNGSTEN_ALLOY_INGOT.get(), "钨合金锭");
+            add(ModItems.TUNGSTEN_HELMET.get(), "钨合金头盔");
+            add(ModItems.TUNGSTEN_CHESTPLATE.get(), "钨合金胸甲");
+            add(ModItems.TUNGSTEN_LEGGINGS.get(), "钨合金护腿");
+            add(ModItems.TUNGSTEN_BOOTS.get(), "钨合金靴子");
+            add(ModItems.RAW_ORICHALCUM.get(), "粗奥利哈钢");
+            add(ModItems.ORICHALCUM_INGOT.get(), "奥利哈钢锭");
+            add(ModItems.ORICHALCUM_SWORD.get(), "奥利哈钢剑");
+            add(ModItems.ORICHALCUM_PICKAXE.get(), "奥利哈钢镐");
+            add(ModItems.ORICHALCUM_AXE.get(), "奥利哈钢斧");
+            add(ModItems.ORICHALCUM_SHOVEL.get(), "奥利哈钢锹");
+            add(ModItems.ORICHALCUM_HOE.get(), "奥利哈钢锄");
+            add(ModItems.ORICHALCUM_HELMET.get(), "奥利哈钢头盔");
+            add(ModItems.ORICHALCUM_CHESTPLATE.get(), "奥利哈钢胸甲");
+            add(ModItems.ORICHALCUM_LEGGINGS.get(), "奥利哈钢护腿");
+            add(ModItems.ORICHALCUM_BOOTS.get(), "奥利哈钢靴子");
+            add(ModItems.BRIMSTONE.get(), "硫磺");
+            add(ModItems.LAVA_ROCK_SHARD.get(), "熔岩石碎片");
+            add(ModItems.LAVA_ROCK.get(), "熔岩石");
+            add(ModItems.GALACTIC_DUST.get(), "星系尘埃");
+            add(ModItems.STRAWBERRY.get(), "草莓");
+            add(ModItems.PEAR.get(), "梨");
+            add(ModItems.MANGO.get(), "芒果");
+            add(ModItems.MEAT_ON_THE_BONE.get(), "带骨肉");
+            add(ModItems.AMETHYST_AUBERGINE.get(), "紫水晶茄子");
+            add(ModEffects.INTANGIBLE.get(), "无实体");
+            add(ModEffects.PROSPERITY.get(), "财运");
+            add(ModEffects.BLOOD_HEAL.get(), "鲜血治疗");
+            add("item.minecraft.potion.effect.spirecraft_strength", "力量药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_strength", "喷溅型力量药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_strength", "滞留型力量药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_strength", "力量药水之箭");
+            add("item.minecraft.potion.effect.spirecraft_flex", "爆发药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_flex", "喷溅型爆发药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_flex", "滞留型爆发药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_flex", "爆发药水之箭");
+            add("item.minecraft.potion.effect.spirecraft_dexterity", "敏捷药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_dexterity", "喷溅型敏捷药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_dexterity", "滞留型敏捷药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_dexterity", "敏捷药水之箭");
+            add("item.minecraft.potion.effect.spirecraft_fysh_oil", "鱼油");
+            add("item.minecraft.splash_potion.effect.spirecraft_fysh_oil", "喷溅型鱼油");
+            add("item.minecraft.lingering_potion.effect.spirecraft_fysh_oil", "滞留型鱼油");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_fysh_oil", "鱼油之箭");
+            add("item.minecraft.potion.effect.spirecraft_weak", "虚弱药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_weak", "喷溅型虚弱药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_weak", "滞留型虚弱药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_weak", "虚弱药水之箭");
+            add("item.minecraft.potion.effect.spirecraft_vulnerable", "易伤药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_vulnerable", "喷溅型易伤药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_vulnerable", "滞留型易伤药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_vulnerable", "易伤药水之箭");
+            add("item.minecraft.potion.effect.spirecraft_poison", "毒药");
+            add("item.minecraft.splash_potion.effect.spirecraft_poison", "喷溅型毒药");
+            add("item.minecraft.lingering_potion.effect.spirecraft_poison", "滞留型毒药");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_poison", "毒药之箭");
+            add("item.minecraft.potion.effect.spirecraft_doom", "灾厄药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_doom", "喷溅型灾厄药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_doom", "滞留型灾厄药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_doom", "灾厄药水之箭");
+            add("item.minecraft.potion.effect.spirecraft_block", "格挡药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_block", "喷溅型格挡药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_block", "滞留型格挡药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_block", "格挡药水之箭");
+            add("item.minecraft.potion.effect.spirecraft_liquid_bronze", "液态青铜");
+            add("item.minecraft.splash_potion.effect.spirecraft_liquid_bronze", "喷溅型液态青铜");
+            add("item.minecraft.lingering_potion.effect.spirecraft_liquid_bronze", "滞留型液态青铜");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_liquid_bronze", "液态青铜之箭");
+            add("item.minecraft.potion.effect.spirecraft_lucky_tonic", "幸运补剂");
+            add("item.minecraft.splash_potion.effect.spirecraft_lucky_tonic", "喷溅型幸运补剂");
+            add("item.minecraft.lingering_potion.effect.spirecraft_lucky_tonic", "滞留型幸运补剂");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_lucky_tonic", "幸运补剂之箭");
+            add("item.minecraft.potion.effect.spirecraft_blood", "鲜血药水");
+            add("item.minecraft.splash_potion.effect.spirecraft_blood", "喷溅型鲜血药水");
+            add("item.minecraft.lingering_potion.effect.spirecraft_blood", "滞留型鲜血药水");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_blood", "鲜血药水之箭");
+            add("item.minecraft.potion.effect.spirecraft_ghost_in_a_jar", "瓶中幽灵");
+            add("item.minecraft.splash_potion.effect.spirecraft_ghost_in_a_jar", "喷溅型瓶中幽灵");
+            add("item.minecraft.lingering_potion.effect.spirecraft_ghost_in_a_jar", "滞留型瓶中幽灵");
+            add("item.minecraft.tipped_arrow.effect.spirecraft_ghost_in_a_jar", "瓶中幽灵之箭");
+            add("itemGroup.spirecraft.consumables", "尖塔工艺：食物与药水");
+            add("message.spirecraft.fruit_bonus", "%s：生命上限永久 +%s");
+            add("item.spirecraft.galactic_dust.need_levels", "至少需要 %s 级经验");
+
+            add(ModEffects.STRENGTH.get(), "力量");
+            add(ModEffects.DEXTERITY.get(), "敏捷");
+            add(ModEffects.BUFFER.get(), "缓冲");
+            add(ModEffects.ARTIFACT.get(), "人工制品");
+            add(ModEffects.THORNS.get(), "荆棘");
+            add(ModEffects.WEAK.get(), "虚弱");
+            add(ModEffects.VULNERABLE.get(), "易伤");
+            add(ModEffects.FRAIL.get(), "脆弱");
+            add(ModEffects.POISON.get(), "中毒");
+            add(ModEffects.DOOM.get(), "灾厄");
+            add("death.attack.spirecraft.doom", "%1$s被灾厄吞噬了");
+            add("death.attack.spirecraft.doom.player", "%1$s在与%2$s战斗时被灾厄吞噬了");
+        }
+    }
+}

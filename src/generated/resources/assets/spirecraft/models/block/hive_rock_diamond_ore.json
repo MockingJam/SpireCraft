@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "spirecraft:block/hive_rock_diamond_ore"
+  }
+}

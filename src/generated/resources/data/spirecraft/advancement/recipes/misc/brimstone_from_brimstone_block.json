@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_brimstone_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "spirecraft:brimstone_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "spirecraft:brimstone_from_brimstone_block"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_brimstone_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "spirecraft:brimstone_from_brimstone_block"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/template_seagrass",
+  "textures": {
+    "texture": "spirecraft:block/polluted_seagrass"
+  }
+}

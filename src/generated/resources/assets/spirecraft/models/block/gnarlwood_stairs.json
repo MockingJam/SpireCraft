@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "spirecraft:block/gnarlwood_planks",
+    "side": "spirecraft:block/gnarlwood_planks",
+    "top": "spirecraft:block/gnarlwood_planks"
+  }
+}

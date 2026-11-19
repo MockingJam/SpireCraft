@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "spirecraft:block/deep_hive_rock_slab"
+    },
+    "type=double": {
+      "model": "spirecraft:block/deep_hive_rock"
+    },
+    "type=top": {
+      "model": "spirecraft:block/deep_hive_rock_slab_top"
+    }
+  }
+}

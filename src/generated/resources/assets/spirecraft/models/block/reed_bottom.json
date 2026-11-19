@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/crop",
+  "textures": {
+    "crop": "spirecraft:block/reed_bottom"
+  }
+}

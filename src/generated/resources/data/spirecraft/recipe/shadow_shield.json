@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:ender_pearl",
+    "minecraft:ink_sac",
+    "minecraft:ink_sac",
+    "minecraft:glass",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:shadow_shield"
+  }
+}

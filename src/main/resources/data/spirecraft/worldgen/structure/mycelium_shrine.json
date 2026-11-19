@@ -1,0 +1,10 @@
+{
+  "type": "spirecraft:carved",
+  "biomes": "#spirecraft:has_structure/mycelium_shrine",
+  "step": "underground_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "kind": "mycelium_shrine",
+  "min_y": -40,
+  "max_y": 30
+}

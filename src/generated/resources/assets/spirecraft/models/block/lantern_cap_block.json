@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/template_single_face",
+  "textures": {
+    "texture": "spirecraft:block/lantern_cap_block"
+  }
+}

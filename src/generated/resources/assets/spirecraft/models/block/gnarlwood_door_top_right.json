@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top_right",
+  "textures": {
+    "bottom": "spirecraft:block/gnarlwood_door_bottom",
+    "top": "spirecraft:block/gnarlwood_door_top"
+  }
+}

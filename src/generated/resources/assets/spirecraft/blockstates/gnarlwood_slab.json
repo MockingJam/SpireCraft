@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "spirecraft:block/gnarlwood_slab"
+    },
+    "type=double": {
+      "model": "spirecraft:block/gnarlwood_planks"
+    },
+    "type=top": {
+      "model": "spirecraft:block/gnarlwood_slab_top"
+    }
+  }
+}
