@@ -1,7 +1,7 @@
 // Model v7 (user 2026-11-18: the models are too crude - a big monster needs its anatomy worked out part by part, and
 // the humanoids must follow STS2, not the vanilla player). Each entry starts from a feature list taken from the STS2
 // render and the real animal behind it, then builds every part to size. Overrides the earlier specs.
-const { R, withPattern, glowing, h2, hash, B, loft, sl, fin, eyeDetail, teethMask, limb, fringe } = require('./kit');
+const { R, withPattern, glowing, h2, hash, B, loft, sl, fin, eyeDetail, teethMask, limb, fringe, rotBox, octo } = require('./kit');
 
 // ===================================================================================================== Soul Fysh
 // Features (StS2_Soul_Fysh.png + a sunfish / discus): a deep, long body with a rounded back and belly, the head
@@ -915,19 +915,31 @@ function bugLeg(name, parent, at, s, o) {
   ] };
 }
 
-// Vine Shambler: a crawling mound of yellow-green vines - a hunched back of tangled strands falling in a shaggy
-// fringe, a wide gaping maw of thorny teeth in front, two long dragging vine arms ending in reddish root-hands,
-// short legs buried in the tangle, leaves sprouting from the top.
+// Vine Shambler: low, elongated golden vine mound, massive front bundles and long bent red hind legs.
 {
-  const vine = withPattern(R('#f0ec98', '#d8d070', '#b8b04c', '#968e36', '#726a24'), (f, x, y) => (x % 2 ? 0.5 : -0.3) + (hash(x, 5) === 0 ? 0.9 : 0) + ((x + y) % 7 === 0 ? -0.8 : 0));
+  const vine = withPattern(R('#e8d783', '#ceba60', '#ae9944', '#897632', '#675a25'),
+    (f, x, y) => (x % 3 === 0 ? -0.6 : x % 3 === 2 ? 0.6 : 0) + ((y + x * 2) % 9 === 0 ? 0.5 : 0));
+  const root = R('#e89b70', '#d17955', '#b35b3f', '#8a3d30');
+  const leaf = R('#56b7a1', '#29917d', '#1d705f');
   NORMALS.vine_shambler = { render: 'cutout', bones: [
-    { name: 'body', pivot: [0, 8, 2], rot: [15, 0, 0], cubes: [...loft([sl(-5, 0, 13, 4, 16), sl(0, 6, 14, 3, 18), sl(6, 9, 11, 4, 15)], vine), fringe([-7.5, 1, 9.2], [15, 16, 0], R('#d8d070', '#b8b04c', '#968e36'), 4, 2),
-      fringe([-7.5, 1, -5.2], [15, 6, 0], R('#d8d070', '#b8b04c'), 3, 4), ...[[-3, 0], [2, 2], [5, -2], [-5, 4]].map(([x, z], i) => B([x, 18, z], [3, 3, 0], R('#9ad070', '#78b050'), { mask: leafMask }))] },
-    { name: 'head', parent: 'body', pivot: [0, 12, -5], cubes: [B([-6, 8, -10], [12, 9, 5], vine, { detail: { north: (x, y, w, h) => (y >= 2 && y <= 6 && x >= 1 && x <= w - 2 ? (y === 2 || y === 6 ? (x % 2 ? '#fffaf0' : '#3a1010') : '#5a1a14') : null) } }),
-      B([-5, 15.5, -10.6], [10, 1, 0], R('#fffaf0', '#e8dcc0'), { mask: (f, x) => x % 2 === 0 })] },
-    ...[['arm_l', -1], ['arm_r', 1]].map(([n, s]) => ({ name: n, parent: 'body', pivot: [s * 6.5, 14, -2], rot: [-25, 0, s * -8], cubes: [
-      B([s * 6.5 - 1.5, 2, -3.5], [3, 12, 3], vine), B([s * 6.5 - 1, -3, -3], [2, 5, 2], vine), B([s * 6.5 - 2.5, -5, -5], [5, 2, 5], R('#e09878', '#c07858', '#a05c40'), { mask: (f, x) => f !== 'north' || x % 2 === 0 })] })),
-    ...[['leg_l', -1], ['leg_r', 1]].map(([n, s]) => ({ name: n, parent: 'body', pivot: [s * 4, 4, 3], cubes: [B([s * 4 - 2, 0, 1], [4, 4, 4], vine)] })),
+    { name: 'body', pivot: [0, 9, 1], cubes: [] },
+    ...octo('mound', 'body', [0, 12, 2], 22, 15, 12, 3, vine, 'z'),
+    { name: 'head', parent: 'body', pivot: [0, 12, -8], rot: [10, 0, 0], cubes: [
+      B([-6, 7, -13], [12, 9, 6], vine, { detail: { north: (x, y, w) => y >= 2 && y <= 6 && x > 0 && x < w - 1 ? (y === 2 && x % 3 !== 1 || y === 6 && x % 3 === 1 ? '#f3e8cc' : '#581c19') : null } }) ] },
+    ...[-1, 1].map(side => ({ name: side < 0 ? 'arm_l' : 'arm_r', parent: 'body', pivot: [side * 6.5, 14, -5], rot: [-12, 0, side * -10], cubes: [
+      B([side * 6.5 - 2.5, 1, -7.5], [5, 13, 5], vine),
+      B([side * 6.5 - 3.5, 0, -9], [7, 3, 7], vine),
+      ...[-2, 0, 2].map(dx => B([side * 6.5 + dx - 0.5, 0, -9.5], [1, 10, 1], vine)) ] })),
+    ...[-1, 1].flatMap(side => {
+      const name = side < 0 ? 'leg_l' : 'leg_r', x = side * 5;
+      return [
+        { name, parent: 'body', pivot: [x, 10, 9], rot: [25, 0, side * 5], cubes: [B([x - 1.5, 4, 8], [3, 6, 3], root)] },
+        { name: name + '_low', parent: name, pivot: [x, 4, 9], rot: [-50, 0, 0], cubes: [B([x - 1, -3, 8], [2, 7, 2], root), B([x - 2, -4, 6], [4, 1, 5], root)] },
+      ];
+    }),
+    ...[-1, 1].flatMap(side => [0, 1, 2, 3, 4].map(i => rotBox('drape_' + (side < 0 ? 'l' : 'r') + i, 'body', [side * (7 + i % 2), 8 + i % 3, -7 + i * 4], [1, 10 + i % 3, 2], [10 + i * 4, 0, side * (8 + i * 3)], vine))),
+    ...[-1, 1].flatMap(side => [0, 1, 2].map(i => rotBox('back_vine_' + (side < 0 ? 'l' : 'r') + i, 'body', [side * (2 + i * 2), 18, -5 + i * 5], [2, 2, 12], [0, side * 12, side * 8], vine))),
+    ...[-1, 1].flatMap(side => [0, 1, 2].map(i => rotBox('sprout_' + (side < 0 ? 'l' : 'r') + i, 'body', [side * (2 + i * 2), 19, -5 + i * 5], [3, 5, 0], [0, side * 25, side * 30], leaf, { mask: leafMask }))),
   ] };
 }
 

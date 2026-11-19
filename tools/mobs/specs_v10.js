@@ -1,7 +1,7 @@
 // Model v10 (user 2026-11-19: "杀戮尖塔2_新增17种怪物原作还原度评审.md"). Each point checked against the STS2 render
 // (slaythespire.wiki.gg StS2_<Name>.png) first; where the review guessed and the render shows otherwise, the render
 // wins (noted per entry). Overrides earlier entries.
-const { R, withPattern, glowing, h2, hash, B, fin, eyeDetail, fringe, limb, rotBox, octo } = require('./kit');
+const { R, withPattern, glowing, h2, hash, B, fin, eyeDetail, fringe, limb, rotBox, octo, bevelBox } = require('./kit');
 const at = (pts, c) => (x, y) => (pts.some(([a, b]) => a === x && b === y) ? c : null);
 const leafMask = (face, x, y, w, h) => { const cx = (w - 1) / 2, t = y / Math.max(1, h - 1); const half = Math.sin(Math.PI * Math.min(1, t * 1.05 + 0.05)) * w / 2; return Math.abs(x - cx) <= half + 0.2; };
 const ring = (n, r, fn) => Array.from({ length: n }, (_, k) => fn(k, k * 2 * Math.PI / n, Math.cos(k * 2 * Math.PI / n) * r, Math.sin(k * 2 * Math.PI / n) * r));
@@ -14,9 +14,10 @@ const out = {};
   const ghost = { ramp: ['#f0fff8', '#ccf8e4', '#a4e8cc', '#80d0b0', '#5cb090'], alpha: 165 };
   const petal = withPattern(ghost, (f, x, y) => (x === 1 ? -0.6 : 0));
   out.eye_with_teeth = { render: 'translucent', bones: [
-    { name: 'body', pivot: [0, 9, 0], cubes: [B([-2.5, 6, -1.5], [5, 6, 3], R('#e8fff0', '#c0f0d8', '#98d8b8'), { detail: { north: (x, y) => (x === 2 && y >= 1 && y <= 4 ? '#10402a' : (x === 1 || x === 3) && y >= 1 && y <= 4 ? '#2a8a5a' : null) } })] },
-    ...ring(8, 4.5, (k, a, cx, cy) => rotBox('petal' + k, 'body', [cx, 9 + cy, -0.5], [3, 5, 0], [0, 0, Math.round(-a * 57.3) + 90], petal, { mask: (f, x, y, w, h) => Math.abs(x - 1) <= (h - y) * 0.4 + 0.2 })),
-    ...ring(8, 6.5, (k, a, cx, cy) => rotBox('petalb' + k, 'body', [Math.cos(a + 0.39) * 6.5, 9 + Math.sin(a + 0.39) * 6.5, 0.5], [3, 5, 0], [0, 0, Math.round(-(a + 0.39) * 57.3) + 90], petal, { mask: (f, x, y, w, h) => Math.abs(x - 1) <= (h - y) * 0.4 + 0.2 })),
+    { name: 'body', pivot: [0, 9, 0], cubes: [B([-0.5, 7, -4.2], [3, 4, 1], R('#4b9d73', '#327d57', '#205d3e'), { detail: { north: (x, y) => x === 1 ? '#10402a' : (y === 0 && x === 0 ? '#b6f4cd' : null) } })] },
+    ...bevelBox('bulb', 'body', [0, 9, 1], [10, 10, 10], 3, R('#d4f8e4', '#a8dfc3', '#78bd9d')),
+    ...ring(8, 4.5, (k, a, cx, cy) => rotBox('petal' + k, 'body', [cx, 9 + cy, -2], [4, 7, 2], [Math.round(Math.sin(a) * 28), Math.round(Math.cos(a) * 28), Math.round(-a * 57.3) + 90], petal, { mask: (f, x, y, w, h) => Math.abs(x - 1) <= (h - y) * 0.4 + 0.2 })),
+    ...ring(8, 6.5, (k, a, cx, cy) => rotBox('petalb' + k, 'body', [Math.cos(a + 0.39) * 6.5, 9 + Math.sin(a + 0.39) * 6.5, 2], [4, 7, 2], [Math.round(Math.sin(a + 0.39) * -35), Math.round(Math.cos(a + 0.39) * -35), Math.round(-(a + 0.39) * 57.3) + 90], petal, { mask: (f, x, y, w, h) => Math.abs(x - 1) <= (h - y) * 0.4 + 0.2 })),
     ...[0, 1, 2, 3, 4].flatMap(i => { const a = i * 1.26 + 0.3, x = Math.cos(a) * 8, y = 9 + Math.sin(a) * 8, deg = Math.round(-a * 57.3);
       return [{ name: 'tent_' + i, parent: 'body', pivot: [x, y, 0], rot: [0, 0, deg], cubes: [B([x, y - 0.5, -0.5], [6, 1, 1], ghost), B([x + 3, y + 0.5, -0.5], [1, 1, 1], ghost)] },
         { name: 'tent_' + i + 'b', parent: 'tent_' + i, pivot: [x + 6, y, 0], rot: [0, 0, 30], cubes: [B([x + 6, y - 0.5, -0.5], [6, 1, 1], ghost), B([x + 9, y - 1.5, -0.5], [1, 1, 1], ghost)] },
@@ -29,16 +30,18 @@ const out = {};
 // green leaves at the top, three thin sprouts with little buds rising from the middle. (No mouth is drawn in the
 // render, so none is added.)
 {
-  const skin = withPattern(R('#ffb4b8', '#f48890', '#e06070', '#c04454', '#9a3040'), (f, x, y) => { const cx = (x + (y % 6 < 3 ? 0 : 1.5)) % 3, cy = y % 3; return cx < 0.6 || cy === 0 ? 1 : (cx > 1 && cx < 2 && cy === 1 ? -0.8 : 0); });
+  const skin = withPattern(R('#ffb4b8', '#f48890', '#e06070', '#c04454', '#9a3040'), (f, x, y) => { const row = Math.floor(y / 4), u = (x + (row % 2) * 2) % 5, v = y % 4; return (u === 0 && v > 0) || (v === 3 && u > 0 && u < 4) ? 0.8 : (u === 2 && v === 1 ? -0.6 : 0); });
   const petal = withPattern(R('#d05050', '#a83838', '#802828', '#5e1c1c'), (f, x) => (x === 1 ? -0.6 : 0));
   const leaf = withPattern(R('#c4e08a', '#a0c868', '#7caa4e', '#5c8a3a'), (f, x, y, w) => (x === Math.floor(w / 2) ? -0.8 : 0));
   out.snapping_jaxfruit = { render: 'cutout', bones: [
     { name: 'body', pivot: [0, 0, 0], cubes: [] },
-    ...octo('fruit', 'body', [0, 7.5, 0], 13, 15, 15, 4, skin, 'y'),
-    rotBox('fruit_top', 'fruit', [0, 14.5, 0], [9, 2, 9], [0, 45, 0], skin), rotBox('fruit_bottom', 'fruit', [0, 0.5, 0], [9, 1, 9], [0, 45, 0], skin),
+    ...bevelBox('fruit', 'body', [0, 8, 0], [16, 16, 16], 4, skin),
     { name: 'head', parent: 'body', pivot: [0, 15, 0], cubes: [] },
     ...ring(8, 5.5, (k, a, cx, cz) => rotBox('petal' + k, 'head', [cx, 18, cz], [5, 10, 0], [Math.round(Math.sin(a) * 40), Math.round(-a * 57.3) + 90, Math.round(-Math.cos(a) * 40)].map((v, i) => (i === 1 ? v : v)), petal, { mask: (f, x, y, w, h) => Math.abs(x - 2) <= (y + 0.5) * 0.25 + 0.2 })),
-    ...ring(4, 6, (k, a, cx, cz) => rotBox('leaf' + k, 'head', [cx, 15.5, cz], [5, 0, 8], [Math.round(Math.sin(a) * -25), Math.round(-a * 57.3) - 90, Math.round(Math.cos(a) * 25)], leaf, { mask: leafMask })),
+    ...ring(6, 7, (k, a, cx, cz) => rotBox('leaf' + k, 'head', [cx, 13, cz], [7, 9, 0], [25, Math.round(-a * 57.3) + 90, 0], leaf, { mask: leafMask })),
+    ...[-1, 1].map(side => rotBox('front_leaf_' + side, 'head', [side * 4, 13.5, -8.5], [8, 10, 0], [8, side * 10, side * 20], leaf, { mask: leafMask })),
+    ...ring(8, 7, (k, a, cx, cz) => rotBox('base_leaf' + k, 'body', [cx, 1.5, cz], [6, 5, 0], [45, Math.round(-a * 57.3) + 90, 0], leaf, { mask: leafMask })),
+    ...[-1, 0, 1].map(i => rotBox('base_front_' + i, 'body', [i * 4.5, 2, -8.5], [6, 4, 0], [15, i * 15, i * 20], leaf, { mask: leafMask })),
     ...[[-2, -1, -10], [0, 1, 0], [2, -1, 10]].map(([x, z, rz], i) => ({ name: 'tent_' + i, parent: 'head', pivot: [x, 15, z], rot: [0, 0, rz], cubes: [B([x - 0.5, 15, z - 0.5], [1, 9 + (i % 2) * 2, 1], R('#7aa848', '#5a8834')), B([x - 1, 24 + (i % 2) * 2, z - 1], [2, 2, 2], R('#a8d870', '#80b850'))] })),
   ] };
 }
@@ -50,10 +53,18 @@ const out = {};
   const scales = withPattern(R('#e88870', '#cc6650', '#ac4c3a', '#8a3a2c', '#6a2c22'), (f, x, y) => ((x + (y % 2)) % 2 === 0 ? 0.5 : 0));
   const spikeM = R('#fffcf0', '#ece4d0', '#d0c4a8');
   const boneG = withPattern(R('#e8ecf0', '#c8ced6', '#a4acb8', '#7c8490'), (f, x, y) => (y === 0 ? 1 : 0));
-  const coil = ring(7, 6, (k, a, cx, cz) => rotBox('coil' + k, 'body', [cx, 2, cz + 4], [4, 4, 6], [0, Math.round(-a * 57.3), 0], scales));
+  // Continuous ground coil, opening into a raised, inward-curving tail tip.
+  const path = [[0,2,-2], [0,2,5], [6,2,9], [12,2,7], [14,2,1], [11,2,-5], [5,2,-6], [3,2,-1], [6,2,2], [10,2,1], [13,4,-1], [14,8,-2], [12,11,-2], [9,11,-2]];
+  const coil = path.slice(0, -1).map((a, i) => {
+    const b = path[i + 1], dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2];
+    const length = Math.ceil(Math.hypot(dx, dy, dz) + 1.5), width = Math.max(2, Math.round(5 - i * 0.24));
+    const yaw = Math.atan2(dx, dz) * 180 / Math.PI;
+    const pitch = Math.atan2(dy, Math.hypot(dx, dz)) * 180 / Math.PI;
+    return rotBox(i ? 'tail_' + i : 'tail', 'body', a.map((v, j) => (v + b[j]) / 2), [width, width, length], [pitch, yaw, 0], scales);
+  });
   out.slithering_strangler = { render: 'cutout', bones: [
     { name: 'body', pivot: [0, 2, 4], cubes: [] },
-    ...coil, ...ring(7, 8.5, (k, a, cx, cz) => rotBox('coilspike' + k, 'body', [cx, 3, cz + 4], [1, 2, 1], [0, 0, 0], spikeM)),
+    ...coil, ...[[0,4.5,3], [6,4.5,9], [13,4.5,4], [11,4.5,-5]].map(([x,y,z], i) => rotBox('coilspike' + i, 'body', [x,y,z], [2,3,2], [0,0,i % 2 ? 15 : -15], spikeM)),
     { name: 'seg_1', parent: 'body', pivot: [0, 3, -2], rot: [-55, 0, 0], cubes: [B([-2, 1, -9], [4, 4, 8], scales), B([-0.5, 5, -7], [1, 2, 1], spikeM), B([-0.5, 5, -4], [1, 2, 1], spikeM)] },
     { name: 'seg_2', parent: 'seg_1', pivot: [0, 3, -9], rot: [35, 0, 0], cubes: [B([-2, 1, -16], [4, 4, 7], scales), B([2, 3, -14], [2, 1, 1], spikeM), B([-4, 3, -12], [2, 1, 1], spikeM)] },
     { name: 'seg_3', parent: 'seg_2', pivot: [0, 3, -16], rot: [-30, 0, 0], cubes: [B([-1.5, 1.5, -21], [3, 3, 5], scales), B([0, 4.5, -21], [0, 4, 6], R('#8a2c24', '#6a1e18'), { mask: (f, x, y, w, h) => y >= h - 1 - (x % 3) })] },
