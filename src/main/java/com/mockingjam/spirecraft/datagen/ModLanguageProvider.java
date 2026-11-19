@@ -492,7 +492,7 @@ public final class ModLanguageProvider {
             add("item.spirecraft.bag_of_marbles.desc", "战斗开始时：8 格内的敌对生物获得易伤（6 秒）。");
             add(ModItems.RED_MASK.get(), "红面具");
             add("item.spirecraft.red_mask.desc", "战斗开始时：8 格内的敌对生物获得虚弱（6 秒）。");
-            add(ModItems.BRONZE_SCALES.get(), "铜制鳞片");
+            add(ModItems.BRONZE_SCALES.get(), "铜质鳞片");
             add("item.spirecraft.bronze_scales.desc", "战斗开始时：+1 层荆棘（30 秒）。");
             add(ModItems.BLOOD_VIAL.get(), "小血瓶");
             add("item.spirecraft.blood_vial.desc", "战斗开始时：回复 2 点生命。");
