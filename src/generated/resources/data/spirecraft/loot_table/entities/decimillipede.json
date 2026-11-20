@@ -99,6 +99,49 @@
         }
       ],
       "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:killed_by_player"
+        },
+        {
+          "chance": 0.5,
+          "condition": "minecraft:random_chance"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:anchor"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:vajra"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:oddly_smooth_stone"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:bag_of_marbles"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:red_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:bronze_scales"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spirecraft:blood_vial"
+        }
+      ],
+      "rolls": 1.0
     }
   ],
   "random_sequence": "spirecraft:entities/decimillipede"

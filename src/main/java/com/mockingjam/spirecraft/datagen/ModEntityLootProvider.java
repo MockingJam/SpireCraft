@@ -154,9 +154,11 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 table.withPool(pool);
             }
             if (d.relic == 2) table.withPool(relic(RelicEvents.RARE)).withPool(drop(com.mockingjam.spirecraft.registry.ModItems.RELIC_FRAGMENT.get(), 2, 3));
-            if (d.elite) table.withPool(drop(com.mockingjam.spirecraft.registry.ModItems.RELIC_FRAGMENT.get(), 1, 1).when(LootItemKilledByPlayerCondition.killedByPlayer()).when(LootItemRandomChanceCondition.randomChance(0.3F)));
-            else if (d.elite) table.withPool(relic(RelicEvents.COMMON).when(LootItemKilledByPlayerCondition.killedByPlayer())
-                    .when(LootItemRandomChanceCondition.randomChance(d.relic == 1 ? 0.5F : 0.15F)));
+            if (d.elite) {
+                table.withPool(drop(com.mockingjam.spirecraft.registry.ModItems.RELIC_FRAGMENT.get(), 1, 1).when(LootItemKilledByPlayerCondition.killedByPlayer()).when(LootItemRandomChanceCondition.randomChance(0.3F)));
+                table.withPool(relic(RelicEvents.COMMON).when(LootItemKilledByPlayerCondition.killedByPlayer())
+                        .when(LootItemRandomChanceCondition.randomChance(d.relic == 1 ? 0.5F : 0.15F)));
+            }
             add(ModEntities.SCRIPTED.get(d.name).get(), table);
         }
     }
