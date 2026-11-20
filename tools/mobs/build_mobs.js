@@ -8,7 +8,7 @@ const path = require('path');
 const { writePng } = require('../png');
 const specs = require('./specs');
 
-const ROOT = 'D:/MCmodev/SpireCraft/';
+const ROOT = __dirname + '/../../';
 const TEX = ROOT + 'src/main/resources/assets/spirecraft/textures/entity/';
 const JAVA = ROOT + 'src/main/java/com/mockingjam/spirecraft/client/model/MobLayers.java';
 const [bbOut, filter] = process.argv.slice(2);

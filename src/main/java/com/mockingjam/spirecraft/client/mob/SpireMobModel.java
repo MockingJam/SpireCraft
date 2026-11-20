@@ -703,10 +703,32 @@ public class SpireMobModel extends EntityModel<SpireMobRenderState> {
         // trailing parts
         float t = age * 0.15F + walk * 0.6F;
         ModelPart tail = p("tail"), tail1 = p("tail_1");
-        if (tail != null) tail.yRot += Mth.sin(t) * (0.2F + 0.25F * amount);
-        if (tail1 != null) tail1.yRot += Mth.sin(t - 1.0F) * (0.25F + 0.3F * amount);
+        if (def.name.equals("slithering_strangler")) {
+            // The overlapping tail segments form one hook; keep the travelling wave subtle at the joints.
+            for (int i = 0; i <= 12; i++) {
+                ModelPart part = p(i == 0 ? "tail" : "tail_" + i);
+                if (part != null) part.yRot += Mth.sin(t - i * 0.45F) * (0.025F + 0.025F * amount);
+            }
+        } else {
+            if (tail != null) tail.yRot += Mth.sin(t) * (0.2F + 0.25F * amount);
+            if (tail1 != null) tail1.yRot += Mth.sin(t - 1.0F) * (0.25F + 0.3F * amount);
+        }
         for (int i = 1; i <= 8; i++) { ModelPart seg = p("seg_" + i); if (seg != null) seg.yRot += Mth.sin(t - i * 0.8F) * (0.12F + 0.15F * amount); }
         for (int i = 0; i < 8; i++) { ModelPart tent = p("tent_" + i); if (tent != null) { tent.xRot += Mth.sin(age * 0.09F + i * 1.3F) * 0.15F; tent.zRot += Mth.cos(age * 0.07F + i) * 0.12F; } }
+        if (def.name.equals("vine_shambler")) {
+            for (String side : new String[] {"l", "r"}) for (int i = 0; i < 5; i++) {
+                ModelPart vine = p("drape_" + side + i);
+                if (vine != null) vine.xRot += Mth.sin(age * 0.07F - i * 0.5F) * 0.04F;
+            }
+        }
+        if (def.name.equals("mawler")) for (int i = 0; i < 2; i++) {
+            ModelPart drool = p("drool_" + i);
+            if (drool != null) drool.zRot += Mth.sin(age * 0.09F + i) * 0.05F;
+        }
+        if (def.name.equals("snapping_jaxfruit")) for (int i = 0; i < 6; i++) {
+            ModelPart leaf = p("leaf" + i);
+            if (leaf != null) leaf.xRot += Mth.sin(age * 0.08F + i) * 0.06F;
+        }
         ModelPart cape = p("cape");
         if (cape != null) cape.xRot += 0.25F * amount + Mth.sin(age * 0.07F) * 0.05F;
         float flap = Mth.sin(age * (def.hover ? 1.6F : 0.3F)) * (def.hover ? 0.5F : 0.08F);

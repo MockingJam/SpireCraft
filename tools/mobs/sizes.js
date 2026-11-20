@@ -16,8 +16,9 @@ const STS2 = {
   corpse_slug: [137, 220], toadpole: [149, 300], two_tailed_rat: [260, 300], seapunk: [243, 305], terror_eel: [317, 704], soul_fysh: [449, 444],
   bowlbug_rock: [250, 300], bowlbug_egg: [137, 170], bowlbug_silk: [250, 300], bowlbug_nectar: [250, 300],   // ~ (no idle sprites)
   exoskeleton: [148, 157], chomper: [125, 219], myte: [252, 309], entomancer: [395, 408], kaiser_crab: [1309, 3178], knowledge_demon: [635, 540],
-  inklet: [174, 106], fogmog: [224, 236], eye_with_teeth: [393, 442], mawler: [368, 530], snapping_jaxfruit: [300, 230], slithering_strangler: [300, 240],
-  vine_shambler: [333, 420], cubex_construct: [284, 167], axe_raider: [235, 258], assassin_raider: [285, 229], brute_raider: [338, 211],
+  // Mawler and Vine Shambler enlarged 1.4x per user's review on 2026-11-19.
+  inklet: [174, 106], fogmog: [224, 236], eye_with_teeth: [393, 442], mawler: [515, 742], snapping_jaxfruit: [300, 230], slithering_strangler: [300, 240],
+  vine_shambler: [466, 588], cubex_construct: [284, 167], axe_raider: [235, 258], assassin_raider: [285, 229], brute_raider: [338, 211],
   crossbow_raider: [296, 216], tracker_raider: [233, 294], wriggler: [151, 169], bygone_effigy: [622, 336], phrog_parasite: [501, 506],
   vantom: [460, 484], kin_priest: [373, 422], kin_follower: [280, 260], sludge_spinner: [310, 236], calcified_cultist: [306, 260], damp_cultist: [329, 244],
   living_fog: [326, 309], gas_bomb: [136, 146], fossil_stalker: [199, 272], gremlin_merc: [320, 317], fat_gremlin: [195, 101], sneaky_gremlin: [186, 193],
@@ -78,7 +79,7 @@ if (require.main === module) {
   console.log(JSON.stringify(out, null, 1));
   // the generated table the game reads (registry/ModEntities sizes the hitboxes, client/mob/SpireMobRenderer scales the models)
   const rows = Object.entries(out).filter(([, v]) => !v.error).map(([n, v]) => `        m.put("${n}", new float[] {${v.scale}F, ${v.hitW}F, ${v.hitH}F});`);
-  fs.writeFileSync('D:/MCmodev/SpireCraft/src/main/java/com/mockingjam/spirecraft/mob/MobSizes.java', `package com.mockingjam.spirecraft.mob;
+  fs.writeFileSync(__dirname + '/../../src/main/java/com/mockingjam/spirecraft/mob/MobSizes.java', `package com.mockingjam.spirecraft.mob;
 
 import java.util.HashMap;
 import java.util.Map;

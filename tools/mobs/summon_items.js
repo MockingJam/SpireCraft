@@ -3,7 +3,7 @@
 // Usage: node tools/mobs/summon_items.js <vanilla item texture dir>
 const { readPng, writePng } = require('../png');
 const SRC = process.argv[2];
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/item/';
+const OUT = __dirname + '/../../src/main/resources/assets/spirecraft/textures/item/';
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
 const ITEMS = {

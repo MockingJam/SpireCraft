@@ -5,7 +5,7 @@
 const fs = require('fs');
 const { readPng, writePng } = require('../png');
 const specs = require('./specs');
-const TEX = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/entity/';
+const TEX = __dirname + '/../../src/main/resources/assets/spirecraft/textures/entity/';
 const [out, filter] = process.argv.slice(2).filter(a => !a.startsWith('--'));
 const viewsArg = (process.argv.find(a => a.startsWith('--views=')) || '--views=front,side').slice(8).split(',');
 const VIEWS = { front: [-35, 22], side: [-90, 12], back: [145, 25], top: [-30, 60], down: [0, 85], face: [0, 5] };

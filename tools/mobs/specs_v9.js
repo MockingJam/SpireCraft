@@ -397,7 +397,25 @@ const named = (spec, name) => spec.bones.find(b => b.name === name);
 // Mawler (A-R1C1 / E-R3C3): the head carried low and pushed forward, the jaw hanging open - the mouth first.
 {
   const m8 = v8.mawler;
-  out.mawler = { ...m8, bones: m8.bones.map(b => b.name === 'body' ? { ...b, rot: [-20, 0, 0] } : b.name === 'head' ? { ...b, rot: [38, 0, 0] } : b.name === 'jaw' ? { ...b, rot: [26, 0, 0] } : b) };
+  const hide = withPattern(R('#80b9c5', '#639cab', '#4b8292', '#376a79', '#28515e'),
+    (f, x, y) => f === 'up' ? -0.3 : (Math.floor(x / 4) + Math.floor(y / 5)) % 4 === 0 ? 0.5 : 0);
+  const drool = R('#d4f4ed', '#a5d8d2', '#80bcb9');
+  const fang = R('#fff9e7', '#e7dcc4', '#c5b9a2');
+  out.mawler = { ...m8, bones: [
+    ...m8.bones.map(b => {
+      if (b.name === 'body') return { ...b, rot: [0, 0, 0] };
+      // Extend the trunk behind the shoulders; move the hips, hind legs and tail with it.
+      if (b.name === 'chest' || b.name.startsWith('chest_e')) return { ...b, rot: b.name === 'chest' ? [0, 0, 0] : b.rot, cubes: b.cubes.map(c => ({ ...c, size: [c.size[0], c.size[1], c.size[2] + 8] })) };
+      if (b.name === 'loins' || b.name.startsWith('loins_e') || b.name.startsWith('leg_b') || b.name === 'tail' || b.name === 'tail_1') return { ...b, pivot: [b.pivot[0], b.pivot[1], b.pivot[2] + 8], rot: b.name === 'tail' ? [30, 0, 0] : b.name === 'tail_1' ? [30, 0, 0] : b.rot, cubes: b.cubes.map(c => ({ ...c, from: [c.from[0], c.from[1], c.from[2] + 8] })) };
+      if (b.name === 'head') return { ...b, rot: [8, 0, 0], cubes: b.cubes.filter(c => !(c.from[0] === -1.5 && c.from[1] === 15 && c.from[2] === -18.5)).map(c => { const { detail, ...plain } = c; return plain; }) };
+      if (b.name === 'jaw') return { ...b, rot: [22, 0, 0], cubes: b.cubes.filter(c => !c.size.includes(0)) };
+      return b;
+    }),
+    ...[-1, 1].map(side => rotBox('shoulder_' + (side < 0 ? 'l' : 'r'), 'body', [side * 6, 16, -4], [5, 8, 9], [0, 0, side * 12], hide)),
+    ...[-1, 1].flatMap(side => [0, 1, 2, 3].map(i => rotBox('maw_fang_' + side + '_' + i, 'jaw', [side * 4.5, 12.4, -18 + i * 2], [1, i % 2 ? 3 : 2, 1], [side * 8, 0, side * (i % 2 ? 12 : -8)], fang))),
+    ...[-1, 1].map((side, i) => ({ name: 'drool_' + i, parent: 'jaw', pivot: [side * 5.8, 12, -19.5], cubes: [
+      B([side * 5.8 - 0.5, 3 - i, -20], [1, 9 + i, 1], drool), B([side * 5.8 - 0.75, 2 - i, -20], [2, 2, 2], drool)] })),
+  ] };
 }
 // Fogmog (A-R3C1): the cap's rim droops - tilted plates all round instead of a flat eave.
 {

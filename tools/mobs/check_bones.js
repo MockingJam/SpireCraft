@@ -4,7 +4,7 @@
 // Usage: node tools/mobs/check_bones.js   (exit code 1 on a problem)
 const fs = require('fs');
 const specs = require('./specs');
-const ROOT = 'D:/MCmodev/SpireCraft/src/main/java/com/mockingjam/spirecraft/';
+const ROOT = __dirname + '/../../src/main/java/com/mockingjam/spirecraft/';
 const model = fs.readFileSync(ROOT + 'client/mob/SpireMobModel.java', 'utf8');
 const renderer = fs.readFileSync(ROOT + 'client/mob/SpireMobRenderer.java', 'utf8');
 

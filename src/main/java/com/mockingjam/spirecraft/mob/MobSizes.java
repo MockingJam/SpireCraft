@@ -40,11 +40,11 @@ public final class MobSizes {
         m.put("knowledge_demon", new float[] {0.85F, 1.58F, 2.84F});
         m.put("inklet", new float[] {0.76F, 0.5F, 0.79F});
         m.put("fogmog", new float[] {0.75F, 0.8F, 1.01F});
-        m.put("eye_with_teeth", new float[] {0.69F, 0.74F, 1.77F});
-        m.put("mawler", new float[] {1.02F, 1.34F, 1.63F});
-        m.put("snapping_jaxfruit", new float[] {0.86F, 0.72F, 1.35F});
-        m.put("slithering_strangler", new float[] {0.84F, 0.99F, 1.36F});
-        m.put("vine_shambler", new float[] {0.97F, 0.98F, 1.5F});
+        m.put("eye_with_teeth", new float[] {0.69F, 0.86F, 1.77F});
+        m.put("mawler", new float[] {1.31F, 1.95F, 2.14F});
+        m.put("snapping_jaxfruit", new float[] {0.83F, 0.69F, 1.35F});
+        m.put("slithering_strangler", new float[] {0.82F, 1.01F, 1.35F});
+        m.put("vine_shambler", new float[] {1.46F, 1.66F, 2.09F});
         m.put("cubex_construct", new float[] {0.77F, 0.5F, 1.27F});
         m.put("axe_raider", new float[] {0.54F, 0.5F, 1.06F});
         m.put("assassin_raider", new float[] {0.56F, 0.5F, 1.29F});
