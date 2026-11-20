@@ -202,28 +202,28 @@ public final class ScriptedDefs {
         ALL.get("inklet").slippery = 1;
         ALL.get("inklet").spawn(20, 3, 3, OG).spawn(30, 3, 3, INK).drop(() -> ModItems.INK_BUBBLE.get(), 0, 1).drop(Items.INK_SAC, 0, 1);
 
-        def("fogmog", "Fogmog", "雾魔菇").hp(33).speed(0.22F).size(1.0F, 1.6F, 1)
+        def("fogmog", "Fogmog", "雾菇").hp(33).speed(0.22F).size(1.0F, 1.6F, 1)
                 .moves(buff().summon("eye_with_teeth", 1).sound(SoundEvents.SPORE_BLOSSOM_PLACE), melee(3.2F).str(1), melee(5.6F).wind(16).anim(Anim.LUNGE))
                 .pattern(ids(1, 2), weighted(new int[] {2, 3}, new int[] {2, 3}));
         ALL.get("fogmog").spawn(25, 1, 1, MISTY).spawn(6, 1, 1, MUSHROOM).drop(Items.BROWN_MUSHROOM, 1, 3).drop(Items.RED_MUSHROOM, 0, 2).drop(Items.BONE_MEAL, 0, 2);
-        def("eye_with_teeth", "Eye With Teeth", "长牙之眼").hp(6).speed(0.3F).size(0.6F, 0.6F, 1)
+        def("eye_with_teeth", "Eye With Teeth", "利齿之眼").hp(6).speed(0.3F).size(0.6F, 0.6F, 1)
                 .moves(shot(0, Items.ENDER_EYE, SpireBolt.Kind.SPORE).fx(RINGING, 60)).pattern(seq(), m(1)).minionOf("fogmog");
         ALL.get("eye_with_teeth").illusion = true;
         ALL.get("eye_with_teeth").reviveTicks = 100;
         ALL.get("eye_with_teeth").hover = true;
         ALL.get("eye_with_teeth").drop(Items.SPIDER_EYE, 0, 1);
 
-        def("mawler", "Mawler", "撕咬兽").hp(32).speed(0.3F).size(1.1F, 1.3F, 1)
+        def("mawler", "Mawler", "蛮兽").hp(32).speed(0.3F).size(1.1F, 1.3F, 1)
                 .moves(melee(1.6F).hits(2, 6), melee(5.6F).wind(16).anim(Anim.LUNGE), aoe(0, 8).fx(VULNERABLE, 120).once().anim(Anim.CALL).sound(SoundEvents.RAVAGER_ROAR))
                 .pattern(ids(1), any(1, 2, 3));
         ALL.get("mawler").spawn(20, 1, 1, OG_PLAIN).drop(Items.LEATHER, 1, 2).drop(Items.BEEF, 1, 2).drop(Items.BONE, 0, 2);
 
-        def("snapping_jaxfruit", "Snapping Jaxfruit", "咬咬果").hp(14).speed(0).size(0.9F, 1.1F, 1)
+        def("snapping_jaxfruit", "Snapping Jaxfruit", "闪光贾克斯果").hp(14).speed(0).size(0.9F, 1.1F, 1)
                 .moves(shot(1.2F, Items.GLOW_BERRIES, SpireBolt.Kind.PEBBLE).str(1).sound(SoundEvents.CAVE_VINES_PICK_BERRIES)).pattern(seq(), m(1));
         ALL.get("snapping_jaxfruit").stationary = true;
         ALL.get("snapping_jaxfruit").spawn(20, 1, 2, OG).drop(Items.GLOW_BERRIES, 1, 3).drop(Items.MELON_SLICE, 0, 2);
 
-        def("slithering_strangler", "Slithering Strangler", "缠绞藤蛇").hp(24).speed(0.28F).size(0.9F, 0.7F, 1)
+        def("slithering_strangler", "Slithering Strangler", "蛇行扼杀者").hp(24).speed(0.28F).size(0.9F, 0.7F, 1)
                 .moves(melee(0).poison(3).reach(3).anim(Anim.LUNGE), melee(2.8F).absorb(2), melee(4.8F).wind(16).reach(3))
                 .pattern(ids(1), any(3, 2), m(1));
         ALL.get("slithering_strangler").spawn(20, 1, 1, OG).drop(Items.VINE, 1, 3).drop(Items.STRING, 0, 2);
@@ -233,7 +233,7 @@ public final class ScriptedDefs {
                 .pattern(seq(), m(1), m(2), m(3));
         ALL.get("vine_shambler").spawn(15, 1, 1, OG).drop(Items.VINE, 2, 4).drop(Items.MOSS_BLOCK, 0, 1).drop(Items.STICK, 1, 3);
 
-        def("cubex_construct", "Cubex Construct", "立方构装体").hp(29).speed(0.18F).armor(6).size(1.0F, 1.0F, 1)
+        def("cubex_construct", "Cubex Construct", "方柱构装体").hp(29).speed(0.18F).armor(6).size(1.0F, 1.0F, 1)
                 .moves(buff().str(1).sound(SoundEvents.BEACON_POWER_SELECT), shot(2.8F, Items.IRON_NUGGET, SpireBolt.Kind.IRON).str(1), shot(2, Items.IRON_NUGGET, SpireBolt.Kind.IRON).hits(2, 6))
                 .pattern(ids(1), m(2), m(2), m(3));
         ALL.get("cubex_construct").artifact = 1;
@@ -241,15 +241,15 @@ public final class ScriptedDefs {
 
         // the Ruby Raiders: a party of three of the five, never two alike
         String[] raiders = {"axe_raider", "assassin_raider", "brute_raider", "crossbow_raider", "tracker_raider"};
-        def("axe_raider", "Ruby Raider (Axe)", "红宝石劫掠者（斧手）").hp(9).speed(0.27F).size(0.6F, 1.9F, 1)
+        def("axe_raider", "Ruby Raider (Axe)", "劫掠者斧手").hp(9).speed(0.27F).size(0.6F, 1.9F, 1)
                 .moves(melee(2).absorb(2), melee(4.8F).wind(18).anim(Anim.SLAM)).pattern(seq(), m(1), m(1), m(2));
-        def("assassin_raider", "Ruby Raider (Assassin)", "红宝石劫掠者（刺客）").hp(9).speed(0.32F).size(0.6F, 1.9F, 1)
+        def("assassin_raider", "Ruby Raider (Assassin)", "劫掠者刺客").hp(9).speed(0.32F).size(0.6F, 1.9F, 1)
                 .moves(shot(4, Items.IRON_NUGGET, SpireBolt.Kind.IRON).wind(18)).pattern(seq(), m(1));
-        def("brute_raider", "Ruby Raider (Brute)", "红宝石劫掠者（蛮兵）").hp(14).speed(0.24F).size(0.8F, 2.0F, 1)
+        def("brute_raider", "Ruby Raider (Brute)", "劫掠者暴徒").hp(14).speed(0.24F).size(0.8F, 2.0F, 1)
                 .moves(melee(2.8F), buff().str(1).sound(SoundEvents.PILLAGER_CELEBRATE)).pattern(seq(), m(1), m(2));
-        def("crossbow_raider", "Ruby Raider (Crossbow)", "红宝石劫掠者（弩手）").hp(9).speed(0.25F).size(0.6F, 1.9F, 1)
+        def("crossbow_raider", "Ruby Raider (Crossbow)", "劫掠者弩手").hp(9).speed(0.25F).size(0.6F, 1.9F, 1)
                 .moves(buff().absorb(1).sound(SoundEvents.CROSSBOW_LOADING_END.value()), shot(5.6F, Items.ARROW, SpireBolt.Kind.IRON).sound(SoundEvents.CROSSBOW_SHOOT)).pattern(seq(), m(1), m(2));
-        def("tracker_raider", "Ruby Raider (Tracker)", "红宝石劫掠者（追猎者）").hp(10).speed(0.28F).size(0.6F, 1.9F, 1)
+        def("tracker_raider", "Ruby Raider (Tracker)", "劫掠者追踪手").hp(10).speed(0.28F).size(0.6F, 1.9F, 1)
                 .moves(shot(0, Items.STRING, SpireBolt.Kind.PEBBLE).fx(FRAIL, 160), melee(0.4F).hits(8, 3).reach(6).anim(Anim.CALL).sound(SoundEvents.RAVAGER_ROAR))
                 .pattern(ids(1), m(2));
         for (String r : raiders) {
@@ -260,23 +260,23 @@ public final class ScriptedDefs {
             d.spawn(4, 1, 1, OG_PLAIN).drop(Items.EMERALD, 0, 1).drop(Items.LEATHER, 0, 1).rareDrop(Items.RED_DYE, 0.3F);
         }
 
-        def("wriggler", "Wriggler", "蠕动虫").hp(8).speed(0.25F).size(0.6F, 0.4F, 1)
+        def("wriggler", "Wriggler", "扭动虫").hp(8).speed(0.25F).size(0.6F, 0.4F, 1)
                 .moves(melee(2.4F), buff().str(1).poison(1).anim(Anim.SHAKE)).pattern(seq(any(1, 2)), m(1), m(2));
         ALL.get("wriggler").spawn(10, 3, 4, MUSHROOM).drop(Items.SLIME_BALL, 0, 1).drop(Items.ROTTEN_FLESH, 0, 1);
 
-        def("bygone_effigy", "Bygone Effigy", "往昔雕像").hp(57).speed(0.2F).armor(6).size(1.0F, 2.6F, 1.3F).elite()
+        def("bygone_effigy", "Bygone Effigy", "旧日雕像").hp(57).speed(0.2F).armor(6).size(1.0F, 2.6F, 1.3F).elite()
                 .moves(rest(20), buff().str(4).wake().sound(SoundEvents.IRON_GOLEM_REPAIR), melee(5.2F).wind(16).anim(Anim.SLAM))
                 .pattern(ids(1, 2), m(3));
         ALL.get("bygone_effigy").sleep = 3;
         ALL.get("bygone_effigy").slowStacks = true;
         ALL.get("bygone_effigy").spawn(2, 1, 1, OG).drop(Items.MOSSY_COBBLESTONE, 2, 5).drop(Items.GOLD_NUGGET, 2, 6);
 
-        def("phrog_parasite", "Phrog Parasite", "蛙形寄生虫").hp(40).speed(0.26F).size(1.0F, 1.2F, 1.2F).elite()
+        def("phrog_parasite", "Phrog Parasite", "异蛙寄生虫").hp(40).speed(0.26F).size(1.0F, 1.2F, 1.2F).elite()
                 .moves(lob(0, Items.SLIME_BALL, SpireBolt.Kind.ACID).poison(3), melee(1.6F).hits(4, 4).reach(3)).pattern(seq(), m(1), m(2))
                 .onDeath(4, "wriggler");
         ALL.get("phrog_parasite").spawn(2, 1, 1, MUSHROOM).spawn(1, 1, 1, OG_PLAIN).drop(Items.SLIME_BALL, 2, 4).drop(Items.FERMENTED_SPIDER_EYE, 0, 1);
 
-        def("vantom", "Vantom", "墨魇").hp(260).speed(0.26F).armor(6).size(2.2F, 3.8F, 1.45F).boss(BossEvent.BossBarColor.PURPLE)
+        def("vantom", "Vantom", "墨影幻灵").hp(260).speed(0.26F).armor(6).size(2.2F, 3.8F, 1.45F).boss(BossEvent.BossBarColor.PURPLE)
                 .moves(shot(2.8F, () -> ModItems.INK_BUBBLE.get(), SpireBolt.Kind.INK), melee(2.4F).hits(2, 6).reach(4.5F).anim(Anim.LUNGE),
                         melee(11).wind(30).reach(4.5F).fx(WITHER, 100).anim(Anim.SLAM).sound(SoundEvents.WITHER_SHOOT), buff().str(1).sound(SoundEvents.SCULK_SHRIEKER_SHRIEK))
                 .pattern(seq(), m(1), m(2), m(3), m(4));
@@ -284,7 +284,7 @@ public final class ScriptedDefs {
         ALL.get("vantom").hover = true;
         ALL.get("vantom").drop(() -> ModItems.INK_BUBBLE.get(), 4, 8).drop(Items.INK_SAC, 4, 8).drop(Items.ECHO_SHARD, 1, 2);
 
-        def("kin_priest", "Kin Priest", "同族祭司").hp(250).speed(0.24F).armor(4).size(1.8F, 2.6F, 1.5F).boss(BossEvent.BossBarColor.GREEN)
+        def("kin_priest", "Kin Priest", "同族神官").hp(250).speed(0.24F).armor(4).size(1.8F, 2.6F, 1.5F).boss(BossEvent.BossBarColor.GREEN)
                 .moves(shot(3.6F, Items.SLIME_BALL, SpireBolt.Kind.SPORE).fx(FRAIL, 160), shot(3.6F, Items.INK_SAC, SpireBolt.Kind.INK).fx(WEAK, 160),
                         shot(1.2F, Items.GLOWSTONE_DUST, SpireBolt.Kind.FIRE).hits(3, 5), buff().str(1).sound(SoundEvents.EVOKER_PREPARE_SUMMON))
                 .pattern(seq(), m(1), m(2), m(3), m(4)).with(2, "kin_follower");
@@ -295,7 +295,7 @@ public final class ScriptedDefs {
         ALL.get("kin_follower").minionOf("kin_priest").drop(Items.BONE, 0, 2).drop(Items.FEATHER, 0, 2);
 
         // ============================================================================ Act 1: the Underdocks
-        def("sludge_spinner", "Sludge Spinner", "污泥纺工").hp(17).speed(0.27F).size(0.9F, 0.8F, 1)
+        def("sludge_spinner", "Sludge Spinner", "淤泥旋螺").hp(17).speed(0.27F).size(0.9F, 0.8F, 1)
                 .moves(shot(3.2F, Items.SLIME_BALL, SpireBolt.Kind.SLIME).fx(WEAK, 120), melee(4.4F).wind(16).anim(Anim.SLAM), melee(2.4F).str(1).anim(Anim.SHAKE))
                 .pattern(ids(1), any(1, 2, 3));
         ALL.get("sludge_spinner").spawn(25, 1, 1, DOCKS).drop(Items.SLIME_BALL, 1, 2).drop(Items.STRING, 0, 2);
@@ -313,14 +313,14 @@ public final class ScriptedDefs {
                 .pattern(ids(1), m(2), m(3));
         ALL.get("living_fog").hover = true;
         ALL.get("living_fog").spawn(12, 1, 1, DOCKS).spawn(10, 1, 1, MISTY).drop(Items.GUNPOWDER, 1, 3).drop(Items.WHITE_DYE, 0, 1);
-        def("gas_bomb", "Gas Bomb", "毒气弹").hp(6).speed(0.3F).size(0.6F, 0.6F, 1)
+        def("gas_bomb", "Gas Bomb", "气态炸弹").hp(6).speed(0.3F).size(0.6F, 0.6F, 1)
                 .moves(aoe(3.2F, 3).particle(ParticleTypes.EXPLOSION).sound(SoundEvents.GENERIC_EXPLODE.value())).pattern(seq(), m(1)).minionOf("living_fog");
         ALL.get("gas_bomb").moves.get(0).explode = true;
         ALL.get("gas_bomb").moves.get(0).windup = 30;
         ALL.get("gas_bomb").hover = true;
         ALL.get("gas_bomb").drop(Items.GUNPOWDER, 0, 1);
 
-        def("fossil_stalker", "Fossil Stalker", "化石潜猎者").hp(23).speed(0.3F).size(1.0F, 1.0F, 1)
+        def("fossil_stalker", "Fossil Stalker", "化石追踪者").hp(23).speed(0.3F).size(1.0F, 1.0F, 1)
                 .moves(melee(4.8F).wind(14).anim(Anim.LUNGE), melee(3.6F).fx(FRAIL, 120), melee(1.2F).hits(2, 5))
                 .pattern(ids(1), any(1, 2, 3));
         ALL.get("fossil_stalker").suck = 1;
@@ -334,7 +334,7 @@ public final class ScriptedDefs {
         ALL.get("fat_gremlin").carriesLoot = true;
         ALL.get("fat_gremlin").fleeAfter = 200;
         ALL.get("fat_gremlin").drop(Items.GOLD_NUGGET, 0, 2);
-        def("sneaky_gremlin", "Sneaky Gremlin", "鬼祟地精").hp(6).speed(0.34F).size(0.5F, 0.9F, 1).moves(rest(20), melee(3.6F)).pattern(ids(1), m(2));
+        def("sneaky_gremlin", "Sneaky Gremlin", "卑鄙地精").hp(6).speed(0.34F).size(0.5F, 0.9F, 1).moves(rest(20), melee(3.6F)).pattern(ids(1), m(2));
         ALL.get("sneaky_gremlin").drop(Items.GOLD_NUGGET, 0, 1);
 
         def("haunted_ship", "Haunted Ship", "幽灵船").hp(28).speed(0.22F).size(1.6F, 2.2F, 1)
@@ -349,19 +349,19 @@ public final class ScriptedDefs {
         ALL.get("punch_construct").artifact = 1;
         ALL.get("punch_construct").spawn(8, 1, 1, DOCKS).drop(Items.COPPER_INGOT, 1, 3).drop(() -> ModItems.SCRAP.get(), 0, 2);
 
-        def("sewer_clam", "Sewer Clam", "污水蛤").hp(25).speed(0.12F).size(1.0F, 0.8F, 1)
+        def("sewer_clam", "Sewer Clam", "下水道蚌").hp(25).speed(0.12F).size(1.0F, 0.8F, 1)
                 .moves(shot(4, Items.PRISMARINE_CRYSTALS, SpireBolt.Kind.PEBBLE).sound(SoundEvents.BUBBLE_COLUMN_UPWARDS_INSIDE), buff().str(2).anim(Anim.PUFF))
                 .pattern(ids(1), m(2), m(1));
         ALL.get("sewer_clam").plating = 4;
         ALL.get("sewer_clam").platingDecays = true;
         ALL.get("sewer_clam").spawn(15, 1, 1, SEA_SHORE).drop(Items.PRISMARINE_CRYSTALS, 0, 2).drop(Items.KELP, 0, 2).rareDrop(Items.PEARLESCENT_FROGLIGHT, 0.1F);
 
-        def("skulking_colony", "Skulking Colony", "潜伏群落").hp(45).speed(0.28F).armor(4).size(1.2F, 1.0F, 1.2F).elite()
+        def("skulking_colony", "Skulking Colony", "鬼祟珊瑚群").hp(45).speed(0.28F).armor(4).size(1.2F, 1.0F, 1.2F).elite()
                 .moves(dash(5.6F), melee(3.6F).str(1), melee(2.8F).hits(2, 5).reach(2.8F)).pattern(seq(), m(1), m(1), m(2), m(3));
         ALL.get("skulking_colony").shellCap = 6;
         ALL.get("skulking_colony").spawn(3, 1, 1, DOCKS).drop(Items.NAUTILUS_SHELL, 0, 1).drop(Items.PRISMARINE_SHARD, 1, 3);
 
-        def("phantasmal_gardener", "Phantasmal Gardener", "幻影园丁").hp(14).speed(0.28F).size(0.6F, 1.0F, 1).elite()
+        def("phantasmal_gardener", "Phantasmal Gardener", "花园幽灵鳗").hp(14).speed(0.28F).size(0.6F, 1.0F, 1).elite()
                 .moves(melee(2), melee(2.8F).reach(3), melee(0.4F).hits(3, 4).anim(Anim.SHAKE), buff().str(1).anim(Anim.PUFF))
                 .pattern(seq(any(1, 2, 3, 4)), m(1), m(2), m(3), m(4));
         ALL.get("phantasmal_gardener").skittish = 2;
@@ -369,7 +369,7 @@ public final class ScriptedDefs {
         ALL.get("phantasmal_gardener").relic = 0;   // four together: the group is the elite, one of them carries the relic chance below
         ALL.get("phantasmal_gardener").spawn(3, 4, 4, STONE_DOCKS).drop(Items.SOUL_SOIL, 0, 1).drop(Items.GLOW_INK_SAC, 0, 1);
 
-        def("waterfall_giant", "Waterfall Giant", "瀑布巨人").hp(270).speed(0.2F).armor(8).size(3.6F, 4.4F, 1.7F).boss(BossEvent.BossBarColor.BLUE)
+        def("waterfall_giant", "Waterfall Giant", "瀑布巨兽").hp(270).speed(0.2F).armor(8).size(3.6F, 4.4F, 1.7F).boss(BossEvent.BossBarColor.BLUE)
                 .moves(buff().steam(15).sound(SoundEvents.BUBBLE_COLUMN_WHIRLPOOL_AMBIENT).anim(Anim.PUFF), aoe(6, 5).fx(WEAK, 120).steam(3).sound(SoundEvents.GENERIC_EXPLODE.value()),
                         dash(4).steam(3), buff().heal(10).steam(3).sound(SoundEvents.GENERIC_DRINK.value()),
                         shot(8, Items.PRISMARINE_CRYSTALS, SpireBolt.Kind.FIST).steam(3).wind(24).sound(SoundEvents.BUCKET_EMPTY), melee(5.2F).reach(4.5F).steam(3))
@@ -378,7 +378,7 @@ public final class ScriptedDefs {
         ALL.get("waterfall_giant").pitch = 0.6F;
         ALL.get("waterfall_giant").drop(Items.PRISMARINE_CRYSTALS, 4, 8).drop(Items.HEART_OF_THE_SEA, 0, 1).drop(Items.COPPER_BLOCK, 1, 2);
 
-        def("lagavulin_matriarch", "Lagavulin Matriarch", "拉格夫林女族长").hp(250).speed(0.22F).armor(10).size(3.2F, 3.6F, 1.45F).boss(BossEvent.BossBarColor.RED)
+        def("lagavulin_matriarch", "Lagavulin Matriarch", "乐加维林族母").hp(250).speed(0.22F).armor(10).size(3.2F, 3.6F, 1.45F).boss(BossEvent.BossBarColor.RED)
                 .moves(melee(7.6F).wind(18).reach(3.5F), melee(3.6F).hits(2, 6).reach(3.5F), melee(4.8F).absorb(5).reach(3.5F),
                         shot(0, Items.SOUL_SAND, SpireBolt.Kind.INK).fx(WEAK, 200).fx2(FRAIL).str(1).anim(Anim.CALL).sound(SoundEvents.SOUL_ESCAPE.value()))
                 .pattern(seq(), m(1), m(2), m(3), m(4));
@@ -389,7 +389,7 @@ public final class ScriptedDefs {
         ALL.get("lagavulin_matriarch").drop(Items.IRON_INGOT, 4, 8).drop(Items.SOUL_SAND, 2, 4).drop(Items.NETHERITE_SCRAP, 0, 1);
 
         // ============================================================================ Act 2: the Hive
-        def("ovicopter", "Ovicopter", "卵翼虫").hp(57).speed(0.25F).size(1.4F, 1.6F, 1.2F)
+        def("ovicopter", "Ovicopter", "直飞产卵虫").hp(57).speed(0.25F).size(1.4F, 1.6F, 1.2F)
                 .moves(buff().summon("tough_egg", 3).sound(SoundEvents.TURTLE_LAY_EGG), melee(6.4F).wind(16).anim(Anim.SLAM), melee(2.8F).fx(VULNERABLE, 120), buff().str(1).sound(SoundEvents.HONEY_DRINK.value()))
                 .pattern(ids(1, 2, 3));
         ALL.get("ovicopter").picker = mob -> {   // Lay Eggs - Smash - Tenderizer, then lay again while 3 or fewer eggs/hatchlings are about, else feed
@@ -406,7 +406,7 @@ public final class ScriptedDefs {
         };
         ALL.get("ovicopter").hover = true;
         ALL.get("ovicopter").spawn(12, 1, 1, HIVE).spawn(20, 1, 1, EGG_HIVE).drop(Items.HONEYCOMB, 0, 2).drop(Items.PHANTOM_MEMBRANE, 0, 1);
-        def("tough_egg", "Tough Egg", "硬壳虫卵").hp(7).speed(0).size(0.6F, 0.7F, 1).moves(rest(40)).pattern(seq(), m(1));
+        def("tough_egg", "Tough Egg", "结实的卵").hp(7).speed(0).size(0.6F, 0.7F, 1).moves(rest(40)).pattern(seq(), m(1));
         ALL.get("tough_egg").stationary = true;
         ALL.get("tough_egg").hatchAfter = 160;
         ALL.get("tough_egg").hatchInto = "hatchling";
@@ -414,54 +414,54 @@ public final class ScriptedDefs {
         def("hatchling", "Hatchling", "幼虫").hp(9).speed(0.3F).size(0.5F, 0.5F, 1).moves(melee(1.6F)).pattern(seq(), m(1));
         ALL.get("hatchling").drop(Items.STRING, 0, 1);
 
-        def("tunneler", "Tunneler", "掘地虫").hp(39).speed(0.26F).size(1.0F, 1.0F, 1)
+        def("tunneler", "Tunneler", "地道虫").hp(39).speed(0.26F).size(1.0F, 1.0F, 1)
                 .moves(melee(5.2F), buff().absorb(13).anim(Anim.SINK).sound(SoundEvents.SNIFFER_DIGGING), dash(9.6F).wind(24).reach(2.8F).anim(Anim.LUNGE))
                 .pattern(ids(1, 2), m(3));
         ALL.get("tunneler").moves.get(1).burrow = true;
         ALL.get("tunneler").burrowMove = 3;
         ALL.get("tunneler").spawn(10, 1, 1, HIVE).spawn(15, 1, 1, QUICKSAND).drop(Items.FLINT, 1, 2).drop(Items.SAND, 1, 3);
 
-        def("thieving_hopper", "Thieving Hopper", "窃贼跳虫").hp(36).speed(0.34F).size(0.8F, 1.0F, 1)
+        def("thieving_hopper", "Thieving Hopper", "偷窃草蜢").hp(36).speed(0.34F).size(0.8F, 1.0F, 1)
                 .moves(melee(6.8F).steal(6), buff().self(RESIST, 100, 1).anim(Anim.SHAKE), melee(8.4F).wind(18).anim(Anim.LUNGE), melee(5.6F), buff())
                 .pattern(seq(), m(1), m(2), m(3), m(4), m(5));
         ALL.get("thieving_hopper").moves.get(4).flee = true;
         ALL.get("thieving_hopper").spawn(8, 1, 1, HIVE).drop(Items.RABBIT_HIDE, 0, 2).drop(Items.EMERALD, 0, 1);
 
-        def("hunter_killer", "Hunter Killer", "猎杀者").hp(54).speed(0.3F).armor(4).size(1.2F, 1.2F, 1.1F)
+        def("hunter_killer", "Hunter Killer", "猎人杀手").hp(54).speed(0.3F).armor(4).size(1.2F, 1.2F, 1.1F)
                 .moves(lob(0, Items.SLIME_BALL, SpireBolt.Kind.SLIME).fx(WEAK, 160).fx2(FRAIL), melee(6.8F).wind(16).anim(Anim.LUNGE), melee(2.8F).hits(3, 4))
                 .pattern(ids(1), weighted(new int[] {2, 3}, new int[] {1, 2}));
         ALL.get("hunter_killer").spawn(8, 1, 1, HIVE).drop(Items.SPIDER_EYE, 1, 2).drop(Items.STRING, 1, 3);
 
-        def("louse_progenitor", "Louse Progenitor", "虱祖").hp(60).speed(0.22F).armor(4).size(1.4F, 1.2F, 1.2F)
+        def("louse_progenitor", "Louse Progenitor", "虱虫之祖").hp(60).speed(0.22F).armor(4).size(1.4F, 1.2F, 1.2F)
                 .moves(shot(3.6F, Items.COBWEB, SpireBolt.Kind.WEB).fx(FRAIL, 120), buff().absorb(6).str(2).anim(Anim.SINK), dash(5.6F))
                 .pattern(seq(), m(1), m(2), m(3));
         ALL.get("louse_progenitor").curlUp = 6;
         ALL.get("louse_progenitor").spawn(8, 1, 1, HIVE).drop(Items.STRING, 2, 4).drop(Items.COBWEB, 0, 1);
 
-        def("slumbering_beetle", "Slumbering Beetle", "沉睡甲虫").hp(39).speed(0.24F).armor(6).size(1.3F, 1.1F, 1.1F)
+        def("slumbering_beetle", "Slumbering Beetle", "熟睡甲虫").hp(39).speed(0.24F).armor(6).size(1.3F, 1.1F, 1.1F)
                 .moves(dash(6.4F).str(1)).pattern(seq(), m(1));
         ALL.get("slumbering_beetle").sleep = 3;
         ALL.get("slumbering_beetle").plating = 7;
         ALL.get("slumbering_beetle").sleepPlatingLost = true;
         ALL.get("slumbering_beetle").spawn(8, 1, 1, HIVE).drop(Items.TURTLE_SCUTE, 0, 1).drop(Items.SLIME_BALL, 0, 1);
 
-        def("spiny_toad", "Spiny Toad", "刺蟾").hp(53).speed(0.24F).size(1.2F, 1.1F, 1.2F)
+        def("spiny_toad", "Spiny Toad", "棘刺蟾蜍").hp(53).speed(0.24F).size(1.2F, 1.1F, 1.2F)
                 .moves(buff().thorns(2).anim(Anim.PUFF).sound(SoundEvents.PUFFER_FISH_BLOW_UP), aoe(9.2F, 4).dropThorns().particle(ParticleTypes.CRIT).sound(SoundEvents.PUFFER_FISH_STING), melee(6.8F).reach(5).wind(14).anim(Anim.LUNGE))
                 .pattern(seq(), m(1), m(2), m(3));
         ALL.get("spiny_toad").spawn(10, 1, 1, HIVE).spawn(8, 1, 1, MUSHROOM).drop(Items.SLIME_BALL, 1, 2).rareDrop(Items.OCHRE_FROGLIGHT, 0.15F);
 
-        def("obscura", "The Obscura", "暗晦体").hp(55).speed(0.22F).size(1.0F, 2.2F, 1.2F)
+        def("obscura", "The Obscura", "胧光怪").hp(55).speed(0.22F).size(1.0F, 2.2F, 1.2F)
                 .moves(buff().summon("parafright", 1).sound(SoundEvents.ILLUSIONER_PREPARE_MIRROR), shot(4.4F, Items.ENDER_EYE, SpireBolt.Kind.INK), buff().wail().sound(SoundEvents.GHAST_SCREAM), melee(2.8F).absorb(3))
                 .pattern(ids(1), any(2, 3, 4));
         ALL.get("obscura").hover = true;
         ALL.get("obscura").spawn(8, 1, 1, HIVE).drop(Items.ENDER_PEARL, 0, 1).drop(Items.BLACK_DYE, 0, 2);
-        def("parafright", "Parafright", "惊魇").hp(9).speed(0.3F).size(0.8F, 1.4F, 1).moves(melee(6.4F).wind(16).anim(Anim.SLAM)).pattern(seq(), m(1)).minionOf("obscura");
+        def("parafright", "Parafright", "寄生惧魔").hp(9).speed(0.3F).size(0.8F, 1.4F, 1).moves(melee(6.4F).wind(16).anim(Anim.SLAM)).pattern(seq(), m(1)).minionOf("obscura");
         ALL.get("parafright").illusion = true;
         ALL.get("parafright").reviveTicks = 100;
         ALL.get("parafright").hover = true;
         ALL.get("parafright").drop(Items.PHANTOM_MEMBRANE, 0, 1);
 
-        def("decimillipede", "Decimillipede", "十节蜈蚣").hp(63).speed(0.3F).armor(4).size(1.0F, 0.8F, 1.2F).elite()
+        def("decimillipede", "Decimillipede", "残杀千足虫").hp(63).speed(0.3F).armor(4).size(1.0F, 0.8F, 1.2F).elite()
                 .moves(melee(2.4F).str(1), melee(2).hits(2, 5), aoe(3.6F, 3).fx(WEAK, 120).particle(ParticleTypes.SNEEZE))
                 .pattern(seq(any(1, 2, 3)), m(1), m(2), m(3));
         ALL.get("decimillipede").revives = 2;
@@ -469,13 +469,13 @@ public final class ScriptedDefs {
         ALL.get("decimillipede").reviveTicks = 40;
         ALL.get("decimillipede").spawn(3, 1, 1, HIVE).drop(Items.STRING, 2, 4).drop(Items.SPIDER_EYE, 1, 2);
 
-        def("infested_prism", "Infested Prism", "寄生棱晶").hp(75).speed(0.18F).armor(6).size(1.4F, 2.0F, 1.2F).elite()
+        def("infested_prism", "Infested Prism", "感染棱柱").hp(75).speed(0.18F).armor(6).size(1.4F, 2.0F, 1.2F).elite()
                 .moves(melee(6.8F).wind(14), aoe(2.4F, 3.5F).hits(3, 5).particle(ParticleTypes.CRIT).anim(Anim.SHAKE), melee(4).fx(VULNERABLE, 120).anim(Anim.PUFF))
                 .pattern(seq(), m(1), m(1), m(2), m(3));
         ALL.get("infested_prism").hover = true;
         ALL.get("infested_prism").spawn(3, 1, 1, HIVE).drop(Items.HONEYCOMB, 2, 4).drop(Items.AMETHYST_SHARD, 2, 5);
 
-        def("insatiable", "The Insatiable", "贪食者").hp(280).speed(0.24F).armor(8).size(3.2F, 4.2F, 1.6F).boss(BossEvent.BossBarColor.YELLOW)
+        def("insatiable", "The Insatiable", "无厌沙虫").hp(280).speed(0.24F).armor(8).size(3.2F, 4.2F, 1.6F).boss(BossEvent.BossBarColor.YELLOW)
                 .moves(aoe(0, 16).fx(SLOW, 120, 2).doom(8).anim(Anim.CALL).particle(ParticleTypes.CLOUD).sound(SoundEvents.SAND_BREAK),
                         melee(3.2F).hits(2, 6).reach(4), dash(11.2F).wind(26).reach(4), buff().str(1).anim(Anim.SHAKE).sound(SoundEvents.RAVAGER_AMBIENT))
                 .pattern(ids(1), m(2), m(3), m(4), m(2));

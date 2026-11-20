@@ -6,12 +6,12 @@
 
 ## 已完成
 - `tools/mobs/kit.js`：建模工具。`loft`（截面拼接，阶梯状——尽量少用）、`figure`（可调比例人形）、`limb`、`fin`、`eyeDetail`、`fringe`、**`rotBox`（单个斜块）**、**`octo`（八角棱柱，四条棱用 45° 斜块倒角，axis 'x'/'y'/'z'，核心块不重叠）**。
-- `tools/mobs/specs_v7.js`（在 specs.js 末尾 Object.assign 覆盖旧模型）：8 个 Boss（灵魂异鱼、帝王蟹、知识恶魔、墨魇、同族祭司、瀑布巨人、拉格夫林女族长、贪食者）、11 个人形、7 个精英、16 个普通怪已按特征重做——但大多仍用 `loft` 阶梯拼法。
-- Boss 绘制比例已改：帝王蟹 1.5、知识恶魔 1.4、灵魂鱼 1.8（`client/mob/SpireMobRenderer.java`）；数据驱动 Boss 的比例在 `mob/ScriptedDefs.java` 的 `.size(w, h, scale)`。
+- `tools/mobs/specs_v7.js`（在 specs.js 末尾 Object.assign 覆盖旧模型）：8 个 Boss（灵魂异鱼、帝王蟹、知识恶魔、墨影幻灵、同族神官、瀑布巨兽、乐加维林族母、无厌沙虫）、11 个人形、7 个精英、16 个普通怪已按特征重做——但大多仍用 `loft` 阶梯拼法。
+- Boss 绘制比例已改：帝王蟹 1.5、知识恶魔 1.4、灵魂异鱼 1.8（`client/mob/SpireMobRenderer.java`）；数据驱动 Boss 的比例在 `mob/ScriptedDefs.java` 的 `.size(w, h, scale)`。
 
 ## 下一步
-1. 用 `octo` / `rotBox` 把 Boss、精英、大型怪身体的阶梯 `loft` 换成斜块：灵魂异鱼身体（`octo` axis 'x'，侧面轮廓倒角；头部前额/下巴用斜块）、帝王蟹甲壳与钳、知识恶魔躯干与盘腿、墨魇身体、瀑布巨人（随机倾斜的岩块）、女族长石壳（倾斜卵石）、贪食者（环节 octo + 喇叭口用一圈外翻斜片）、寄生棱晶（斜面拼成四面体）、蛙形寄生虫囊、撕咬兽躯干、十节蜈蚣体节。
-2. 其余普通怪（inklet、eye_with_teeth、snapping_jaxfruit、slithering_strangler、cubex_construct、wriggler、living_fog、gas_bomb、tough_egg、hatchling、parafright、四种盛碗虫、外骨骼虫、咬咬机、螨）也按特征细化。
+1. 用 `octo` / `rotBox` 把 Boss、精英、大型怪身体的阶梯 `loft` 换成斜块：灵魂异鱼身体（`octo` axis 'x'，侧面轮廓倒角；头部前额/下巴用斜块）、帝王蟹甲壳与钳、知识恶魔躯干与盘腿、墨影幻灵身体、瀑布巨兽（随机倾斜的岩块）、女族长石壳（倾斜卵石）、无厌沙虫（环节 octo + 喇叭口用一圈外翻斜片）、感染棱柱（斜面拼成四面体）、异蛙寄生虫囊、蛮兽躯干、残杀千足虫体节。
+2. 其余普通怪（inklet、eye_with_teeth、snapping_jaxfruit、slithering_strangler、cubex_construct、wriggler、living_fog、gas_bomb、tough_egg、hatchling、parafright、四种盛碗虫、外骨骼虫、啃咬机、异螨）也按特征细化。
 3. 检查动画骨骼名仍匹配（`client/mob/SpireMobModel.java`；数据驱动怪用通用动画 `scripted()`，按骨骼名 body/head/jaw/arm_l/arm_r/leg_*/tail*/seg_*/wing_*/tent_*/orbit/cape 驱动）。
 4. 文档：在 `docs/design/mobs.md` 末尾加“十二、模型 v7/v8”小节（中英双语）。
 
