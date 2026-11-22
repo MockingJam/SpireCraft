@@ -1,0 +1,13 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/silent_gathering",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:silent_gathering/1"
+  ],
+  "mode": "stilts",
+  "sink": 13,
+  "ignore_waterlogging": true
+}
