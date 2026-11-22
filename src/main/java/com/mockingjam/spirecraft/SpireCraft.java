@@ -45,6 +45,7 @@ public final class SpireCraft {
         com.mockingjam.spirecraft.worldgen.DryJigsawStructure.TYPES.register(modBusGroup);
         com.mockingjam.spirecraft.worldgen.SpireStructures.TYPES.register(modBusGroup);
         com.mockingjam.spirecraft.worldgen.SpireStructures.PIECES.register(modBusGroup);
+        com.mockingjam.spirecraft.worldgen.SpireStructures.PROCESSORS.register(modBusGroup);
         net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent.getBus(modBusGroup)
                 .addListener(e -> e.enqueueWork(com.mockingjam.spirecraft.block.BiomeBlocks::commonSetup));
 

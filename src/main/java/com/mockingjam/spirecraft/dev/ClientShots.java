@@ -76,8 +76,12 @@ public final class ClientShots {
             }
             return;
         }
+        // the script has run out (no quit line): hand the game back to the player, Esc menu and all
+        if (LINES.isEmpty() && wait == 0 && !useHeld) return;
         mc.options.pauseOnLostFocus = false;
         if (mc.screen instanceof net.minecraft.client.gui.screens.PauseScreen) mc.setScreen(null);   // the window lost focus
+        // a script that opens a chest (use on) goes on: the opening is what it tests
+        if (mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> && mc.player != null) mc.player.closeContainer();
         if (mc.player == null || mc.getSingleplayerServer() == null || mc.screen != null) return;
         if (useHeld) mc.options.keyUse.setDown(true);   // closing a pause screen re-reads the real keyboard
         if (wait > 0) { wait--; return; }

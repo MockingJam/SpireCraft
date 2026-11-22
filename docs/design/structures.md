@@ -191,20 +191,29 @@ Style: ancient-European fantasy, vanilla blocks first with mod accents; each str
 
 Ironclad: a palisaded war camp in the badlands with a stone forge, red-black tents and a tall banner; main loot is sulfur.
 
-### 2. 静默猎手藏身处 `silent_hideout`（毒与蛇）
+### 2. 静默猎手：猎人的聚集地 `silent_gathering`（毒与蛇，issue #37）
+
+> issue #37 把“藏身处”改为“猎人的聚集地”：一群猎手共用的藏身窝。第二版（用户反馈）：更难发现、陷阱藏得更好、床少且分开、整体更大、更矮、内部错综复杂。
 
 | 项 | 内容 |
 |---|---|
-| 位置 | 沼泽、红树林沼泽（不与暗港重叠：只在离海较远的部分）、丛林 |
-| 造型 | 架在高桩/大树上的**隐蔽树屋**：红树林木板 + 深色橡木墙，屋顶盖满树叶和藤蔓，只有一条梯子上去。屋外平台晾着兽皮（棕色羊毛/旗帜）。屋内：**调毒台**（炼药锅 + 酿造台 + 绿色蜡烛）、毒瓶架（装饰罐、花盆、绿色玻璃）、睡铺、**飞刀靶**（标靶方块） |
-| 标志物 | 树屋周围的树上系着一串串**白色布条**（白色旗帜/白羊毛，呼应白绷带），像猎手的路标 |
-| 陷阱 | 通往梯子的地面藏着绊线 + 发射器（中毒药箭），体现猎手的营地 |
-| 主要方块 | 红树林原木/木板、深色橡木、树叶、藤蔓、梯子、炼药锅、酿造台、绿色蜡烛、标靶 |
-| 尺寸 | 约 20×20，高 18（含桩/树） |
-| 主箱（猎手的箱子） | 毒药水、毒马铃薯、蜘蛛眼、绊线钩、小刀 8–16 把；小概率淬毒匕首 / 毒瓶；很小概率罐装幽灵 |
-| 材料 | **静默猎手目前没有专属材料**，见下方“待确认” |
+| 位置 | 沼泽、红树林沼泽、丛林、稀疏丛林。浅水（≤3 格深）或平地都可以，深水和起伏大的地方不生成；本模组的暗港群系不在列表里，不会重叠 |
+| 造型 | 一片**矮桩上的房间群**（平台离地 2 格，下面能钻过去），七个房间用 1 格宽、拐来拐去的**窄走廊**连在一起，有一条死胡同；深色橡木和云杉的墙和地板（不用红色的红树林木板），外墙爬满藤蔓，桩脚长着红树林根 |
+| 隐蔽 | 屋顶是连成一片的**树冠**：墙上和墙外一两格铺树叶，上面再堆几团不规则的树叶，高度和沼泽橡树的树冠差不多，从天上看像一丛树；树冠没有破洞；火塘是冷的，不冒烟；没有高处的旗子 |
+| 房间 | **大厅**（中央）：冷火塘、原木座位、织布机、北墙两块插着飞刀的标靶；**调毒室**：酿造台、炼药锅、绿色蜡烛、毒瓶架，地上一块绿地毯**盖着活板门**，下面是 2 格高的泥砖**地窖**（诱饵：只有一个补给木桶）；**储藏室**：制箭台、补给木桶、干草，西墙的矮门被一面挂毯半遮着，通到**西侧小间**（一张床、一堆白布绷带）；**剥皮室**：烟熏炉、磨石、炼药锅、干草、补给木桶，东外墙晾着兽皮（棕色旗帜和一张绿色蛇皮）；**东侧小间**（另一张床）通向水上的**阳台**，对面水里立着两根插着飞刀的靶桩；**入口间**在空心树桩上面 |
+| 地下宝库 | 地窖地上的一块苔藓地毯下面还有一扇活板门，一条泥砖竖井向下约 8 格到地下的**宝库**（全封闭的泥砖房间，有悬垂的根、灯笼、墙上的飞刀和淬毒匕首、两个装补给的饰纹陶罐、一个头骨）；主箱是一个**陷阱箱**，放在南墙 2 格深的凹槽里，上面挂着蛇皮旗帜 |
+| 床 | 全村只有 **2 张床**，分在西侧小间和东侧小间 |
+| 入口 | **只有一条路**：一个空心的红树林原木树桩（在入口间正下方），里面的梯子通上去；树桩的开口前是一条 1 格宽、2 格高的**树叶隧道** |
+| 陷阱 | ① 树叶隧道里横着一根绊线，两端的绊线钩挂在灌木里的原木上，原木上面各有一个发射器，发射口被藤蔓遮住（箭能穿过藤蔓），踩到就从两边朝头部射剧毒药箭；② 大厅通往调毒室的走廊里也有一根绊线，钩子嵌在墙缝里，墙外的发射器透过墙上的藤蔓射箭；③ 竖井底部的窄道里有一根绊线，两边墙缝里的发射器透过悬垂的根射箭；④ 打开陷阱箱时，箱子前面那格地面（苔藓地毯下面）的发射器向上射箭 |
+| 标志物 | 只在近处能看到的**白色布条**：树桩开口旁一条，平台下面几根桩子上各系一条 |
+| 废弃 | 地板约 3% 缺块、7% 长苔藓地毯，房间角落有蜘蛛网；灯笼还挂着 |
+| 主要方块 | 深色橡木/云杉木板、去皮深色橡木原木、红树林原木和根、丛林/红树林/橡树树叶、藤蔓、泥砖、梯子、活板门、酿造台、炼药锅、绿色蜡烛、标靶 |
+| 尺寸 | 47×23×47（地下 12 格：桩基和宝库；地面以上约 10 格） |
+| 主箱 `chests/silent_gathering` | 蜘蛛眼、毒马铃薯、发酵蛛眼、线、绊线钩、箭、兔子皮、皮革、羽毛、**飞刀 8–16 把**、黏液球；1–2 瓶剧毒药水 / 喷溅剧毒药水 / 敏捷药水 / 虚弱药水；约 33% 一件武器（淬毒匕首、毒瓶 2–4、蛇咬、墨水匕首）；12% 罐装幽灵或手里剑（藏在宝库里，比一般主箱略好） |
+| 补给木桶 `chests/silent_supply` | 兔子皮、皮革、线、箭、剧毒药箭、熟兔肉、熟鸡肉、羽毛、骨头、蜘蛛眼、蘑菇、甜浆果 |
+| 材料 | **静默猎手目前没有专属材料**，先用原版物品占位 |
 
-Silent: a hidden tree house in the swamps with a poison bench and a knife target; white cloth strips mark the way; a tripwire trap guards the ladder.
+Silent: a low den of seven rooms and narrow corridors on short stilts in the swamp / jungle, under a leaf canopy that looks like swamp trees from above. The only way in is a ladder inside a hollow stump, through a leaf tunnel with a hidden poison-arrow tripwire; a second one guards the corridor to the poison room. Under its rug is a decoy cellar, and under a carpet there a shaft down to a sealed vault: a tripwire at the bottom, and the main chest is a trapped chest that shoots up from the floor. Two beds, in different rooms.
 
 ### 3. 储君宫廷 `regent_court`（群星与锻造）
 
@@ -262,3 +271,8 @@ Defect: a two-storey workshop of automaton alloy and copper with a lightning-cat
 
 - **铁甲战士营地**：`build.js` 的 `ironcladCamp`，模板 `ironclad_camp/1`（31×19×31）。主箱 `chests/ironclad_camp`（指挥官帐篷里），补给木桶 `chests/ironclad_supply`。
 - **第二版（用户反馈）**：放置改用 `spirecraft:cave_template` 的新模式 `open_ground`（`SpireStructures.CaveTemplate.openGround`）：整个占地必须是干地、高差不超过 6 格，否则不生成；大门（模板 +z）转向门外地形最低、最开阔的一面；地形适配 `beard_box`。帐篷改为 7 格宽、屋脊 5 格高、后墙封闭前面敞开、木板地面，箱子上方留空能打开，人能走进去；指挥官帐篷里有主箱、制图台、座椅、床和红地毯，士兵帐篷各两张床和一个木桶。栅栏降到 3–4 格、高低错落，顶上不再放栅栏（之前连成横杆）。营地地面不用红沙和砂土（会长枯灌木，地面一换就碎成木棍）。
+- **静默猎手：猎人的聚集地**（issue #37）：`build.js` 的 `silentGathering`，模板 `silent_gathering/1`（47×16×47）。主箱 `chests/silent_gathering`（调毒室下面的地窖），补给木桶 `chests/silent_supply`（储藏室两个、剥皮室一个）。
+  - 放置用 `spirecraft:cave_template` 的新模式 `stilts`（`SpireStructures.CaveTemplate.stilts`）：占地范围内水深不超过 3 格，地面（水底）不低于平均地表 4 格（宝库上面还留得住实心的土），也不高出 2 格（第二版平台只离地 2 格）；随机朝向，地形适配 `none`。
+  - 生成阶段是 `top_layer_modification`（在树之后）：小屋、聚会棚和吊桥的空间都写成空气，所以长在这里的树会被切掉，不会有树叶长进屋里。相邻区块后生成的树仍可能从边上伸进来一点；被切掉的沼泽橡树剩下的树叶会自然凋落（掉树苗）。
+  - `cave_template` 的新选项 `ignore_waterlogging`（这里打开）：放置时不吸收地下水。宝库在沼泽的含水层里，不打开时陷阱箱、陶罐、梯子、根都会变成含水方块，水漫进宝库，还把绊线冲掉。
+  - 新的结构处理器 `spirecraft:hanging_pos`（所有 `TemplatePiece` 都会用）：模板里的物品展示框没有 `block_pos`，放置时会报 “Block-attached entity at invalid position”；处理器在放置前写入实际位置。
