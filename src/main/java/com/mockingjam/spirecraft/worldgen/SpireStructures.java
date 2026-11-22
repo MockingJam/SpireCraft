@@ -111,6 +111,7 @@ public final class SpireStructures {
             if (size.getX() == 0) return Optional.empty();
             int x = ctx.chunkPos().getMiddleBlockX(), z = ctx.chunkPos().getMiddleBlockZ();
             if (mode.equals("shore")) return shore(ctx, id, size, x, z);
+            if (mode.equals("open_ground")) return openGround(ctx, id, size, x, z);
             // a cave floor: air with headroom over solid rock, here and at the template's corners
             NoiseColumn col = ctx.chunkGenerator().getBaseColumn(x, z, ctx.heightAccessor(), ctx.randomState());
             List<Integer> floors = new ArrayList<>();
@@ -162,6 +163,45 @@ public final class SpireStructures {
                 return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot))));
             }
             return Optional.empty();
+        }
+
+        private static int height(GenerationContext ctx, int x, int z, Heightmap.Types type) {
+            return ctx.chunkGenerator().getBaseHeight(x, z, type, ctx.heightAccessor(), ctx.randomState());
+        }
+
+        /**
+         * v3.7 (user: the Ironclad camp only on open, fairly flat dry ground, its gate facing the open side): the whole
+         * footprint must be dry land within 6 blocks of height; the template's +z side (the gate) is turned to the
+         * direction whose ground in front of the gate rises least above the camp.
+         */
+        private Optional<GenerationStub> openGround(GenerationContext ctx, ResourceLocation id, net.minecraft.core.Vec3i size, int x, int z) {
+            int r = Math.max(size.getX(), size.getZ()) / 2 - 1;
+            int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE, sum = 0, n = 0;
+            for (int dx = -r; dx <= r; dx += 4) for (int dz = -r; dz <= r; dz += 4) {
+                if (dx * dx + dz * dz > r * r) continue;
+                int s = height(ctx, x + dx, z + dz, Heightmap.Types.WORLD_SURFACE_WG);
+                if (s != height(ctx, x + dx, z + dz, Heightmap.Types.OCEAN_FLOOR_WG)) return Optional.empty();   // water
+                min = Math.min(min, s);
+                max = Math.max(max, s);
+                sum += s;
+                n++;
+            }
+            if (max - min > 6) return Optional.empty();
+            int ground = Math.round(sum / (float) n);
+            Direction best = Direction.SOUTH;
+            int bestScore = Integer.MAX_VALUE;
+            for (Direction d : Direction.Plane.HORIZONTAL) {
+                int score = 0;
+                for (int k = r + 3; k <= r + 15; k += 4) for (int side = -6; side <= 6; side += 6) {
+                    int px = x + d.getStepX() * k - d.getStepZ() * side, pz = z + d.getStepZ() * k + d.getStepX() * side;
+                    score += Math.max(0, height(ctx, px, pz, Heightmap.Types.WORLD_SURFACE_WG) - ground);
+                }
+                score = score * 4 + ctx.random().nextInt(4);   // ties broken at random
+                if (score < bestScore) { bestScore = score; best = d; }
+            }
+            Rotation rot = switch (best) { case WEST -> Rotation.CLOCKWISE_90; case NORTH -> Rotation.CLOCKWISE_180; case EAST -> Rotation.COUNTERCLOCKWISE_90; default -> Rotation.NONE; };
+            BlockPos anchor = new BlockPos(x, ground, z), pivot = new BlockPos(size.getX() / 2, sink, size.getZ() / 2);
+            return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot))));
         }
     }
 

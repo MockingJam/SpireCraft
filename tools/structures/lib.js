@@ -8,6 +8,10 @@ const zlib = require('zlib');
 const ROOT = path.resolve(__dirname, '../..');
 const DATA = path.join(ROOT, 'src/main/resources/data/spirecraft');
 const DATA_VERSION = 4556;   // SharedConstants.WORLD_VERSION for 1.21.10
+/** Templates tuned by hand in the game (one id per line in tuned.txt, e.g. ironclad_camp/1): build.js leaves them alone. */
+const TUNED_FILE = path.join(__dirname, 'tuned.txt');
+const TUNED = new Set(fs.existsSync(TUNED_FILE)
+  ? fs.readFileSync(TUNED_FILE, 'utf8').split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#')) : []);
 
 // ------------------------------------------------------------------ NBT (big-endian, gzip)
 const T = { byte: 1, short: 2, int: 3, long: 4, float: 5, double: 6, string: 8, list: 9, compound: 10, intArray: 11 };
@@ -202,6 +206,7 @@ class Struct {
 
   save(id) {
     const file = path.join(DATA, 'structure', id + '.nbt');
+    if (TUNED.has(id) && fs.existsSync(file)) { console.log('kept hand-tuned', id); return 'spirecraft:' + id; }
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, encode(this.toNbt()));
     return 'spirecraft:' + id;
