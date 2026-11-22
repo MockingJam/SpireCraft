@@ -886,7 +886,7 @@ const HIVES = ['spirecraft:hive_caves', 'spirecraft:egg_hive_caves'], ALL_HIVES 
 function special(id, type, biomes, spacing, separation, extra) {
   writeJson(`tags/worldgen/biome/has_structure/${id}.json`, { values: biomes });
   writeJson(`worldgen/structure/${id}.json`, Object.assign({ type, biomes: `#spirecraft:has_structure/${id}`,
-    step: type === 'spirecraft:carved' ? 'underground_structures' : extra.mode === 'shore' ? 'surface_structures' : 'underground_decoration',
+    step: type === 'spirecraft:carved' ? 'underground_structures' : extra.mode === 'shore' || extra.mode === 'open_ground' ? 'surface_structures' : 'underground_decoration',
     spawn_overrides: {}, terrain_adaptation: 'none' }, extra));
   writeJson(`worldgen/structure_set/${id}.json`, { structures: [{ structure: `spirecraft:${id}`, weight: 1 }],
     placement: { type: 'minecraft:random_spread', spacing, separation, salt: [...id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 7) & 0x7fffffff } });
@@ -899,7 +899,138 @@ special('beekeeper_hollow', 'spirecraft:carved', HIVES, 14, 5, { kind: 'beekeepe
 special('man_sized_holes', 'spirecraft:cave_template', ALL_HIVES, 9, 3, { templates: hiveTemplates.holes, mode: 'cave_floor', sink: 9, min_y: -50, max_y: 40 });
 special('dock_pier', 'spirecraft:cave_template', ['spirecraft:stone_forest_docks', 'spirecraft:beach_docks'], 7, 2, { templates: pierTemplates, mode: 'shore', sink: 14 });
 special('web_nest', 'spirecraft:carved', ALL_HIVES, 12, 5, { kind: 'web_nest', min_y: -40, max_y: 30 });
-special('kaiser_crab_cave', 'spirecraft:carved', ALL_HIVES, 44, 18, { kind: 'kaiser_cave', min_y: -36, max_y: 0 });
+special('kaiser_crab_cave','spirecraft:carved', ALL_HIVES, 44, 18, { kind: 'kaiser_cave', min_y: -36, max_y: 0 });
+
+// ------------------------------------------------------------------ Ascender buildings (v3.7, issue #30)
+/** Ironclad camp (fire and blood): a palisaded war camp in the badlands / savanna. Abandoned - the Ironclad went on to
+ * the Spire. A stone forge with a smoking chimney and a stock of brimstone (north), the commander's tent with the main
+ * chest (west), two soldiers' tents (east), a tall flagpole with a red-and-black flag in the middle, a fire pit, training
+ * dummies and weapon racks by the south gate. */
+loot('ironclad_camp', [
+  { rolls: [4, 7], items: [['spirecraft:brimstone', 12, 3, 8], ['iron_ingot', 8, 1, 4], ['gunpowder', 8, 2, 6], ['coal', 6, 2, 6], ['iron_nugget', 6, 3, 9], ['leather', 4, 1, 3], ['bread', 4, 1, 3], ['blaze_powder', 2, 1, 2]] },
+  { rolls: [1, 2], items: [potion('blood', 4), potion('strength', 2), ['empty', 3]] },
+  { rolls: 1, items: [['empty', 70], ['spirecraft:bludgeon', 6], ['spirecraft:morning_star', 6], ['spirecraft:bloodletting_dagger', 6], ['spirecraft:cleaver', 6], ['spirecraft:tank_shield', 4], ['spirecraft:infernal_blade', 2]] },
+  { rolls: 1, items: [['empty', 95], ['spirecraft:red_skull', 3], ['spirecraft:burning_blood', 2]] },
+]);
+loot('ironclad_supply', [
+  { rolls: [2, 5], items: [['coal', 10, 1, 5], ['iron_nugget', 8, 2, 7], ['arrow', 6, 3, 10], ['bread', 6, 1, 3], ['cooked_beef', 5, 1, 3], ['leather', 5, 1, 3], ['string', 4, 1, 4], ['spirecraft:brimstone', 3, 1, 2], ['torch', 5, 2, 6]] },
+]);
+function ironcladCamp(seed) {
+  const r = rng(seed), n = 31, c = 15, s = new Struct(n, 19, n);
+  const BB = 'polished_blackstone_bricks', DB = 'deepslate_bricks';
+  const inRing = (x, z) => Math.hypot(x - c, z - c) <= 12.6;
+  // clear the inside (hills, plants) and lay a trodden floor. v3.7 (user: sticks lying around): no red sand / coarse dirt
+  // on the floor - dead bushes grow on those, and they break into sticks when the ground under them changes
+  const FLOOR = ['dirt_path', 'dirt_path', 'packed_mud', 'gravel', 'packed_mud', 'mud_bricks'];
+  for (let x = 0; x < n; x++) for (let z = 0; z < n; z++) {
+    const d = Math.hypot(x - c, z - c);
+    if (d > 13.6) continue;
+    s.set(x, 0, z, r.pick(FLOOR));
+    for (let y = 1; y < 12; y++) s.set(x, y, z, 'air');
+  }
+  // the palisade: a ring of spruce stakes of uneven height (v3.7 user: no fence rails on top, low enough to see in),
+  // a few broken; the gate (+z) is turned to the open side by the structure
+  s.disc(c, 0, c, 13.6, (x, y, z) => {
+    if (z > c && Math.abs(x - c) <= 1) return;                    // the gateway
+    const gatePost = z > c && Math.abs(x - c) === 2;
+    const broken = !gatePost && r.chance(0.12);
+    const h = gatePost ? 5 : broken ? r.int(1, 2) : r.int(3, 4);
+    s.set(x, 0, z, 'packed_mud');
+    for (let k = 1; k <= h; k++) s.set(x, k, z, r.chance(0.7) ? 'spruce_log[axis=y]' : 'stripped_spruce_log[axis=y]');
+    if (gatePost) s.set(x, h + 1, z, 'campfire[lit=true,facing=south]');   // braziers on the gate posts
+  }, 12.6);
+  // a path from the gate to the flagpole
+  for (let z = c + 2; z <= n - 1; z++) for (let x = c - 1; x <= c + 1; x++) if (Math.hypot(x - c, z - c) <= 13.6) s.set(x, 0, z, r.chance(0.8) ? 'dirt_path' : 'gravel');
+
+  // the forge (north): a hearth of deepslate over magma, a chimney with a campfire inside so it always smokes
+  for (let x = c - 4; x <= c + 4; x++) for (let z = 4; z <= 9; z++) s.set(x, 0, z, r.chance(0.7) ? BB : 'blackstone');
+  s.fill(c - 3, 1, 4, c + 3, 3, 4, DB);                           // back wall
+  s.fill(c - 3, 1, 5, c - 3, 3, 6, DB).fill(c + 3, 1, 5, c + 3, 3, 6, DB);
+  s.fill(c - 2, 1, 5, c + 2, 1, 6, DB);
+  s.fill(c - 1, 1, 5, c + 1, 1, 5, 'magma_block');
+  s.fill(c - 2, 2, 5, c + 2, 3, 6, 'air');
+  s.fill(c - 2, 2, 5, c - 2, 3, 6, DB).fill(c + 2, 2, 5, c + 2, 3, 6, DB);
+  s.fill(c - 3, 4, 4, c + 3, 4, 6, `${BB.replace('bricks', 'brick')}_slab[type=bottom]`);
+  s.fill(c - 1, 4, 4, c + 1, 9, 6, DB);                           // the chimney, hollow in the middle
+  for (let y = 5; y <= 9; y++) s.set(c, y, 5, 'air');
+  s.set(c, 4, 5, 'campfire[lit=true,facing=south]');
+  for (const [x, z] of [[c - 1, 4], [c + 1, 4], [c - 1, 6], [c + 1, 6]]) s.set(x, 10, z, 'polished_blackstone_wall');
+  s.set(c - 3, 1, 6, 'blast_furnace[facing=south,lit=false]');
+  s.set(c - 3, 1, 8, 'chipped_anvil[facing=east]').set(c - 2, 1, 8, 'water_cauldron[level=3]');
+  s.set(c + 3, 1, 8, 'grindstone[face=floor,facing=north]').set(c + 2, 1, 8, 'smithing_table');
+  // the brimstone stock and coal by the forge
+  s.set(c + 4, 1, 4, 'coal_block').set(c + 4, 1, 5, 'spirecraft:brimstone_block').set(c + 4, 1, 6, 'spirecraft:brimstone_block').set(c + 4, 2, 5, 'spirecraft:brimstone_block');
+  s.set(c + 5, 1, 5, 'spirecraft:brimstone_block').barrel(c + 5, 1, 7, 'up', 'ironclad_supply');
+  weather(s, r, { [DB]: ['cracked_deepslate_bricks'], [BB]: ['cracked_polished_blackstone_bricks'] }, 0.25);
+
+  // tents (v3.7 user: big enough to walk into and open the chest): 7 wide, walls 2 high, a pitched roof to a ridge 5 up,
+  // a plank floor, the back closed and the front open. `front` is the open end ('south' = +z).
+  const militaryTent = (x0, z0, len, front, wool, ridge) => {
+    const z1 = z0 + len - 1, back = front === 'south' ? z0 : z1;
+    for (let z = z0; z <= z1; z++) {
+      for (let x = x0 + 1; x <= x0 + 5; x++) { s.set(x, 0, z, 'spruce_planks'); s.set(x, 1, z, 'air').set(x, 2, z, 'air'); }
+      s.set(x0, 1, z, wool).set(x0, 2, z, wool).set(x0 + 6, 1, z, wool).set(x0 + 6, 2, z, wool);
+      s.set(x0 + 1, 3, z, wool).set(x0 + 5, 3, z, wool).set(x0 + 2, 4, z, wool).set(x0 + 4, 4, z, wool).set(x0 + 3, 5, z, ridge);
+      s.set(x0 + 2, 3, z, 'air').set(x0 + 3, 3, z, 'air').set(x0 + 4, 3, z, 'air').set(x0 + 3, 4, z, 'air');
+    }
+    for (let x = x0 + 1; x <= x0 + 5; x++) s.set(x, 1, back, wool).set(x, 2, back, wool);
+    s.set(x0 + 2, 3, back, wool).set(x0 + 3, 3, back, wool).set(x0 + 4, 3, back, wool).set(x0 + 3, 4, back, wool);
+    // the front corners are dark oak poles; a lantern hangs from the ridge
+    const fz = front === 'south' ? z1 : z0;
+    s.set(x0, 1, fz, 'dark_oak_fence').set(x0, 2, fz, 'dark_oak_fence').set(x0 + 6, 1, fz, 'dark_oak_fence').set(x0 + 6, 2, fz, 'dark_oak_fence');
+    s.set(x0 + 3, 4, z0 + (len >> 1), 'lantern[hanging=true]');
+    const step = front === 'south' ? 1 : -1, bz = back + step;   // the inside row against the back wall
+    const facing = front === 'south' ? 'south' : 'north', toBack = front === 'south' ? 'north' : 'south';
+    return { bz, step, facing, toBack };
+  };
+  // the commander's tent (west, red with a black ridge): the main chest, a map table and his seat, a bed, a red carpet
+  {
+    const x0 = 4, t = militaryTent(x0, 11, 7, 'south', 'red_wool', 'black_wool');
+    s.chest(x0 + 1, 1, t.bz, t.facing, 'ironclad_camp');
+    s.set(x0 + 3, 1, t.bz, 'cartography_table').set(x0 + 3, 1, t.bz + t.step, `dark_oak_stairs[facing=${t.facing},half=bottom]`);
+    s.set(x0 + 5, 1, t.bz, `red_bed[facing=${t.toBack},part=head]`).set(x0 + 5, 1, t.bz + t.step, `red_bed[facing=${t.toBack},part=foot]`);
+    for (let k = 2; k <= 4; k++) s.set(x0 + 3, 1, t.bz + t.step * k, 'red_carpet');
+  }
+  // two soldiers' tents (east), their open ends facing each other across a lane: two beds each and a barrel
+  for (const [z0, front, wool, ridge, loot] of [[9, 'south', 'black_wool', 'red_wool', 'ironclad_supply'], [17, 'north', 'red_wool', 'black_wool', null]]) {
+    const x0 = 19, t = militaryTent(x0, z0, 6, front, wool, ridge);
+    for (const x of [x0 + 1, x0 + 5]) s.set(x, 1, t.bz, `red_bed[facing=${t.toBack},part=head]`).set(x, 1, t.bz + t.step, `red_bed[facing=${t.toBack},part=foot]`);
+    if (loot) s.barrel(x0 + 3, 1, t.bz, 'up', loot); else s.set(x0 + 3, 1, t.bz, 'barrel[facing=up]');
+  }
+  const banner = (x, z, rot) => s.set(x, 1, z, `red_banner[rotation=${rot}]`, { id: 'minecraft:banner', patterns: [{ pattern: 'minecraft:stripe_middle', color: 'black' }, { pattern: 'minecraft:border', color: 'black' }] });
+  banner(11, 18, 0); banner(18, 14, 4); banner(18, 17, 4);
+
+  // the flagpole: a blackstone base, a dark oak pole, a red flag with a black band, torn at the end
+  s.fill(c - 1, 0, c - 1, c + 1, 0, c + 1, BB).set(c, 1, c, 'polished_blackstone_wall');
+  for (let y = 2; y <= 17; y++) s.set(c, y, c, 'dark_oak_fence');
+  for (let x = c + 1; x <= c + 5; x++) for (let y = 13; y <= 16; y++) {
+    if (x === c + 5 && r.chance(0.5)) continue;
+    s.set(x, y, c, y === 14 || y === 15 ? (y === 14 ? 'black_wool' : 'red_wool') : 'red_wool');
+  }
+  s.set(c + 1, 14, c, 'black_wool').set(c + 2, 14, c, 'black_wool').set(c + 3, 14, c, 'black_wool').set(c + 4, 14, c, 'black_wool');
+  // the fire pit south of the pole, with log seats
+  s.set(c, 0, c + 4, 'stone').set(c, 1, c + 4, 'campfire[lit=false,facing=north]');
+  s.set(c - 2, 1, c + 4, 'stripped_dark_oak_log[axis=z]').set(c + 2, 1, c + 4, 'stripped_dark_oak_log[axis=z]').set(c - 2, 1, c + 5, 'stripped_dark_oak_log[axis=z]');
+  // training dummies (west of the gate): a post, a hay body, a pumpkin head, and a scuffed patch around them
+  for (const [x, z] of [[6, 21], [8, 24], [11, 26]]) {
+    s.set(x, 1, z, 'spruce_fence').set(x, 2, z, 'hay_block').set(x, 3, z, 'carved_pumpkin[facing=east]');
+    s.set(x + 1, 0, z, 'gravel').set(x, 0, z + 1, 'packed_mud');
+  }
+  // weapon racks (east of the gate): armour stands in worn iron, a rack of fences and a barrel
+  const worn = (id, dmg) => ({ id: 'minecraft:' + id, count: 1, components: { 'minecraft:damage': dmg } });
+  const stand = (x, z, yaw, eq) => s.entity(x, 1, z, { id: 'minecraft:armor_stand', ShowArms: true, Rotation: [{ t: 5, v: yaw }, { t: 5, v: 0 }], equipment: eq });
+  stand(19, 24, 0, { head: worn('iron_helmet', 120), chest: worn('chainmail_chestplate', 160), mainhand: worn('iron_sword', 180) });
+  stand(22, 23, 0, { head: worn('chainmail_helmet', 120), mainhand: worn('iron_axe', 180), offhand: worn('shield', 200) });
+  s.fill(18, 1, 26, 20, 1, 26, 'spruce_fence').fill(18, 2, 26, 20, 2, 26, 'spruce_slab[type=bottom]');
+  s.set(17, 1, 26, 'barrel[facing=up]');
+  // supply barrels by the commander's tent
+  s.barrel(11, 1, 12, 'up', 'ironclad_supply').set(11, 1, 13, 'barrel[facing=up]').set(11, 2, 12, 'barrel[facing=up]').set(11, 1, 14, 'lantern[hanging=false]');
+  return s.save(`ironclad_camp/${seed}`);
+}
+const ironcladTemplates = [ironcladCamp(1)];
+// v3.7: the Ironclad camp on open flat dry ground, its gate turned to the open side (SpireStructures.CaveTemplate.openGround)
+special('ironclad_camp', 'spirecraft:cave_template', ['minecraft:badlands', 'minecraft:eroded_badlands', 'minecraft:wooded_badlands', 'minecraft:savanna', 'minecraft:savanna_plateau'],
+  50, 17, { templates: ironcladTemplates, mode: 'open_ground', sink: 1, terrain_adaptation: 'beard_box' });
 
 // template ids used by worldgen/TemplateFeature placements (see BiomeData)
 console.log('ok', JSON.stringify(hiveTemplates), pierTemplates);
