@@ -24,8 +24,11 @@ jobs:
         with:
           persist-credentials: false
       - name: Parse tracked assets, data packs and metadata
+        shell: bash
         run: |
-          git ls-files -z -- 'src/main/resources/*.json' 'src/main/resources/*.mcmeta' 'src/generated/resources/*.json' 'src/generated/resources/*.mcmeta' |
+          git ls-files -z -- \
+            'src/main/resources/*.json' 'src/main/resources/*.mcmeta' \
+            'src/generated/resources/*.json' 'src/generated/resources/*.mcmeta' |
             xargs -0 -r pipx run --spec pre-commit-hooks==6.0.0 check-json
 
   package:
