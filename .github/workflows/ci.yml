@@ -1,0 +1,55 @@
+name: SpireCraft CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spirecraft-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  resources:
+    name: Resource JSON
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Parse tracked assets, data packs and metadata
+        run: |
+          git ls-files -z -- 'src/main/resources/*.json' 'src/main/resources/*.mcmeta' 'src/generated/resources/*.json' 'src/generated/resources/*.mcmeta' |
+            xargs -0 -r pipx run --spec pre-commit-hooks==6.0.0 check-json
+
+  package:
+    name: Forge mod JAR
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          gradle-version: wrapper
+          cache-provider: basic
+      - name: Assemble the mod
+        run: gradle assemble --console=plain
+      - name: Upload installable JAR
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: build/libs/spirecraft-*.jar
+          archive: false
+          if-no-files-found: error
+          retention-days: 14

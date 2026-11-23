@@ -37,7 +37,9 @@ $env:JAVA_HOME = "$PWD/runtime/jdk-21.0.9+10"
 ./gradlew.bat build --no-daemon -g ./.gradle_repo
 ```
 
-首次构建需要联网解析插件和依赖。产物位于 `build/libs/aimod-1.0.0.jar`。
+首次构建需要联网解析插件和依赖。当前版本的产物位于 `build/libs/spirecraft-0.1.0.jar`。
+
+向 `main` 提交 PR 或推送后，[SpireCraft CI](https://github.com/MockingJam/SpireCraft/actions/workflows/ci.yml) 会并行检查资源 JSON（含 `.mcmeta`）和构建 Forge 模组。在运行详情的 **Artifacts** 中可直接下载 JAR，产物保留 14 天。
 
 ## 🛠️ 快速上手
 
