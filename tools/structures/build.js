@@ -1362,9 +1362,14 @@ function necrobinderGiant(seed) {
     for (let y = G - 4; y < G; y++) s.set(x, y, z, 'dirt');
     for (let y = G + 1; y < H; y++) s.set(x, y, z, 'air');
   }
-  // ---- the hall floor between the ribs, with the spine down the middle of it
-  for (let x = c - 7; x <= c + 7; x++) for (let z = 9; z <= 26; z++)
-    s.set(x, G, z, r.pick(['pale_oak_planks', 'dark_oak_planks', 'dark_oak_planks', 'pale_oak_planks', 'stripped_dark_oak_log[axis=z]']));
+  // ---- the hall floor between the ribs (review: not a checkerboard): worn dark oak with a few ragged patches of pale
+  // oak where it was mended, a few boards gone to the earth under them; the spine down the middle
+  const PATCHES = Array.from({ length: 5 }, () => [c + r.int(-6, 6), r.int(10, 25), 1.2 + r() * 1.4]);
+  for (let x = c - 7; x <= c + 7; x++) for (let z = 9; z <= 26; z++) {
+    const pale = PATCHES.some(([px, pz, pr]) => Math.hypot(x - px, (z - pz) * 0.8) < pr + r() * 0.9 - 0.45);
+    s.set(x, G, z, r.chance(0.04) ? r.pick(['coarse_dirt', 'rooted_dirt']) : pale ? 'pale_oak_planks'
+      : r.chance(0.07) ? 'stripped_dark_oak_log[axis=z]' : 'dark_oak_planks');
+  }
   for (let z = 0; z <= 30; z++) {
     s.set(c, G, z, BONE('z')).set(c, G - 1, z, BONE('z'));
     if ((z <= 8 || z >= 27) && z % 2 === 0) s.set(c, G + 1, z, BONE('y'));   // the spinous processes, outside the hall
@@ -1490,10 +1495,13 @@ function necrobinderGiant(seed) {
     s.set(x, y, z, inside ? 'air' : y === 1 && x >= c - 6 && x <= c + 6 && z >= 15 && z <= 21 ? 'soul_soil' : r.pick(WALL));
   }
   for (const z of [15, 21]) for (const dx of [-3, 3]) for (let y = 2; y <= 6; y++) s.set(c + dx, y, z, BONE('y'));
-  const niche = (x, z, rot) => s.set(x, 3, z, `skeleton_skull[rotation=${rot}]`).set(x, 4, z, 'air');
-  for (const dx of [-5, -2, 1, 4]) niche(c + dx, 14, 0);
-  for (const dx of [-5, -2, 1]) niche(c + dx, 22, 8);
-  for (const z of [16, 18, 20]) niche(c - 7, z, 12);
+  // skulls in niches (review: a few more, unevenly placed): random spots along three walls, at two heights, each
+  // turned a little (not in front of the bone pillars, nor by the stair on the east wall)
+  const niche = (x, z, rot) => { const y = r.pick([3, 3, 4]); s.set(x, y, z, `skeleton_skull[rotation=${(rot + r.int(-1, 1) + 16) % 16}]`).set(x, y + 1, z, 'air'); };
+  const some = (arr, k) => { const a = [...arr], out = []; while (out.length < k && a.length) out.push(a.splice(r.int(0, a.length - 1), 1)[0]); return out; };
+  for (const dx of some([-6, -5, -4, -2, -1, 0, 1, 2, 4, 5], 6)) niche(c + dx, 14, 0);
+  for (const dx of some([-6, -5, -4, -2, -1, 0, 1, 2], 4)) niche(c + dx, 22, 8);
+  for (const z of some([16, 17, 18, 19, 20], 3)) niche(c - 7, z, 12);
   s.spawner(c, 2, 18, 'minecraft:skeleton');
   s.barrel(c - 6, 2, 15, 'up', 'necrobinder_supply').barrel(c - 6, 2, 21, 'up', 'necrobinder_supply');
   for (const dx of [-3, 3]) s.set(c + dx, 6, 18, 'soul_lantern[hanging=true]');
@@ -1521,9 +1529,12 @@ function necrobinderGiant(seed) {
 }
 const necrobinderTemplates = [necrobinderGiant(1)];
 // issue #40: open dry ground like the Ironclad camp, the jaw (+z) turned to the open side; placed after the trees
-// (top_layer_modification) so the clearing and the hall cut the dark oaks out. No terrain adaptation: the template
+// (top_layer_modification) so the clearing and the hall cut the trees out. No terrain adaptation: the template
 // reaches G blocks underground for the ossuary, and a beard from that deep would hollow the land out.
-special('necrobinder_giant', 'spirecraft:cave_template', ['minecraft:dark_forest', 'minecraft:pale_garden'],
+// Biomes (review: far too rare): the draft's dark forest no longer exists in new worlds - WorldPresetProvider hands every
+// dark forest to the overgrowth (v2.4) - and the pale garden is rare and hilly (4 of the first 5 candidates rose 13-45),
+// so the gloomy old-growth taigas (dark spruce, podzol and moss, mostly gentle ground) stand in for the dark forest.
+special('necrobinder_giant', 'spirecraft:cave_template', ['minecraft:pale_garden', 'minecraft:old_growth_spruce_taiga', 'minecraft:old_growth_pine_taiga'],
   50, 17, { templates: necrobinderTemplates, mode: 'open_ground', sink: 11, step: 'top_layer_modification' });
 
 // template ids used by worldgen/TemplateFeature placements (see BiomeData)
