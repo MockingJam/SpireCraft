@@ -71,6 +71,12 @@ public final class ModBlocks {
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).requiresCorrectToolForDrops().strength(1.5F).sound(SoundType.AMETHYST).lightLevel(s -> 12));
     public static final RegistryObject<Block> CRACKED_CORE_CRYSTAL_BLOCK = register("cracked_core_crystal_block", Block::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).requiresCorrectToolForDrops().strength(1.2F).sound(SoundType.AMETHYST).lightLevel(s -> 5));
+    /** Issue #36 (the Regent's meteor crater): the fallen star's rock - night-sky indigo with star specks. */
+    public static final RegistryObject<Block> METEORITE = register("meteorite", Block::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(4.0F, 9.0F).sound(SoundType.DEEPSLATE));
+    /** Issue #36: STS2 Orange Dough - the glowing orange clumps in the crater, the material of the Regent's weapons. */
+    public static final RegistryObject<Block> ORANGE_DOUGH = register("orange_dough", Block::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.8F).sound(SoundType.HONEY_BLOCK).lightLevel(s -> 9));
 
     /** Deepslate only (the orichalcum vein never reaches stone layers). */
     public static final RegistryObject<Block> ORICHALCUM_ORE = register("orichalcum_ore",

@@ -26,6 +26,7 @@ public final class ModCreativeTabs {
             ModBlocks.ORICHALCUM_ORE.get(), ModBlocks.ORICHALCUM_BLOCK.get(),
             ModBlocks.AUTOMATON_ALLOY_BLOCK.get(), ModBlocks.TARNISHED_AUTOMATON_ALLOY_BLOCK.get(), ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK.get(),
             ModBlocks.CORE_CRYSTAL_BLOCK.get(), ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(),
+            ModBlocks.METEORITE.get(), ModBlocks.ORANGE_DOUGH.get(),
             ModBlocks.NETHER_BRIMSTONE_ORE.get(), ModBlocks.BRIMSTONE_BLOCK.get(),
             ModBlocks.LAVA_ROCK_ORE.get()));
 

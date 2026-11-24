@@ -4,10 +4,11 @@
   "key": {
     "G": "minecraft:glowstone_dust",
     "I": "minecraft:iron_ingot",
-    "S": "minecraft:stick"
+    "S": "minecraft:stick",
+    "X": "spirecraft:orange_dough"
   },
   "pattern": [
-    "  I",
+    " XI",
     " G ",
     "S  "
   ],
