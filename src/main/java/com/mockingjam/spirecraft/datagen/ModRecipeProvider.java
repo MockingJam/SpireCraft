@@ -143,17 +143,18 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.INK_SAC), has(Items.INK_SAC)).save(output, key("ink_bubble"));
 
         // ---- Phase 6 weapons v2 (docs/design/weapons.md): vanilla materials that tell each card's story; no vanilla pattern clashes ----
-        // Regent
-        relicShaped(ModItems.SOVEREIGN_BLADE.get(), ModItems.ORICHALCUM_INGOT.get(), "sovereign_blade", "GDG", " O ", " S ",
-                'G', Items.GOLD_INGOT, 'D', ModItems.GALACTIC_DUST.get(), 'O', ModItems.ORICHALCUM_INGOT.get(), 'S', Items.STICK);
-        relicShaped(ModItems.CRESCENT_SPEAR.get(), Items.AMETHYST_SHARD, "crescent_spear", "  G", " A ", "S  ",
-                'G', Items.GOLD_INGOT, 'A', Items.AMETHYST_SHARD, 'S', Items.STICK);
-        relicShaped(ModItems.HEIRLOOM_HAMMER.get(), Items.DIAMOND, "heirloom_hammer", "GDG", " S ", " S ",
-                'G', Items.GOLD_INGOT, 'D', Items.DIAMOND, 'S', Items.STICK);
-        relicShaped(ModItems.REGENT_STRIKE.get(), Items.GOLD_INGOT, "regent_strike", "G", "L", "S",
-                'G', Items.GOLD_INGOT, 'L', Items.LEATHER, 'S', Items.STICK);
-        relicShaped(ModItems.PHOTON_CUT.get(), Items.GLOWSTONE_DUST, "photon_cut", "  I", " G ", "S  ",
-                'I', Items.IRON_INGOT, 'G', Items.GLOWSTONE_DUST, 'S', Items.STICK);
+        // Regent (issue #36: every Regent weapon takes Orange Dough from the meteor crater)
+        Item dough = ModBlocks.ORANGE_DOUGH.get().asItem();
+        relicShaped(ModItems.SOVEREIGN_BLADE.get(), dough, "sovereign_blade", "GDG", "XOX", " S ",
+                'G', Items.GOLD_INGOT, 'D', ModItems.GALACTIC_DUST.get(), 'X', dough, 'O', ModItems.ORICHALCUM_INGOT.get(), 'S', Items.STICK);
+        relicShaped(ModItems.CRESCENT_SPEAR.get(), dough, "crescent_spear", " XG", " AX", "S  ",
+                'G', Items.GOLD_INGOT, 'A', Items.AMETHYST_SHARD, 'X', dough, 'S', Items.STICK);
+        relicShaped(ModItems.HEIRLOOM_HAMMER.get(), dough, "heirloom_hammer", "GDG", "XSX", " S ",
+                'G', Items.GOLD_INGOT, 'D', Items.DIAMOND, 'X', dough, 'S', Items.STICK);
+        relicShaped(ModItems.REGENT_STRIKE.get(), dough, "regent_strike", "G", "X", "S",
+                'G', Items.GOLD_INGOT, 'X', dough, 'S', Items.STICK);
+        relicShaped(ModItems.PHOTON_CUT.get(), dough, "photon_cut", " XI", " G ", "S  ",
+                'I', Items.IRON_INGOT, 'G', Items.GLOWSTONE_DUST, 'X', dough, 'S', Items.STICK);
         // Necrobinder
         relicShaped(ModItems.SCYTHE.get(), Items.WITHER_ROSE, "scythe", "III", " SW", "S B",
                 'I', Items.IRON_INGOT, 'S', Items.STICK, 'W', Items.WITHER_ROSE, 'B', Items.BONE_BLOCK);

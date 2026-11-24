@@ -185,7 +185,7 @@ public class ModModelProvider extends ModelProvider {
             // v3.3: thatch (+ stairs, slab), twig nest, webbed hive soil, the hive building blocks
             family(ModBlocks.THATCH.get()).generateFor(new BlockFamily.Builder(ModBlocks.THATCH.get()).stairs(ModBlocks.THATCH_STAIRS.get()).slab(ModBlocks.THATCH_SLAB.get()).getFamily());
             for (var cube : List.of(ModBlocks.AUTOMATON_ALLOY_BLOCK, ModBlocks.TARNISHED_AUTOMATON_ALLOY_BLOCK, ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK,
-                    ModBlocks.CORE_CRYSTAL_BLOCK, ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK)) {
+                    ModBlocks.CORE_CRYSTAL_BLOCK, ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK, ModBlocks.METEORITE, ModBlocks.ORANGE_DOUGH)) {
                 createTrivialCube(cube.get());
                 itemModelOutput.accept(cube.get().asItem(), ItemModelUtils.plainModel(ModelLocationUtils.getModelLocation(cube.get())));
             }

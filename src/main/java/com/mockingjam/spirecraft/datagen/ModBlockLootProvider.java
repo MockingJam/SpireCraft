@@ -46,6 +46,8 @@ public class ModBlockLootProvider extends BlockLootSubProvider {
         add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), b -> createSilkTouchDispatchTable(b, applyExplosionDecay(b, net.minecraft.world.level.storage.loot.entries.LootItem.lootTableItem(net.minecraft.world.item.Items.PRISMARINE_CRYSTALS)
                 .apply(net.minecraft.world.level.storage.loot.functions.SetItemCountFunction.setCount(net.minecraft.world.level.storage.loot.providers.number.UniformGenerator.between(1, 3))))));
         dropSelf(ModBlocks.BRIMSTONE_BLOCK.get());
+        dropSelf(ModBlocks.METEORITE.get());
+        dropSelf(ModBlocks.ORANGE_DOUGH.get());
 
         // ---- Phase 7 biome blocks: same rules as their vanilla counterparts ----
         for (WoodSet w : BiomeBlocks.woods()) {
