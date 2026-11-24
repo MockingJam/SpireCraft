@@ -3,12 +3,12 @@
   "category": "equipment",
   "key": {
     "G": "minecraft:gold_ingot",
-    "L": "minecraft:leather",
-    "S": "minecraft:stick"
+    "S": "minecraft:stick",
+    "X": "spirecraft:orange_dough"
   },
   "pattern": [
     "G",
-    "L",
+    "X",
     "S"
   ],
   "result": {

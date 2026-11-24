@@ -105,7 +105,7 @@ Style: ancient-European fantasy, vanilla blocks first with mod accents; each str
 |---|---|---|---|
 | the_spire | 高塔（荣耀） | 高塔 | 构思 |
 | ancient_tree | 先古之民的树 | 先古之民 | 构思 |
-| ironclad_camp / silent_hideout / regent_court / necrobinder_crypt / defect_workshop | 五位攀登者建筑 | 角色建筑 | 设计稿（见第十一节） |
+| ironclad_camp / silent_gathering / regent_crater / necrobinder_crypt / defect_workshop | 五位攀登者建筑 | 角色建筑 | 设计稿（见第十一节） |
 
 ## 六、实现记录（v3.2）Implementation record
 
@@ -215,19 +215,26 @@ Ironclad: a palisaded war camp in the badlands with a stone forge, red-black ten
 
 Silent: a low den of seven rooms and narrow corridors on short stilts in the swamp / jungle, under a leaf canopy that looks like swamp trees from above. The only way in is a ladder inside a hollow stump, through a leaf tunnel with a hidden poison-arrow tripwire; a second one guards the corridor to the poison room. Under its rug is a decoy cellar, and under a carpet there a shaft down to a sealed vault: a tripwire at the bottom, and the main chest is a trapped chest that shoots up from the floor. Two beds, in different rooms.
 
-### 3. 储君宫廷 `regent_court`（群星与锻造）
+### 3. 储君：陨石坑 `regent_crater`（群星与锻造，issue #36）
+
+> issue #36 把“储君宫廷”改为“陨石坑，坑里有橙色团块，可用于合成与储君有关的物品”。故事：一颗星落在这里，储君守着它、用它锻造了自己的剑，后来去了尖塔；星的残骸裂开，露出里面发光的橙色团块（STS2 储君的遗物 *Orange Dough*）。
 
 | 项 | 内容 |
 |---|---|
-| 位置 | 草甸、裸岩山峰（高处，离星空最近） |
-| 造型 | 一座小王庭，分三块（jigsaw）：**庭院**（地面是星图：深蓝/黑色方块上嵌着零星的海晶灯和萤石当星星，中央是**星之锻台**：铁砧 + 锻造台 + 末地烛，呼应储君的“锻造”与君王之剑）；**大厅**（两排石英柱，尽头是王座：楼梯 + 金块 + 橙色与深蓝旗帜）；**观星穹顶**（圆顶天文台，顶上留一道朝天的开口，夜里能看到星空） |
-| 标志物 | 穹顶顶端的金色太阳/星形饰（金块 + 避雷针做光芒） |
-| 主要方块 | 石英砖、平滑石英、石英柱、橙色陶瓦、青金石块、深蓝/紫色染色玻璃、海晶灯、萤石、蜡烛、少量金块 |
-| 尺寸 | 约 36×36，高 20（拆成 3 块） |
-| 主箱（宝库） | **星系尘埃 4–10**（幻翼以外的主要来源）、金锭、青金石；小概率光子切割刃 / 新月长矛 / 传承之锤之一，王之剑（打击）概率较高 |
-| 平衡 | 金块只用几块做装饰，避免玩家拆宫廷拿走大量金子 |
+| 位置 | 沙漠、草甸（开阔平地；不放积雪平原：结构之后生成的积雪会把团块和裂开的陨石整个盖住；与铁甲战士的恶地/热带草原、静默猎手的沼泽/丛林不重叠）。占地 45 格直径内必须全是陆地（没有水面），高差不超过 6 格 |
+| 造型 | 一个圆形的**陨石坑**：直径约 27–32、比周围地面低 8–9 格，抛物线形的坑壁，一圈高出地面 2–3 格的**坑沿**（被掀起的土石，向外 7 格渐平）。坑底和坑壁是烧焦的岩石：中间黑石、玄武岩、少量岩浆块，往上凝灰岩、黑石、沙砾，坑口是粗泥、沙砾和当地的地表方块（沙、草、泥土）。坑外有一道道放射状的**溅射线**（沙砾、粗泥、凝灰岩铺在地表），散落着**陨石碎块** |
+| 坠星 | 坑底正中一块半埋在地里的**陨石**（新方块，约 7×6×7），沿一条裂缝**裂开**，露出里面的**橙色团块**内核；裂缝里立着三根末地烛，像从星里射出的光 |
+| 橙色团块 | 新方块 `orange_dough`：发光（9）、软（铲子挖）、蜂蜜块的声音；陨石内核、陨石里零星夹着的、坑底中间约 12%、坑壁约 3% 都是它，偶尔也被甩到坑外。每个坑约 40–60 块 |
+| 储君的痕迹 | 坑壁半腰一块削平的**锻造台地**（深板岩瓦铺地）：开裂的铁砧、锻造台、砂轮、**主箱**、两个补给木桶、木桶上一盏灯笼、两块蓝色地毯；储君“锻造”的地方 |
+| 标志物 | 对面坑沿上一根去皮深色橡木杆，顶上一面**橙色旗帜**朝向坑内；夜里坑底的橙光和末地烛远远就能看到 |
+| 主要方块 | 陨石、橙色团块、黑石、玄武岩、岩浆块、凝灰岩、沙砾、粗泥、圆石、深板岩瓦、末地烛 |
+| 尺寸 | 约 60×60（含溅射线），坑深 8–9，坑沿高 2–3 |
+| 主箱 `chests/regent_crater` | **星系尘埃 4–10**（幻翼以外的主要来源）、金锭、金粒、青金石、紫水晶碎片、萤石粉、橙色团块 1–3、铁锭；约 45% 一件储君武器（王之剑（打击）最常见，其次光子切割刃 / 新月长矛，传承之锤最少） |
+| 补给木桶 `chests/regent_supply` | 面包、熟羊肉、煤炭、铁粒、金粒、蜡烛、纸、火把、线 |
+| 合成 | **五件储君武器都要橙色团块**：王之剑（打击）= 金锭 / 橙色团块 / 木棍（竖排，原来是皮革）；君王之剑 = 金锭 星系尘埃 金锭 / 团块 奥利哈钢锭 团块 / 木棍；新月长矛、传承之锤各加 2 块，光子切割刃加 1 块 |
+| 地形适配 | 逐区块雕刻的结构（`spirecraft:carved` 的 `meteor_crater`），按每一列的实际地面高度挖坑、堆坑沿，所以在缓坡上也贴合；坑底挖穿的空洞和含水层用下面三层衬底封住，不进水 |
 
-Regent: a small court on the peaks with a star-map courtyard, a star forge, a throne hall and an open observatory dome; main loot is galaxy dust.
+Regent: a meteor crater on open land (desert, meadow). A split fallen star of meteorite lies in the middle with a glowing core of Orange Dough, more dough clumps in the bowl; rays of ejecta and meteorite fragments outside; the Regent's abandoned forge on a terrace part way down (main chest: galactic dust); an orange banner on the far rim. Every Regent weapon now takes Orange Dough.
 
 ### 4. 亡灵契约师墓穴 `necrobinder_crypt`（灵魂与灾厄）
 
@@ -276,3 +283,6 @@ Defect: a two-storey workshop of automaton alloy and copper with a lightning-cat
   - 生成阶段是 `top_layer_modification`（在树之后）：小屋、聚会棚和吊桥的空间都写成空气，所以长在这里的树会被切掉，不会有树叶长进屋里。相邻区块后生成的树仍可能从边上伸进来一点；被切掉的沼泽橡树剩下的树叶会自然凋落（掉树苗）。
   - `cave_template` 的新选项 `ignore_waterlogging`（这里打开）：放置时不吸收地下水。宝库在沼泽的含水层里，不打开时陷阱箱、陶罐、梯子、根都会变成含水方块，水漫进宝库，还把绊线冲掉。
   - 新的结构处理器 `spirecraft:hanging_pos`（所有 `TemplatePiece` 都会用）：模板里的物品展示框没有 `block_pos`，放置时会报 “Block-attached entity at invalid position”；处理器在放置前写入实际位置。
+- **储君：陨石坑**（issue #36）：`SpireStructures.CarvedPiece.crater`（`spirecraft:carved`，kind `meteor_crater`，`surface_structures` 阶段），结构 JSON、群系标签和战利品表由 `build.js` 写出（`regent_crater`，spacing 50、separation 17）。新方块**陨石** `meteorite`（夜空靛蓝的岩石带几颗星点，镐、石镐以上）和**橙色团块** `orange_dough`（发光 9，铲子），贴图由 `tools/regent_textures.js` 生成（陨石用原版黑石的石纹重新上色，团块是程序画的挤在一起的面团）。
+  - 放置：`Carved.crater` 在起点周围半径 22 格内每 4 格取样，必须全是陆地、高差不超过 6 格；坑以取样平均高度为基准。
+  - 雕刻：每一列读这一列自己的自然地面高度（`WORLD_SURFACE_WG`），坑内按抛物线挖到目标高度（水也挖掉），坑沿在自然地面上堆高；坑内最后 3 格向坑沿的高度过渡，所以有坡的一侧会切出一小段坑壁。所有随机数都在放置之前取完，主箱和木桶的战利品种子用单独的随机源，不同区块雕的部分能对上。
