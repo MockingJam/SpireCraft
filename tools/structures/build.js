@@ -1348,9 +1348,15 @@ function defectStation(seed) {
   const r = rng(seed), n = 36, H = 26, s = new Struct(n, H, n);
   const SHELL = () => r.pick(['smooth_quartz', 'smooth_quartz', 'smooth_quartz', 'white_concrete', 'white_concrete', 'calcite']);
   const ALLOY = 'spirecraft:automaton_alloy_block', TALLOY = 'spirecraft:tarnished_automaton_alloy_block', DALLOY = 'spirecraft:derelict_automaton_alloy_block';
-  // clear the site (ice spikes, spruces: placed in top_layer_modification, after them) and keep the natural ground
+  // clear the site (ice spikes, spruces: placed in top_layer_modification, after them) and lay the ground layer.
+  // v3 (review: a checkerboard of snow and bare grass by the shells and the door): beard_box cuts the terrain inside the
+  // box down to one below layer 0, so a layer 0 left unset stayed air - open cells got a snow layer on the lowered
+  // ground, cells under a shell did not. Layer 0 is now snow blocks over the whole box; the outer band and the corners
+  // thin out to snow layers of falling height, so the pad does not end in a square step.
   for (let x = 0; x < n; x++) for (let z = 0; z < n; z++) {
-    if (Math.hypot(x - 17.5, z - 17.5) > 17.6) continue;
+    const d = Math.hypot(x - 17.5, z - 17.5), edge = x === 0 || z === 0 || x === n - 1 || z === n - 1;
+    const layers = Math.max(1, Math.min(7, Math.round(8 - (d - 15.5) * 1.5 - r() * 2)));
+    s.set(x, 0, z, d > 15.5 || edge ? `snow[layers=${edge ? Math.min(layers, 4) : layers}]` : 'snow_block');
     for (let y = 1; y < H; y++) s.set(x, y, z, 'air');
   }
 
@@ -1466,35 +1472,74 @@ function defectStation(seed) {
   for (let z = DZ + 7; z < PZ; z++) s.set(15, 1, z, z === 24 ? 'light_gray_concrete' : r.chance(0.12) ? null : 'iron_chain[axis=z]');
   s.set(15, 1, PZ, 'light_gray_concrete');
 
-  // ---- the shells it threw away: a row facing north, each older one more corroded; the oldest toppled into the drift
+  // ---- the shells it threw away, each older one more corroded; the oldest toppled into the drift.
+  // v3 (review: they stood upright in a neat row on top of the ground): sunk into the ground layer with snow and packed
+  // ice banked round them, in different poses, turned different ways, at uneven spacing. Local frames, front = -z.
   const SHELLS = [
     { b: 'waxed_copper', slab: 'waxed_cut_copper_slab', head: 'waxed_copper_bulb' },
     { b: 'waxed_exposed_copper', slab: 'waxed_exposed_cut_copper_slab', head: 'waxed_exposed_copper_bulb' },
     { b: 'waxed_weathered_copper', slab: 'waxed_weathered_cut_copper_slab', head: 'waxed_weathered_copper_bulb' },
     { b: 'waxed_oxidized_copper', slab: 'waxed_oxidized_cut_copper_slab', head: 'waxed_oxidized_copper_bulb' },
   ];
-  SHELLS.forEach((m, i) => {
-    const x = 17 - i * 5, z = 1;                 // newest nearest the shed, oldest to the west
-    s.set(x - 1, 1, z, `${m.slab}[type=bottom]`).set(x + 1, 1, z, `${m.slab}[type=bottom]`);    // legs out in front
-    for (let k = -1; k <= 1; k++) for (let y = 1; y <= 3; y++) s.set(x + k, y, z + 1, m.b);       // hips and torso
-    s.set(x, 2, z + 1, i < 2 ? 'spirecraft:cracked_core_crystal_block' : 'air');                  // the orb socket, empty on the oldest
-    s.set(x, 4, z + 1, `${m.head}[lit=false,powered=false]`);
-    if (i % 2) s.set(x + 2, 2, z + 1, 'iron_bars'); else s.set(x - 2, 1, z + 1, `${m.slab}[type=bottom]`);   // an arm hanging / fallen
-    for (let k = 0; k < i; k++) { const [a, b] = [r.int(-1, 1), r.int(2, 3)]; s.set(x + a, b, z + 1, 'air'); }   // pieces missing
-    for (let k = -1; k <= 1; k++) s.set(x + k, 1, z + 2, 'snow_block');                           // snow banked behind
-  });
-  // the oldest, of derelict alloy, lies on its back in the drift by the dome's west side
-  // (v2: it was lost in the drift) the chest and head stand out of the snow, one arm reaches up
+  const POSES = {
+    // sitting, slumped: hips in the ground, legs out in front, one shoulder gone, the head fallen forward onto the chest
+    slumped(f, m, socket) {
+      f.fill(-1, 0, 0, 1, 1, 0, m.b).set(0, 1, 0, socket);
+      f.set(-1, 2, 0, m.b).set(0, 2, 0, m.b).set(0, 2, -1, `${m.head}[lit=false,powered=false]`);
+      f.set(-1, 0, -1, m.b).set(-1, 1, -2, `${m.slab}[type=bottom]`).set(1, 1, -1, `${m.slab}[type=bottom]`);
+      f.set(2, 1, 0, `${m.slab}[type=bottom]`);                                    // an arm dropped on the ground
+    },
+    // kneeling and pitched forward: knees sunk, the chest bent over, the head down by the snow, arms propping it up
+    kneeling(f, m, socket) {
+      f.set(-1, 0, 0, m.b).set(1, 0, 0, m.b).fill(-1, 1, 0, 1, 1, 0, m.b);
+      f.fill(-1, 2, -1, 1, 2, -1, m.b).set(0, 2, -1, socket).set(0, 1, -2, `${m.head}[lit=false,powered=false]`);
+      f.set(-2, 1, -1, 'iron_bars').set(2, 1, -2, 'iron_bars');
+    },
+    // lying on its side, half under: the body along x in the ground layer, its side and head showing, an arm up
+    lying(f, m, socket) {
+      f.fill(-2, 0, 0, 1, 0, 0, m.b).set(-1, 1, 0, m.b).set(0, 1, 0, socket).set(2, 1, 0, `${m.head}[lit=false,powered=false]`);
+      f.set(-3, 0, 0, m.b).set(-4, 1, 0, `${m.slab}[type=bottom]`).set(0, 1, -1, 'iron_bars').set(0, 2, -1, 'iron_bars');
+    },
+  };
+  // [shell, pose, x, z, turns]: newest nearest the shed, oldest to the west
+  const placed = [[0, 'slumped', 18, 4, 1], [1, 'kneeling', 13, 2, 0], [2, 'lying', 8, 6, 0], [3, 'slumped', 2, 3, 3]];
+  for (const [i, pose, x, z, t] of placed) {
+    const m = SHELLS[i], f = new Frame(s, x, 0, z, t);
+    POSES[pose](f, m, i < 2 ? 'spirecraft:cracked_core_crystal_block' : 'air');   // the orb socket, empty on the older ones
+    for (let k = 0; k < i; k++) { const a = r.int(-1, 1); if (/copper$/.test(s.get(x + a, 2, z) || '')) s.set(x + a, 2, z, 'air'); }   // pieces missing (never the head)
+  }
+  // the oldest, of derelict alloy, lies on its back in the drift by the dome's west side, at the drift's level (sunk to
+  // the ground layer it lay in a pit below the drift, its brown alloy reading as dirt): chest and head showing, one arm up
   for (let k = -1; k <= 1; k++) for (let z = 9; z <= 11; z++) s.set(2 + k, 1, z, DALLOY);
   s.set(2, 2, 10, DALLOY).set(2, 2, 11, DALLOY).set(2, 1, 12, DALLOY).set(2, 2, 12, DALLOY);
   s.set(1, 1, 8, DALLOY).set(3, 1, 7, DALLOY);                                         // legs, one kicked out
   s.set(0, 1, 10, DALLOY).set(0, 2, 10, 'iron_bars').set(0, 3, 10, 'iron_bars');      // the arm reaching up
+  // snow and packed ice banked round them (ragged), a little drifted snow on the second layer against the bodies
+  const SHELL_BLOCK = /copper|automaton_alloy|iron_bars|core_crystal/;
+  const isShell = (x, y, z) => SHELL_BLOCK.test(s.get(x, y, z) || '');
+  for (let x = 0; x < n; x++) for (let z = 0; z < 15; z++) {
+    if (s.get(x, 1, z) !== 'air' || !s.get(x, 0, z) || !/snow_block|snow\[/.test(s.get(x, 0, z))) continue;
+    let near = 0;
+    for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) if (isShell(x + a, 0, z + b) || isShell(x + a, 1, z + b)) near++;
+    if (!near || r.chance(0.5)) continue;
+    s.set(x, 1, z, r.chance(0.2) ? 'packed_ice' : 'snow_block');
+    const touch = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => isShell(x + a, 2, z + b));
+    if (touch && s.get(x, 2, z) === 'air' && r.chance(0.6)) s.set(x, 2, z, `snow[layers=${r.int(2, 6)}]`);
+  }
+  // the sunk parts are under a thin crust, so a body lies in the snow, not at the bottom of a trench
+  // (where the drift round it is a block deep, a full block, or the body shows as the walls of a pit)
+  for (let x = 0; x < n; x++) for (let z = 0; z < 15; z++) {
+    if (!/copper$|automaton_alloy/.test(s.get(x, 0, z) || '') || s.get(x, 1, z) !== 'air') continue;
+    const deep = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([a, b]) => /snow_block|packed_ice/.test(s.get(x + a, 1, z + b) || '')).length;
+    if (deep >= 2) s.set(x, 1, z, 'snow_block');
+    else if (r.chance(0.7)) s.set(x, 1, z, `snow[layers=${r.int(3, 6)}]`);
+  }
   return s.save(`defect_station/${seed}`);
 }
 const defectTemplates = [defectStation(1)];
 // issue #40: on open dry land in the snow, its door turned to the open side (open_ground); placed after the ice spikes and
 // spruces (top_layer_modification) so the site clears them, and before the snow, which then settles on the open tops
-special('defect_station', 'spirecraft:cave_template', ['minecraft:snowy_plains', 'minecraft:ice_spikes'],
+special('defect_station', 'spirecraft:cave_template', ['minecraft:snowy_plains', 'minecraft:ice_spikes', 'minecraft:snowy_taiga'],
   50, 17, { templates: defectTemplates, mode: 'open_ground', sink: 1, terrain_adaptation: 'beard_box', step: 'top_layer_modification' });
 
 // template ids used by worldgen/TemplateFeature placements (see BiomeData)
