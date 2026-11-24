@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_diamond": {
+    "has_orange_dough": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:diamond"
+            "items": "spirecraft:orange_dough"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_diamond"
+      "has_orange_dough"
     ]
   ],
   "rewards": {

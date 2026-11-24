@@ -79,6 +79,10 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
                 ModBlocks.CORE_CRYSTAL_BLOCK.get(), ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get());
         tag(BlockTags.NEEDS_STONE_TOOL).add(ModBlocks.AUTOMATON_ALLOY_BLOCK.get(), ModBlocks.TARNISHED_AUTOMATON_ALLOY_BLOCK.get(), ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK.get());
         tag(BlockTags.MINEABLE_WITH_SHOVEL).add(ModBlocks.WEBBED_HIVE_SOIL.get());
+        // issue #36: the Regent's crater
+        tag(BlockTags.MINEABLE_WITH_PICKAXE).add(ModBlocks.METEORITE.get());
+        tag(BlockTags.NEEDS_STONE_TOOL).add(ModBlocks.METEORITE.get());
+        tag(BlockTags.MINEABLE_WITH_SHOVEL).add(ModBlocks.ORANGE_DOUGH.get());
         tag(BlockTags.MINEABLE_WITH_PICKAXE).add(ModBlocks.PACKED_HIVE_SOIL.get(), ModBlocks.CRACKED_HIVE_ROCK_BRICKS.get(), ModBlocks.CHISELED_HIVE_ROCK_BRICKS.get());
         tag(BlockTags.STAIRS).add(ModBlocks.THATCH_STAIRS.get());
         tag(BlockTags.SLABS).add(ModBlocks.THATCH_SLAB.get());
