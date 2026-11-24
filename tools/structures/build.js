@@ -1330,5 +1330,172 @@ loot('regent_supply', [
 special('regent_crater', 'spirecraft:carved', ['minecraft:desert', 'minecraft:meadow'],
   50, 17, { kind: 'meteor_crater', step: 'surface_structures' });
 
+/** The Defect's cooling station (issue #40, orbs and machines): on the snowy plains / ice spikes, where the Defect came
+ * to cool a core that ran hotter with every change it made to itself. A low white dome with an ice floor and the core
+ * cooling in the middle (main chest by the terminal), a gantry shed holding a half-built shell, a row of older shells it
+ * threw away rusting in the snow (the oldest, of derelict alloy, toppled into the drift), a frozen pool with three orbs
+ * in it, and an antenna mast that catches lightning. Cream-white shell, blue orbs, grey cables (art_style 101 / 109).
+ * Template +z (the dome door, the shed front and the pool) is turned to the open side by `open_ground`. */
+loot('defect_station', [
+  { rolls: [4, 7], items: [['spirecraft:automaton_alloy_ingot', 12, 1, 4], ['copper_ingot', 10, 2, 6], ['redstone', 10, 2, 8], ['prismarine_crystals', 6, 1, 4], ['spirecraft:cracked_core_crystal_block', 5, 1, 2], ['spirecraft:core_crystal_block', 2, 1, 1], ['iron_ingot', 5, 1, 3], ['spirecraft:scrap', 5, 1, 4], ['spirecraft:flak_shell', 4, 2, 6]] },
+  { rolls: 1, items: [['empty', 65], ['spirecraft:rocket_punch', 8], ['spirecraft:tesla_coil', 8], ['spirecraft:flak_cannon', 7], ['spirecraft:shadow_shield', 6], ['spirecraft:lightning_rod', 6]] },
+  { rolls: 1, items: [['empty', 96], ['spirecraft:energy_core', 4]] },
+]);
+loot('defect_supply', [
+  { rolls: [2, 5], items: [['copper_ingot', 8, 1, 4], ['iron_nugget', 8, 2, 8], ['redstone', 8, 1, 5], ['gunpowder', 5, 1, 3], ['glass', 5, 1, 4], ['string', 5, 1, 4], ['snowball', 6, 2, 8], ['packed_ice', 4, 1, 3]] },
+]);
+function defectStation(seed) {
+  const r = rng(seed), n = 36, H = 26, s = new Struct(n, H, n);
+  const SHELL = () => r.pick(['smooth_quartz', 'smooth_quartz', 'smooth_quartz', 'white_concrete', 'white_concrete', 'calcite']);
+  const ALLOY = 'spirecraft:automaton_alloy_block', TALLOY = 'spirecraft:tarnished_automaton_alloy_block', DALLOY = 'spirecraft:derelict_automaton_alloy_block';
+  // clear the site (ice spikes, spruces: placed in top_layer_modification, after them) and keep the natural ground
+  for (let x = 0; x < n; x++) for (let z = 0; z < n; z++) {
+    if (Math.hypot(x - 17.5, z - 17.5) > 17.6) continue;
+    for (let y = 1; y < H; y++) s.set(x, y, z, 'air');
+  }
+
+  // ---- the dome: a squashed half-ellipsoid, one block thick; a band of light blue glass on the steep part of the wall (v2: higher up the snow hid it)
+  const DX = 12, DZ = 15, R = 7.5, HD = 8.5;
+  const inE = (x, y, z) => y >= 0 && ((x - DX) ** 2 + (z - DZ) ** 2) / (R * R) + (y / HD) ** 2 <= 1;
+  for (let x = 0; x < n; x++) for (let z = 0; z < n; z++) for (let y = 1; y <= 9; y++) {
+    if (!inE(x, y, z)) continue;
+    const edge = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 0, -1]].some(([a, b, c]) => !inE(x + a, y + b, z + c));
+    s.set(x, y, z, !edge ? 'air' : y === 4 && (x + z) % 4 !== 0 ? 'light_blue_stained_glass' : SHELL());
+  }
+  // the floor: packed ice laced with lines of blue ice, a quartz rim, the core cooling on a blue ice plinth
+  s.disc(DX, 0, DZ, R, (x, y, z, d) => d > R - 1.2 ? 'smooth_quartz' : (x - DX) % 3 === 0 || (z - DZ) % 3 === 0 ? 'blue_ice' : 'packed_ice');
+  s.set(DX, 0, DZ, 'blue_ice').set(DX, 1, DZ, 'spirecraft:core_crystal_block');
+  for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) s.set(DX + a, 1, DZ + b, 'smooth_quartz_slab[type=bottom]');
+  // the door (south, +z) and the passage to the shed (east): arched openings through the shell
+  for (let z = DZ + 4; z <= DZ + 8; z++) { s.fill(DX - 1, 1, z, DX + 1, 2, z, 'air'); s.set(DX, 3, z, 'air'); }
+  for (let x = DX + 4; x <= DX + 8; x++) { s.fill(x, 1, DZ - 1, x, 2, DZ + 1, 'air'); s.set(x, 3, DZ, 'air'); }
+  // inside: the terminal on the north wall (observers, a dark lamp, a lever) with the main chest beside it
+  const tz = DZ - 5;
+  s.set(DX - 1, 1, tz, 'observer[facing=south]').set(DX, 1, tz, 'observer[facing=south]').set(DX + 1, 1, tz, 'light_gray_concrete');
+  s.set(DX, 2, tz, 'redstone_lamp[lit=false]').set(DX - 1, 2, tz, 'lever[face=floor,facing=south,powered=false]');
+  s.chest(DX + 2, 1, tz, 'south', 'defect_station');
+  // the parts rack along the west wall: hoppers and dispensers, chains and bars above
+  for (let z = DZ - 2; z <= DZ + 2; z++) {
+    s.set(DX - 5, 1, z, z % 2 ? 'hopper[facing=down]' : 'dispenser[facing=east]');
+    s.set(DX - 5, 2, z, z % 2 ? 'iron_chain[axis=y]' : 'iron_bars');
+  }
+  // its charging spot (a bed it never sleeps in), south-west
+  s.set(DX - 4, 1, DZ + 2, 'white_bed[facing=north,part=head]').set(DX - 4, 1, DZ + 3, 'white_bed[facing=north,part=foot]');
+  // grey cables across the ceiling and a lamp at the top
+  for (let x = DX - 4; x <= DX + 4; x++) if (s.get(x, 6, DZ) === 'air') s.set(x, 6, DZ, 'iron_chain[axis=x]');
+  for (let z = DZ - 4; z <= DZ + 4; z++) if (s.get(DX, 6, z) === 'air') s.set(DX, 6, z, 'iron_chain[axis=z]');
+  s.set(DX, 7, DZ, 'sea_lantern');
+  // weathering: some roof blocks are snow, a few wall blocks are gone (only low, so no snow falls inside)
+  s.forEach((x, y, z, st) => {
+    if (!/smooth_quartz$|white_concrete$|calcite$/.test(st) || y < 1 || !inE(x, y, z)) return;
+    if (y >= 5 && r.chance(0.03)) s.set(x, y, z, 'snow_block');
+    else if (y <= 3 && r.chance(0.04)) s.set(x, y, z, 'air');
+  });
+  // a snow drift against the windward (west) side, up to half the dome's height
+  for (let x = 0; x < DX; x++) for (let z = 0; z < n; z++) {
+    const rho = Math.hypot(x - DX, z - DZ) - R, west = Math.min(1, (DX - x) / R);
+    if (rho < -0.5 || rho > 4) continue;
+    const h = Math.min(5, (4 - rho) * 1.25 * west);
+    if (h < 0.5) continue;
+    const full = Math.floor(h);
+    for (let y = 1; y <= full; y++) if (!inE(x, y, z) && s.get(x, y, z) === 'air') s.set(x, y, z, 'snow_block');
+    const layers = Math.round((h - full) * 8);
+    if (layers > 0 && !inE(x, full + 1, z) && s.get(x, full + 1, z) === 'air') s.set(x, full + 1, z, `snow[layers=${layers}]`);
+  }
+
+  // ---- the gantry shed (east): white walls on alloy posts, a flat roof, open to the south
+  const X0 = 21, X1 = 31, Z0 = 9, Z1 = 21, ROOF = 9;   // v2: lower (it read as a tall white box)
+  for (let x = X0; x <= X1; x++) for (let z = Z0; z <= Z1; z++) {
+    s.set(x, 0, z, (x + z) % 5 ? 'polished_andesite' : 'light_gray_concrete');
+    const wall = x === X0 || x === X1 || z === Z0;
+    for (let y = 1; y < ROOF; y++) s.set(x, y, z, !wall ? 'air' : y === 1 || y === ROOF - 1 ? 'light_gray_concrete' : (y === 4 || y === 5) && (x + z) % 3 === 0 ? 'light_blue_stained_glass' : 'white_concrete');
+    s.set(x, ROOF, z, x === X0 || x === X1 || z === Z0 || z === Z1 ? 'smooth_quartz' : (x + z) % 4 ? 'white_concrete' : 'light_blue_stained_glass');
+  }
+  for (const [x, z] of [[X0, Z0], [X1, Z0], [X0, Z1], [X1, Z1]]) for (let y = 1; y < ROOF; y++) s.set(x, y, z, TALLOY);
+  for (let x = X0 + 1; x < X1; x++) s.set(x, ROOF - 1, Z1, 'light_gray_concrete');   // a lintel over the open front
+  // the passage from the dome: a short white corridor
+  for (let x = DX + 6; x <= X0; x++) {
+    for (let y = 1; y <= 3; y++) { s.set(x, y, DZ - 2, 'white_concrete'); s.set(x, y, DZ + 2, 'white_concrete'); }
+    s.fill(x, 4, DZ - 2, x, 4, DZ + 2, 'smooth_quartz');
+    s.fill(x, 1, DZ - 1, x, 3, DZ + 1, 'air');
+    s.fill(x, 0, DZ - 1, x, 0, DZ + 1, 'polished_andesite');
+  }
+  // the gantry: two alloy posts and a beam, the half-built shell hanging from it on chains (a statue, not a mob)
+  const GZ = 15;
+  for (let y = 1; y <= 7; y++) { s.set(23, y, GZ, ALLOY); s.set(29, y, GZ, ALLOY); }
+  for (let x = 23; x <= 29; x++) s.set(x, 8, GZ, ALLOY);
+  // torso (3 wide, 2 deep), its chest panel open on the bare frame; the head with one core-crystal eye
+  for (let x = 25; x <= 27; x++) for (let y = 2; y <= 4; y++) for (let z = GZ; z <= GZ + 1; z++) s.set(x, y, z, (x + y + z) % 3 ? 'smooth_quartz' : 'white_concrete');
+  s.set(26, 3, GZ + 1, 'iron_bars').set(26, 3, GZ, 'redstone_block');
+  // v2 (it read as one white slab): a bare neck, a head of its own with a rounded top, the chains on the shoulders
+  s.set(26, 5, GZ, 'iron_bars');
+  for (let x = 25; x <= 27; x++) for (let z = GZ; z <= GZ + 1; z++) s.set(x, 6, z, 'smooth_quartz');
+  s.set(26, 6, GZ + 1, 'spirecraft:core_crystal_block').set(26, 7, GZ, 'smooth_quartz_slab[type=bottom]').set(26, 7, GZ + 1, 'smooth_quartz_slab[type=bottom]');
+  s.set(28, 4, GZ, 'smooth_quartz').set(28, 3, GZ, 'smooth_quartz').set(28, 2, GZ, 'quartz_slab[type=top]');   // one arm on
+  s.set(24, 4, GZ, 'iron_bars').set(24, 3, GZ, 'iron_chain[axis=y]');                                                // the other not yet
+  for (const x of [24, 28]) for (let y = 5; y <= 7; y++) s.set(x, y, GZ, 'iron_chain[axis=y]');
+  for (const x of [25, 27]) s.set(x, 1, GZ, 'iron_bars');
+  // the bench along the north wall and two supply barrels
+  s.set(22, 1, 10, 'smithing_table').set(23, 1, 10, 'crafter').set(25, 1, 10, 'grindstone[face=floor,facing=south]');
+  s.set(26, 1, 10, 'iron_chain[axis=x]').set(27, 1, 10, 'spirecraft:cracked_core_crystal_block');
+  s.barrel(30, 1, 10, 'up', 'defect_supply').barrel(30, 1, 11, 'up', 'defect_supply').set(30, 2, 10, 'barrel[facing=up]');
+  for (const [x, z] of [[24, 18], [28, 12]]) for (let y = ROOF - 1; y >= ROOF - 3; y--) s.set(x, y, z, 'iron_chain[axis=y]');
+  s.set(26, ROOF, 18, 'sea_lantern');
+
+  // ---- the antenna mast (north of the shed): copper and alloy, three cross-arms of bars, a light and a lightning rod
+  const MX = 27, MZ = 5;
+  s.fill(MX - 1, 0, MZ - 1, MX + 1, 1, MZ + 1, TALLOY);
+  for (let y = 2; y <= 21; y++) s.set(MX, y, MZ, y % 5 === 0 ? ALLOY : y % 2 ? 'waxed_cut_copper' : 'waxed_copper_block');
+  for (const y of [10, 15, 19]) {
+    const w = y === 19 ? 1 : 2;
+    for (let k = -w; k <= w; k++) if (k) { s.set(MX + k, y, MZ, 'iron_bars'); s.set(MX, y, MZ + k, 'iron_bars'); }
+  }
+  s.set(MX, 22, MZ, 'sea_lantern').set(MX, 23, MZ, 'lightning_rod[facing=up]');
+  for (let z = MZ + 2; z < Z0; z++) s.set(MX, ROOF - 1, z, 'iron_chain[axis=z]');          // a cable from the mast to the shed
+
+  // ---- the frozen pool (south-east): packed ice with a blue ice rim, three orbs frozen in it
+  const PX = 26, PZ = 28;
+  s.disc(PX, 0, PZ, 5, (x, y, z, d) => d > 4.1 ? 'blue_ice' : 'packed_ice');
+  s.set(PX - 2, 0, PZ - 1, 'packed_ice').set(PX - 2, 1, PZ - 1, 'sea_lantern');                       // lightning
+  s.set(PX + 2, 0, PZ - 1, 'blue_ice').set(PX + 2, 1, PZ - 1, 'sea_lantern');                         // frost: in blue ice
+  s.set(PX + 1, 1, PZ - 1, 'blue_ice').set(PX + 3, 1, PZ - 1, 'blue_ice');
+  s.set(PX, 0, PZ + 2, 'packed_ice').set(PX, 1, PZ + 2, 'crying_obsidian');                           // dark
+  for (const [x, z] of [[PX - 1, PZ - 2], [PX + 1, PZ + 1], [PX - 3, PZ + 1], [PX + 3, PZ + 2]]) s.set(x, 1, z, 'packed_ice');
+  // grey cables from the pool to the dome: chains on the ground (no snow settles on them), junction boxes on the way
+  for (let x = 15; x <= PX - 5; x++) s.set(x, 1, PZ, x === 18 ? 'light_gray_concrete' : r.chance(0.12) ? null : 'iron_chain[axis=x]');
+  for (let z = DZ + 7; z < PZ; z++) s.set(15, 1, z, z === 24 ? 'light_gray_concrete' : r.chance(0.12) ? null : 'iron_chain[axis=z]');
+  s.set(15, 1, PZ, 'light_gray_concrete');
+
+  // ---- the shells it threw away: a row facing north, each older one more corroded; the oldest toppled into the drift
+  const SHELLS = [
+    { b: 'waxed_copper', slab: 'waxed_cut_copper_slab', head: 'waxed_copper_bulb' },
+    { b: 'waxed_exposed_copper', slab: 'waxed_exposed_cut_copper_slab', head: 'waxed_exposed_copper_bulb' },
+    { b: 'waxed_weathered_copper', slab: 'waxed_weathered_cut_copper_slab', head: 'waxed_weathered_copper_bulb' },
+    { b: 'waxed_oxidized_copper', slab: 'waxed_oxidized_cut_copper_slab', head: 'waxed_oxidized_copper_bulb' },
+  ];
+  SHELLS.forEach((m, i) => {
+    const x = 17 - i * 5, z = 1;                 // newest nearest the shed, oldest to the west
+    s.set(x - 1, 1, z, `${m.slab}[type=bottom]`).set(x + 1, 1, z, `${m.slab}[type=bottom]`);    // legs out in front
+    for (let k = -1; k <= 1; k++) for (let y = 1; y <= 3; y++) s.set(x + k, y, z + 1, m.b);       // hips and torso
+    s.set(x, 2, z + 1, i < 2 ? 'spirecraft:cracked_core_crystal_block' : 'air');                  // the orb socket, empty on the oldest
+    s.set(x, 4, z + 1, `${m.head}[lit=false,powered=false]`);
+    if (i % 2) s.set(x + 2, 2, z + 1, 'iron_bars'); else s.set(x - 2, 1, z + 1, `${m.slab}[type=bottom]`);   // an arm hanging / fallen
+    for (let k = 0; k < i; k++) { const [a, b] = [r.int(-1, 1), r.int(2, 3)]; s.set(x + a, b, z + 1, 'air'); }   // pieces missing
+    for (let k = -1; k <= 1; k++) s.set(x + k, 1, z + 2, 'snow_block');                           // snow banked behind
+  });
+  // the oldest, of derelict alloy, lies on its back in the drift by the dome's west side
+  // (v2: it was lost in the drift) the chest and head stand out of the snow, one arm reaches up
+  for (let k = -1; k <= 1; k++) for (let z = 9; z <= 11; z++) s.set(2 + k, 1, z, DALLOY);
+  s.set(2, 2, 10, DALLOY).set(2, 2, 11, DALLOY).set(2, 1, 12, DALLOY).set(2, 2, 12, DALLOY);
+  s.set(1, 1, 8, DALLOY).set(3, 1, 7, DALLOY);                                         // legs, one kicked out
+  s.set(0, 1, 10, DALLOY).set(0, 2, 10, 'iron_bars').set(0, 3, 10, 'iron_bars');      // the arm reaching up
+  return s.save(`defect_station/${seed}`);
+}
+const defectTemplates = [defectStation(1)];
+// issue #40: on open dry land in the snow, its door turned to the open side (open_ground); placed after the ice spikes and
+// spruces (top_layer_modification) so the site clears them, and before the snow, which then settles on the open tops
+special('defect_station', 'spirecraft:cave_template', ['minecraft:snowy_plains', 'minecraft:ice_spikes'],
+  50, 17, { templates: defectTemplates, mode: 'open_ground', sink: 1, terrain_adaptation: 'beard_box', step: 'top_layer_modification' });
+
 // template ids used by worldgen/TemplateFeature placements (see BiomeData)
 console.log('ok', JSON.stringify(hiveTemplates), pierTemplates);
