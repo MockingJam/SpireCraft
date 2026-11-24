@@ -236,35 +236,52 @@ Silent: a low den of seven rooms and narrow corridors on short stilts in the swa
 
 Regent: a meteor crater on open land (desert, meadow). A split fallen star of meteorite lies in the middle with a glowing core of Orange Dough, more dough clumps in the bowl; rays of ejecta and meteorite fragments outside; the Regent's abandoned forge on a terrace part way down (main chest: galactic dust); an orange banner on the far rim. Every Regent weapon now takes Orange Dough.
 
-### 4. 亡灵契约师墓穴 `necrobinder_crypt`（灵魂与灾厄）
+### 4. 亡灵契约师：巨人遗骸 `necrobinder_giant`（灵魂与灾厄，issue #40）
+
+> issue #40 把“墓穴”改为“巨人遗骸”（设计稿 v3.8，待确认）。原作：亡灵契约师是“生于尖塔、寻求复仇的巫妖”，时间线有一个纪元叫 *The Giant*（巨人）。故事：一具远古巨人的骨架半埋在森林里，契约师把它的胸腔当成了住处，在头骨里供着自己的命匣（*Bound Phylactery*），后来去了尖塔。
 
 | 项 | 内容 |
 |---|---|
-| 位置 | 黑森林、苍白之园 |
-| 造型 | 两块（jigsaw）：**地表**是一片小墓园（墓碑用石砖墙、楼梯、半砖，铁栏杆围栏，灵魂灯笼，枯树）和一座小礼拜堂入口（深板岩砖墙、紫色彩窗）；**地下墓室**：楼梯向下，环形墓廊两侧壁龛里放棺椁和骷髅头颅、骨块柱，最里面是**契约祭坛**（骨块台、紫色地毯、灵魂火） |
-| 标志物 | 祭坛后面一只从地里伸出的**巨大骨手**（骨块拼成，奥斯提）；地表礼拜堂的尖顶 |
-| 主要方块 | 深板岩砖/瓦、磨制黑石、骨块、灵魂灯笼/灵魂火把、紫色羊毛/地毯/染色玻璃、蜘蛛网、苍白橡木 |
-| 尺寸 | 地表约 24×24；地下约 40×40，深约 12 |
-| 守卫 | 墓室里 1–2 个骷髅刷怪笼（像原版地牢） |
-| 主箱（骨匣） | 骨头、凋零玫瑰、灾厄药水、灵魂土；小概率镰刀 / 鞭子 / 挽歌笛子 / 亡灵召唤书之一 |
-| 以后 | 奥斯提（阶段 8）做好后，骨手可作为召唤点 |
-| 材料 | **亡灵契约师目前没有专属材料**，见下方“待确认” |
+| 位置 | 黑森林、苍白之园（与其他四座不重叠）。占地内全是陆地、高差不超过 6 格 |
+| 造型 | 一具**仰面半埋的巨人骨架**，全长约 42 格：**脊椎**大半埋在地下，只露出一排椎骨的棘突；**肋骨**每边 6 根，从地里拱起、在中线上方差 1–2 格合拢，最高约 12 格，围成一条长约 20 格的**骨廊**；一头是**头骨**（约 13×11×13，空心），下颌张开、贴在地上，牙齿之间就是头骨的入口；另一头露出一截骨盆。一条手臂从肩部伸出、半埋在地里，**手掌**在骨架旁边朝天张开、手指弯曲，像要从地里抓出来 |
+| 骨廊（住处） | 肋骨之间挂紫色羊毛/地毯做的**帘子**（有的扯破了），地面铺苍白橡木/深色橡木木板；靠肋骨摆书架、讲台（放一本书）、一张床、炼药锅、酿造台；从肋骨上用锁链垂下灵魂灯笼，紫色蜡烛摆在地上和书架上；角落有蜘蛛网 |
+| 头骨（圣所） | 地上铺紫色地毯，中间一座**命匣祭坛**：磨制黑石台座上一个饰纹陶罐（命匣），四周一圈紫水晶簇和灵魂篝火；两个眼窝里各放一块灵魂火（从外面能看到眼窝里的蓝火）。**主箱**（骨匣）在祭坛后面 |
+| 地下骨堂 | 骨廊中间一块活板门下面，一段楼梯通到脊椎下方的**骨堂**（约 13×7×9）：骨块和磨制黑石的墙，壁龛里放骷髅头颅，灵魂土地面，**1 个骷髅刷怪笼**（像原版地牢）、两个补给木桶 |
+| 标志物 | 远远就能看到森林里拱起的一排白色肋骨和张开的巨手；夜里头骨眼窝里的蓝色灵魂火 |
+| 废弃 | 骨块约 10% 换成钙化的方解石或缺块，苍白之园里骨头上长苍白苔藓、黑森林里长普通苔藓；帘子约 30% 缺块 |
+| 主要方块 | 骨块、方解石、磨制黑石、灵魂土、灵魂灯笼/灵魂篝火/灵魂火、紫色羊毛/地毯、紫色蜡烛、紫水晶簇、苍白橡木/深色橡木木板、书架、锁链、蜘蛛网 |
+| 尺寸 | 约 42×16×24（地上约 12 格，地下骨堂 9 格） |
+| 主箱 `chests/necrobinder_giant` | 骨头、骨块、凋零玫瑰、灵魂土、书、紫水晶碎片、墨囊；1–2 瓶灾厄药水；约 35% 一件亡灵契约师武器（镰刀 / 鞭子 / 挽歌笛子 / 亡灵召唤书 / 死亡之舞扇子） |
+| 补给木桶 `chests/necrobinder_supply` | 骨头、腐肉、蜡烛、纸、书、墨囊、线、灵魂火把、面包 |
+| 材料 | 先用原版物品占位（2026-11-22 已确认），以后再加专属材料 |
+| 以后 | 奥斯提（阶段 8）做好后，巨手可作为奥斯提的召唤点；命匣做好遗物后加进主箱 |
+| 实现提示 | 黑森林树很密，和静默猎手一样放在 `top_layer_modification` 阶段、把骨廊和头骨里面写成空气，切掉长进来的树 |
 
-Necrobinder: a graveyard and chapel above, a crypt below with an altar and a giant bone hand (Osty); skeleton spawners guard it.
+Necrobinder: the skeleton of an ancient giant lies half-buried on its back in the dark forest / pale garden. Its ribs arch out of the ground into a hall where the Necrobinder lived (purple curtains, books, soul lanterns hanging from the ribs); its open-jawed skull holds her phylactery altar and the main chest, with soul fire in the eye sockets. One huge hand reaches up out of the ground beside it. A small ossuary under the spine has a skeleton spawner.
 
-### 5. 故障机器人工坊 `defect_workshop`（充能球与机械）
+### 5. 故障机器人：冰原散热站 `defect_station`（充能球与机械，issue #40）
+
+> issue #40：放在**雪地、冰原**，因为故障机器人是蓝白配色（设计稿 v3.8，待确认）。原作：故障机器人是“永远在改造自己以求生存的自动机”。故事：每改造一次，核心就更烫，它来到冰原给核心散热，在这里一次次换下旧躯壳、装上新的，后来去了尖塔。
 
 | 项 | 内容 |
 |---|---|
-| 位置 | 风袭丘陵、平原 |
-| 造型 | 两层**工坊**：石砖地基，墙用机巧合金块和铜块（各氧化阶段），屋顶上是**特斯拉塔**（铜柱 + 核心晶块 + 顶上的避雷针，雷雨天会照原版规则引雷）。屋内：装配台（锻造台、合成器）、一具**半组装的机器人躯壳**（平滑石英/白色陶瓦做奶白外壳，核心晶块做眼，是方块雕像不是生物）、零件架（锁链、铁栏杆、漏斗、发射器）、墙上走灰色“导线和管道”；实验台上摆着**三种充能球**：海晶灯（闪电）、浮冰（冰霜）、哭泣的黑曜石（黑暗） |
-| 标志物 | 屋顶的特斯拉塔 |
-| 主要方块 | 机巧合金块（含氧化/废弃）、铜块、石砖、平滑石英、核心晶块、破损核心晶块、避雷针、锁链、铁栏杆 |
-| 尺寸 | 约 22×22，高 24（含塔） |
-| 主箱（零件柜） | 机巧合金锭、铜锭、红石、海晶砂粒、破损核心晶块；少量核心晶块；很小概率能量核心；小概率火箭飞拳发射器 / 散射炮 / 特斯拉线圈 / 暗影之盾投射器 / 引雷针护盾之一 |
-| 与废弃机械堆的区别 | 机械堆在巢穴里，是被虫占据的残骸；工坊在地表，是故障机器人自己修理和改装的地方，比较完整 |
+| 位置 | 积雪平原、冰刺之地（与储君的沙漠/草甸不重叠；储君坑不放积雪平原，这里正好用上）。占地内全是陆地、高差不超过 6 格 |
+| 造型 | 三部分：① 一座低矮的**白色圆顶站**（直径约 15，高约 8；平滑石英、白色混凝土和方解石，顶上一圈淡蓝色染色玻璃），迎风一侧被雪埋住一半；② 圆顶一侧开口连着一个**装配棚**；③ 站外一片**冷却池** |
+| 圆顶站（里面） | 地面是浮冰和蓝冰拼的**散热地板**，中间一块核心晶块（故障机器人的核心放在这里冷却）；墙边是“终端”（侦测器 + 红石灯 + 拉杆）、零件架（锁链、铁栏杆、漏斗、发射器）、灰色的**导线和管道**（灰色混凝土、锁链、铁栏杆沿墙和天花板走）；一张床（它不睡，只是充电位）。**主箱**（零件柜）在终端旁边 |
+| 装配棚 | 机巧合金和铁的**龙门吊**，下面吊着一具**半组装的躯壳**（平滑石英/白色混凝土做奶白外壳，核心晶块做眼，是方块雕像不是生物）；锻造台、合成器、砂轮、两个补给木桶 |
+| 旧躯壳 | 站外一排 4–5 具**丢弃的旧躯壳**（方块雕像，坐着或倒着），半埋在雪和浮冰里；越旧的锈得越厉害（铜块从未氧化到完全氧化，最旧的一具是废弃机巧合金） |
+| 冷却池 | 一片浮冰/蓝冰的冻池，冰里冻着**三颗充能球**：海晶灯（闪电）、蓝冰包着的海晶灯（冰霜）、哭泣的黑曜石（黑暗）；灰色导线从池子拉到圆顶站 |
+| 标志物 | 圆顶旁一根约 22 格高的**天线塔**（铜柱 + 机巧合金，几层铁栏杆横臂，顶上避雷针和一盏海晶灯，雷雨天照原版规则引雷）；白色圆顶在雪地里不显眼，远处主要看塔 |
+| 配色 | 奶白外壳 + 蓝色充能球 + 灰色导线（`art_style.md` 第 101、109 条），铜和合金只在塔、龙门吊和旧躯壳上 |
+| 废弃 | 约 10% 外壳方块换成积雪或缺块，部分导线断开；结构生成之后原版会在露天的顶面上铺一层雪，正好盖住旧躯壳和池边，里面有顶的地方不受影响 |
+| 主要方块 | 平滑石英、白色混凝土、方解石、淡蓝色染色玻璃、浮冰、蓝冰、海晶灯、哭泣的黑曜石、核心晶块、破损核心晶块、机巧合金块（含氧化/废弃）、铜块、避雷针、灰色混凝土、锁链、铁栏杆 |
+| 尺寸 | 约 36×24×36（塔高约 22） |
+| 主箱 `chests/defect_station` | 机巧合金锭、铜锭、红石、海晶砂粒、破损核心晶块；少量核心晶块；很小概率能量核心；约 35% 一件故障机器人武器（火箭飞拳发射器 / 散射炮 / 特斯拉线圈 / 暗影之盾投射器 / 引雷针护盾） |
+| 补给木桶 `chests/defect_supply` | 铜锭、铁粒、红石、火药、玻璃、线、雪球、浮冰 |
+| 材料 | 先用现有材料（机巧合金、核心晶块），不加新材料 |
+| 与废弃机械堆的区别 | 机械堆在巢穴里，是被虫占据的残骸；散热站在地表，是故障机器人自己冷却、改装的地方，比较完整 |
 
-Defect: a two-storey workshop of automaton alloy and copper with a lightning-catching tesla tower, a half-built robot shell and three orbs on the bench.
+Defect: a cooling station on the snowy plains / ice spikes. A low white dome with an ice floor where the core cooled, a gantry shed holding a half-built shell, a row of discarded older shells rusting in the snow, a frozen pool with three orbs locked in the ice, and an antenna mast that catches lightning. Cream-white shell, blue orbs, grey cables.
 
 ### 已确认（2026-11-22）Confirmed
 
@@ -273,6 +290,7 @@ Defect: a two-storey workshop of automaton alloy and copper with a lightning-cat
 3. 密度：**约每 50 区块一座**。
 4. 搭建方式：**先用 `tools/structures/build.js` 生成**，进游戏看效果，再手工微调。微调过的模板在游戏里用结构方块保存后，复制回 `src/main/resources/data/spirecraft/structure/`，并把模板名写进 `tools/structures/tuned.txt`，以后重新运行 build.js 不会覆盖它。
 5. 顺序：铁甲战士营地 → 故障机器人工坊 → 储君宫廷 → 静默猎手藏身处 → 亡灵契约师墓穴。
+6. （2026-11-25，issue #40）亡灵契约师改为**巨人遗骸**；故障机器人放**雪地、冰原**（蓝白配色），造型见上面第 5 条的散热站；两者都**暂不加专属材料**。
 
 ### 实现记录 Implementation
 
