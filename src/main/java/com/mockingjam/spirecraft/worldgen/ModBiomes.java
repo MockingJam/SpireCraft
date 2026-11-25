@@ -26,11 +26,9 @@ public final class ModBiomes {
     public static final ResourceKey<Biome> HIVE_CAVES = key("hive_caves");
     public static final ResourceKey<Biome> SPARSE_HIVE_CAVES = key("sparse_hive_caves");
     public static final ResourceKey<Biome> EGG_HIVE_CAVES = key("egg_hive_caves");
-    public static final ResourceKey<Biome> QUICKSAND_CAVES = key("quicksand_caves");
 
     public static final List<ResourceKey<Biome>> ALL = List.of(STONE_FOREST_DOCKS, BEACH_DOCKS, POLLUTED_SEA, WATERFALLS,
             OVERGROWTH, MISTY_OVERGROWTH, MUSHROOM_OVERGROWTH, INK_SPRING_CAVES, HIVE_CAVES, SPARSE_HIVE_CAVES, EGG_HIVE_CAVES);
-    /** v3.2: no longer placed in the world (quicksand is on the desert surface now); kept registered for old worlds. */
     public static final List<ResourceKey<Biome>> CAVES = List.of(INK_SPRING_CAVES, HIVE_CAVES, SPARSE_HIVE_CAVES, EGG_HIVE_CAVES);
     public static final List<ResourceKey<Biome>> OVERGROWTHS = List.of(OVERGROWTH, MISTY_OVERGROWTH, MUSHROOM_OVERGROWTH);
 

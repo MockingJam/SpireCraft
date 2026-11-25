@@ -65,6 +65,7 @@ public final class ClientSetup {
     private static void blockRenderLayers() {
         // tough eggs are translucent, like the STS2 egg clusters
         net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(ModBlocks.HIVE_EGG.get(), net.minecraft.client.renderer.chunk.ChunkSectionLayer.TRANSLUCENT);
+        net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(ModBlocks.STAR_GLASS.get(), net.minecraft.client.renderer.chunk.ChunkSectionLayer.TRANSLUCENT);
         for (var w : com.mockingjam.spirecraft.block.BiomeBlocks.woods()) {
             for (var b : w.hasTree ? java.util.List.of(w.door, w.trapdoor, w.sapling) : java.util.List.of(w.door, w.trapdoor)) {
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(b.get(), net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
@@ -72,7 +73,7 @@ public final class ClientSetup {
             if (w.hasTree) net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(w.leaves.get(), net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT_MIPPED);
         }
         for (var b : java.util.List.of(ModBlocks.GLOWVINE, ModBlocks.GLOWVINE_PLANT, ModBlocks.FOGCAP, ModBlocks.SPIRE_FERN,
-                ModBlocks.BARNACLES, ModBlocks.HIVE_MYCELIUM_LAYER, ModBlocks.MYCELIUM_THREAD, ModBlocks.PAVING_STONES, ModBlocks.BUG_CARCASS,
+                ModBlocks.BARNACLES, ModBlocks.HARBOUR_ROCK_SPIRE, ModBlocks.HIVE_MYCELIUM_LAYER, ModBlocks.MYCELIUM_THREAD, ModBlocks.PAVING_STONES, ModBlocks.BUG_CARCASS,
                 // biomes v2 plants
                 ModBlocks.REED, ModBlocks.ROTTEN_SHRUB, ModBlocks.POLLUTED_TUBE_CORAL, ModBlocks.POLLUTED_HORN_CORAL, ModBlocks.POLLUTED_CORAL_FAN,
                 ModBlocks.POLLUTED_CORAL_WALL_FAN, ModBlocks.POLLUTED_SEAGRASS, ModBlocks.POLLUTED_KELP, ModBlocks.POLLUTED_KELP_PLANT,

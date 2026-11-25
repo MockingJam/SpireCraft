@@ -42,12 +42,15 @@ public class ModBlockLootProvider extends BlockLootSubProvider {
         dropSelf(ModBlocks.ORICHALCUM_BLOCK.get());
         for (var b : java.util.List.of(ModBlocks.AUTOMATON_ALLOY_BLOCK, ModBlocks.TARNISHED_AUTOMATON_ALLOY_BLOCK, ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK,
                 ModBlocks.CORE_CRYSTAL_BLOCK)) dropSelf(b.get());
-        // the cracked crystal breaks into prismarine crystals (silk touch keeps it)
-        add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), b -> createSilkTouchDispatchTable(b, applyExplosionDecay(b, net.minecraft.world.level.storage.loot.entries.LootItem.lootTableItem(net.minecraft.world.item.Items.PRISMARINE_CRYSTALS)
+        // the cracked crystal breaks into core crystals (silk touch keeps it)
+        add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), b -> createSilkTouchDispatchTable(b, applyExplosionDecay(b, net.minecraft.world.level.storage.loot.entries.LootItem.lootTableItem(com.mockingjam.spirecraft.registry.ModItems.CORE_CRYSTAL.get())
                 .apply(net.minecraft.world.level.storage.loot.functions.SetItemCountFunction.setCount(net.minecraft.world.level.storage.loot.providers.number.UniformGenerator.between(1, 3))))));
         dropSelf(ModBlocks.BRIMSTONE_BLOCK.get());
-        dropSelf(ModBlocks.METEORITE.get());
         dropSelf(ModBlocks.ORANGE_DOUGH.get());
+        for (var b : java.util.List.of(ModBlocks.POLISHED_AUTOMATON_ALLOY, ModBlocks.AUTOMATON_ALLOY_LAMP, ModBlocks.POLISHED_ORANGE_DOUGH,
+                ModBlocks.ORANGE_DOUGH_BRICKS, ModBlocks.STAR_LAMP)) dropSelf(b.get());
+        dropWhenSilkTouch(ModBlocks.STAR_GLASS.get());
+        dropSelf(ModBlocks.HARBOUR_ROCK_SPIRE.get());
 
         // ---- Phase 7 biome blocks: same rules as their vanilla counterparts ----
         for (WoodSet w : BiomeBlocks.woods()) {

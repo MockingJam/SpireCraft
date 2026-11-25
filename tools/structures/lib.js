@@ -289,10 +289,10 @@ function jigsaw(o) {
   });
 }
 
-/** A loot table: pools = [{rolls:[min,max], items:[[id, weight, min, max]]}] */
-function loot(name, pools) {
-  writeJson(`loot_table/chests/${name}.json`, {
-    type: 'minecraft:chest',
+/** A loot table: pools = [{rolls:[min,max], items:[[id, weight, min, max]]}]; kind 'archaeology' for suspicious sand / gravel */
+function loot(name, pools, kind = 'chests') {
+  writeJson(`loot_table/${kind}/${name}.json`, {
+    type: kind === 'archaeology' ? 'minecraft:archaeology' : 'minecraft:chest',
     pools: pools.map(p => ({
       rolls: Array.isArray(p.rolls) ? { type: 'minecraft:uniform', min: p.rolls[0], max: p.rolls[1] } : p.rolls,
       entries: p.items.map(([item, weight, min, max, extra]) => {

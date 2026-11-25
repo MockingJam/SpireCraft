@@ -20,7 +20,7 @@ public final class ModLanguageProvider {
                 { "ink_spring_caves", "Ink Spring Caves", "墨泉洞穴" }, { "overgrowth", "Overgrowth", "密林" },
                 { "misty_overgrowth", "Misty Overgrowth", "迷雾密林" }, { "mushroom_overgrowth", "Mushroom Overgrowth", "蘑菇密林" },
                 { "hive_caves", "Hive Caves", "巢穴洞穴" }, { "sparse_hive_caves", "Sparse Hive Caves", "稀疏巢穴洞穴" },
-                { "egg_hive_caves", "Egg Hive Caves", "虫卵巢穴洞穴" }, { "quicksand_caves", "Quicksand Caves", "流沙洞" } };
+                { "egg_hive_caves", "Egg Hive Caves", "虫卵巢穴洞穴" } };
         for (String[] b : biomes) add.accept("biome.spirecraft." + b[0], zh ? b[2] : b[1]);
 
         String[][] woods = { { "Gnarlwood", "盘根木" }, { "Hiveshroom", "巢菇" }, { "Rotten", "腐木" } };
@@ -65,7 +65,7 @@ public final class ModLanguageProvider {
         }
         Object[][] misc = { { ModBlocks.CRACKED_RUIN_STONE_BRICKS, "Cracked Ruin Stone Bricks", "裂纹遗迹石砖" },
                 { ModBlocks.CHISELED_RUIN_STONE_BRICKS, "Chiseled Ruin Stone Bricks", "雕纹遗迹石砖" },
-                { ModBlocks.PAVING_STONES, "Paving Stones", "铺路石" }, { ModBlocks.JUNK_BLOCK, "Junk Block", "垃圾块" },
+                { ModBlocks.PAVING_STONES, "Paving Stones", "铺路石" }, { ModBlocks.JUNK_BLOCK, "Machine Scrap Block", "机械碎片块" },
                 { ModBlocks.HIVE_MYCELIUM_LAYER, "Mycelium Mat", "菌丝层" }, { ModBlocks.MYCELIUM_THREAD, "Mycelium Thread", "菌丝线" },
                 { ModBlocks.BUG_CARCASS, "Bug Carcass", "虫尸" }, { ModBlocks.BYRDONIS_EGG, "Byrdonis Egg", "多尼斯异鸟蛋" }, { ModBlocks.GLOWVINE, "Glowvine", "萤光藤" },
                 { ModBlocks.GLOWVINE_PLANT, "Glowvine Plant", "萤光藤植株" }, { ModBlocks.FOGCAP, "Fogcap", "雾菇" },
@@ -233,7 +233,9 @@ public final class ModLanguageProvider {
             add(ModItems.INK_BUBBLE.get(), "Ink Bubble");
             add(com.mockingjam.spirecraft.fluid.ModFluids.INK_BUCKET.get(), "Ink Bucket");
             add("block.spirecraft.ink", "Ink");
-            add(ModItems.SCRAP.get(), "Scrap");
+            add(ModItems.SCRAP.get(), "Machine Scrap");
+            add(ModItems.ORANGE_DOUGH_LUMP.get(), "Orange Dough");
+            add(ModItems.CORE_CRYSTAL.get(), "Core Crystal");
             add(ModItems.DOCK_BRICK.get(), "Dock Brick");
             add(ModItems.FLAK_SHELL.get(), "Flak Shell");
             add("item.minecraft.potion.effect.spirecraft_capacity", "Potion of Capacity");
@@ -360,8 +362,14 @@ public final class ModLanguageProvider {
             add(ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK.get(), "Derelict Automaton Alloy");
             add(ModBlocks.CORE_CRYSTAL_BLOCK.get(), "Core Crystal Block");
             add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), "Cracked Core Crystal Block");
-            add(ModBlocks.METEORITE.get(), "Meteorite");
-            add(ModBlocks.ORANGE_DOUGH.get(), "Orange Dough");
+            add(ModBlocks.ORANGE_DOUGH.get(), "Orange Dough Block");
+            add(ModBlocks.POLISHED_AUTOMATON_ALLOY.get(), "Polished Automaton Alloy");
+            add(ModBlocks.AUTOMATON_ALLOY_LAMP.get(), "Automaton Alloy Lamp");
+            add(ModBlocks.POLISHED_ORANGE_DOUGH.get(), "Polished Orange Dough");
+            add(ModBlocks.ORANGE_DOUGH_BRICKS.get(), "Orange Dough Bricks");
+            add(ModBlocks.STAR_LAMP.get(), "Radiant Star Lamp");
+            add(ModBlocks.STAR_GLASS.get(), "Radiant Star Glass");
+            add(ModBlocks.HARBOUR_ROCK_SPIRE.get(), "Harbour Rock Spire");
             add(ModBlocks.NETHER_BRIMSTONE_ORE.get(), "Nether Brimstone Ore");
             add(ModBlocks.BRIMSTONE_BLOCK.get(), "Block of Brimstone");
             add(ModBlocks.LAVA_ROCK_ORE.get(), "Lava Rock Ore");
@@ -613,7 +621,9 @@ public final class ModLanguageProvider {
             add(ModItems.INK_BUBBLE.get(), "墨泡");
             add(com.mockingjam.spirecraft.fluid.ModFluids.INK_BUCKET.get(), "墨桶");
             add("block.spirecraft.ink", "墨");
-            add(ModItems.SCRAP.get(), "废料");
+            add(ModItems.SCRAP.get(), "机械碎片");
+            add(ModItems.ORANGE_DOUGH_LUMP.get(), "橙色团块");
+            add(ModItems.CORE_CRYSTAL.get(), "核心水晶");
             add(ModItems.DOCK_BRICK.get(), "港砖");
             add(ModItems.FLAK_SHELL.get(), "霰弹");
             add("item.minecraft.potion.effect.spirecraft_capacity", "扩容药水");
@@ -737,10 +747,16 @@ public final class ModLanguageProvider {
             add(ModBlocks.AUTOMATON_ALLOY_BLOCK.get(), "机巧合金块");
             add(ModBlocks.TARNISHED_AUTOMATON_ALLOY_BLOCK.get(), "氧化机巧合金块");
             add(ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK.get(), "废弃机巧合金块");
-            add(ModBlocks.CORE_CRYSTAL_BLOCK.get(), "核心晶块");
-            add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), "破损核心晶块");
-            add(ModBlocks.METEORITE.get(), "陨石");
-            add(ModBlocks.ORANGE_DOUGH.get(), "橙色团块");
+            add(ModBlocks.CORE_CRYSTAL_BLOCK.get(), "核心水晶块");
+            add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), "破损核心水晶块");
+            add(ModBlocks.ORANGE_DOUGH.get(), "橙色团块方块");
+            add(ModBlocks.POLISHED_AUTOMATON_ALLOY.get(), "磨制机巧合金块");
+            add(ModBlocks.AUTOMATON_ALLOY_LAMP.get(), "机巧合金灯");
+            add(ModBlocks.POLISHED_ORANGE_DOUGH.get(), "磨制橙色团块");
+            add(ModBlocks.ORANGE_DOUGH_BRICKS.get(), "橙色团块砖");
+            add(ModBlocks.STAR_LAMP.get(), "辉星灯");
+            add(ModBlocks.STAR_GLASS.get(), "辉星玻璃");
+            add(ModBlocks.HARBOUR_ROCK_SPIRE.get(), "港岩石锥");
             add(ModBlocks.NETHER_BRIMSTONE_ORE.get(), "下界硫磺矿石");
             add(ModBlocks.BRIMSTONE_BLOCK.get(), "硫磺块");
             add(ModBlocks.LAVA_ROCK_ORE.get(), "熔岩石矿");

@@ -113,7 +113,7 @@ public final class V2Features {
                 boulder(level, r, base, rock, 2.0F + r.nextFloat() * 1.8F, 3 + r.nextInt(3));
             }
             barnacles(level, r, rock);
-            // (v3.3, user: the barnacle spire block is gone)
+            spires(level, r, rock);   // 2026-11-25 (user): the stone cones are back - the harbour rock spire
             return true;
         }
 
@@ -121,6 +121,53 @@ public final class V2Features {
          * Barnacles (v2.8): a layer of the barnacles block on the open faces of the rock - patches thickest at the
          * waterline (where barnacles live), a few higher up.
          */
+        /**
+         * Harbour rock spires (2026-11-25): stacks of 1-4 (base / middle / frustum / tip) pointing up from open spots on
+         * the rock - its top, ledges and steps - a few hanging down from overhangs, and small groups round the foot.
+         */
+        private static void spires(WorldGenLevel level, RandomSource r, java.util.Set<BlockPos> rock) {
+            java.util.List<BlockPos> list = new java.util.ArrayList<>(rock);
+            if (list.isEmpty()) return;
+            int up = 4 + r.nextInt(6), down = r.nextInt(3);
+            for (int i = 0; i < up * 3 && up > 0; i++) {
+                BlockPos p = list.get(r.nextInt(list.size())).above();
+                if (rock.contains(p) || !level.getBlockState(p).isAir() && !level.getBlockState(p).is(Blocks.WATER)) continue;
+                if (spire(level, p, Direction.UP, 1 + r.nextInt(4))) up--;
+            }
+            for (int i = 0; i < down * 3 && down > 0; i++) {
+                BlockPos p = list.get(r.nextInt(list.size())).below();
+                if (rock.contains(p) || !level.getBlockState(p).isAir()) continue;
+                if (spire(level, p, Direction.DOWN, 1 + r.nextInt(3))) down--;
+            }
+            // a few short ones on the ground round the foot
+            BlockPos foot = list.get(0);
+            for (int i = 0; i < 4; i++) {
+                BlockPos g = level.getHeightmapPos(Heightmap.Types.OCEAN_FLOOR_WG, foot.offset(r.nextInt(9) - 4, 0, r.nextInt(9) - 4));
+                if (!rock.contains(g) && level.getBlockState(g.below()).isFaceSturdy(level, g.below(), Direction.UP)) spire(level, g, Direction.UP, 1 + r.nextInt(2));
+            }
+        }
+
+        /** One spire of length n from p in dir, thickest at the root; returns whether it was placed. */
+        private static boolean spire(WorldGenLevel level, BlockPos p, Direction dir, int n) {
+            BlockPos root = p.relative(dir.getOpposite());
+            if (!level.getBlockState(root).isFaceSturdy(level, root, dir)) return false;
+            int len = 0;
+            for (int k = 0; k < n; k++) { BlockState s = level.getBlockState(p.relative(dir, k)); if (!s.isAir() && !s.is(Blocks.WATER)) break; len++; }
+            if (len == 0) return false;
+            var block = com.mockingjam.spirecraft.registry.ModBlocks.HARBOUR_ROCK_SPIRE.get();
+            for (int k = 0; k < len; k++) {
+                var t = k == len - 1 ? net.minecraft.world.level.block.state.properties.DripstoneThickness.TIP
+                        : k == len - 2 ? net.minecraft.world.level.block.state.properties.DripstoneThickness.FRUSTUM
+                        : k == 0 ? net.minecraft.world.level.block.state.properties.DripstoneThickness.BASE
+                        : net.minecraft.world.level.block.state.properties.DripstoneThickness.MIDDLE;
+                BlockPos q = p.relative(dir, k);
+                level.setBlock(q, block.defaultBlockState().setValue(com.mockingjam.spirecraft.block.HarbourSpireBlock.TIP_DIRECTION, dir)
+                        .setValue(com.mockingjam.spirecraft.block.HarbourSpireBlock.THICKNESS, t)
+                        .setValue(com.mockingjam.spirecraft.block.HarbourSpireBlock.WATERLOGGED, level.getBlockState(q).is(Blocks.WATER)), 2);
+            }
+            return true;
+        }
+
         private static void barnacles(WorldGenLevel level, RandomSource r, java.util.Set<BlockPos> rock) {
             int sea = level.getSeaLevel();
             for (BlockPos p : rock) {

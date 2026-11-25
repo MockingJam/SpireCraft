@@ -1,0 +1,8 @@
+{
+  "type": "spirecraft:carved",
+  "biomes": "#spirecraft:has_structure/sand_pit",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "kind": "sand_pit"
+}

@@ -1,0 +1,274 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>SpireCraft smooth art</title>
+<style>
+  body { background: #2b2b2b; color: #ddd; font: 13px sans-serif; margin: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 14px; }
+  figure { margin: 0; text-align: center; }
+  canvas { width: 192px; height: 192px; background: #8b8b8b; image-rendering: auto; }
+  #log { margin-top: 8px; color: #9c9; }
+</style>
+<div class="row" id="row"></div>
+<div id="log"></div>
+<script>
+// Smooth 256x256 drawings for tools/art/pixelize_tex.js. 1 unit = 16 px, so coordinates read like the 16x16 grid.
+// Light comes from the top left everywhere (vanilla). Blocks are drawn so they tile (shapes repeated at +-256).
+const S = 256, U = 16, TAU = Math.PI * 2;
+const jobs = [];
+const job = (name, block, draw, regions) => jobs.push({ name, block, draw, regions });
+const rnd = seed => () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+/** draw fn(ctx) 9 times shifted by the tile size so a block wraps seamlessly */
+const tiled = (c, fn) => { for (const ox of [-S, 0, S]) for (const oy of [-S, 0, S]) { c.save(); c.translate(ox, oy); fn(c); c.restore(); } };
+const lin = (c, x0, y0, x1, y1, stops) => { const g = c.createLinearGradient(x0 * U, y0 * U, x1 * U, y1 * U); stops.forEach(([t, col]) => g.addColorStop(t, col)); return g; };
+const rad = (c, x0, y0, r0, x1, y1, r1, stops) => { const g = c.createRadialGradient(x0 * U, y0 * U, r0 * U, x1 * U, y1 * U, r1 * U); stops.forEach(([t, col]) => g.addColorStop(t, col)); return g; };
+/** a smooth closed blob through points (unit coords), Catmull-Rom to Bezier */
+function blob(c, pts) {
+  const p = pts.map(([x, y]) => [x * U, y * U]), n = p.length;
+  c.beginPath(); c.moveTo(p[0][0], p[0][1]);
+  for (let i = 0; i < n; i++) {
+    const a = p[(i - 1 + n) % n], b = p[i], d = p[(i + 1) % n], e = p[(i + 2) % n];
+    c.bezierCurveTo(b[0] + (d[0] - a[0]) / 6, b[1] + (d[1] - a[1]) / 6, d[0] - (e[0] - b[0]) / 6, d[1] - (e[1] - b[1]) / 6, d[0], d[1]);
+  }
+  c.closePath();
+}
+const poly = (c, pts) => { c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x * U, y * U) : c.moveTo(x * U, y * U)); c.closePath(); };
+
+// Region layer (2026-11-25, user: "features get lost at 16 px"): jobs with regions are drawn twice - once in colour,
+// once with every region filled in a flat ID colour (id = group * 8 + face). The pixelizer gives each 16x16 cell the
+// region that covers most of it, colours it from that region only, and draws a 1 px dark line where a back group meets
+// a front group (higher group = in front), so parts and faces stay separate instead of blurring together.
+let MODE = 'color';
+const idRGB = id => id === 0 ? [0, 0, 0] : [40 + (id * 97) % 216, 40 + (id * 151) % 216, 40 + (id * 59) % 216];
+/** fill / stroke style: the colour in colour mode, the region's flat ID colour in ID mode */
+const paint = (style, group, face = 0) => MODE === 'color' ? style : `rgb(${idRGB(group * 8 + face).join(',')})`;
+
+// ---------------------------------------------------------------- core crystal block: raised glossy gems
+function crystalBlock(c, cracked) {
+  const seeds = [[3.6, 3.4, 1.0], [11.2, 3.0, 1.12], [7.6, 10.2, 1.35], [0.6, 11.6, 0.92], [14.2, 12.6, 0.98]];
+  const img = c.createImageData(S, S), d = img.data;
+  const wo = (a, b) => { let t = a - b; t -= 16 * Math.round(t / 16); return t; };
+  for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) {
+    const x = (px + 0.5) / U, y = (py + 0.5) / U;
+    let d1 = 1e9, d2 = 1e9, k1 = 0;
+    seeds.forEach(([sx, sy, w], k) => { const dd = Math.hypot(wo(x, sx), wo(y, sy)) / w; if (dd < d1) { d2 = d1; d1 = dd; k1 = k; } else if (dd < d2) d2 = dd; });
+    const border = (d2 - d1) * 0.9;                        // ~ distance to the seam, in units
+    const [sx, sy, w] = seeds[k1], vx = wo(x, sx), vy = wo(y, sy), vl = Math.hypot(vx, vy) || 1;
+    const facing = (-vx - vy) / (vl * Math.SQRT2);          // +1 on the top-left side of the gem, -1 bottom-right
+    let r, g, b;
+    if (border < 0.32) { [r, g, b] = cracked ? [9, 44, 46] : [14, 70, 72]; }          // the seam
+    else {
+      const bevel = Math.min(1, (border - 0.32) / 1.1);    // 0 at the rim, 1 on the flat top
+      // the rim: lit on the top-left side, shaded bottom-right; the top: a soft gradient, brighter toward the top left
+      const rim = (1 - bevel) * facing * 0.55;
+      const top = 0.55 + 0.25 * (-(vx + vy) / (w * 4));
+      let t = 0.38 + 0.32 * bevel + rim + bevel * (top - 0.55);
+      // the specular glint: a soft ellipse up-left of the gem's centre
+      const gx = vx + 0.9 * w, gy = vy + 0.9 * w, gl = Math.hypot(gx * 1.4, gy) / w;
+      if (bevel > 0.6) t += 0.55 * Math.max(0, 1 - gl / 0.9) ** 2;
+      if (cracked) t -= 0.12;
+      t = Math.max(0, Math.min(1.15, t));
+      // teal ramp: deep -> mid -> bright cyan -> near white
+      const cols = [[11, 52, 54], [20, 106, 105], [37, 163, 155], [94, 214, 200], [222, 252, 248]];
+      const f = Math.min(0.999, t / 1.15) * (cols.length - 1), i = Math.floor(f), fr = f - i;
+      [r, g, b] = cols[i].map((v, k) => v + (cols[i + 1][k] - v) * fr);
+    }
+    const o = (py * S + px) * 4; d[o] = r; d[o + 1] = g; d[o + 2] = b; d[o + 3] = 255;
+  }
+  c.putImageData(img, 0, 0);
+  if (cracked) {   // a few thin dark cracks across the gems
+    c.strokeStyle = '#0a2f31'; c.lineWidth = 0.55 * U; c.lineCap = 'round';
+    tiled(c, c => { for (const pts of [[[5, 6.5], [6.5, 8], [7, 10], [9, 11.5]], [[11, 1.5], [12.5, 3.5], [12, 5]], [[1, 10], [2.5, 12.5]]]) { c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x * U, y * U) : c.moveTo(x * U, y * U)); c.stroke(); } });
+  }
+}
+job('block__core_crystal_block', true, c => crystalBlock(c, false));
+job('block__cracked_core_crystal_block', true, c => crystalBlock(c, true));
+
+// ---------------------------------------------------------------- core crystal: a cluster of faceted prisms
+job('item__core_crystal', false, c => {
+  // one prism: base centre (bx, by), axis angle (0 = up, + = leaning right), length, half width. Three visible faces
+  // (left lit, middle bright, right dark), a two-facet point, a rounded-off foot hidden in the cluster
+  // regions: each prism is a group (later = in front), each face its own face id, so the 16 px version keeps the
+  // three faces and the point facets as clean flat areas and draws a dark line where a front prism crosses a back one
+  const prism = (g, bx, by, ang, len, hw) => {
+    const ux = Math.sin(ang), uy = -Math.cos(ang), vx = -uy, vy = ux;
+    const P = (u, v) => [bx + ux * u + vx * v, by + uy * u + vy * v];
+    const tip = len, shoulder = len - hw * 1.9;
+    const L0 = P(0, -hw), L1 = P(shoulder, -hw), M0 = P(0, -hw * 0.25), M1 = P(shoulder + hw * 0.35, -hw * 0.25),
+      N0 = P(0, hw * 0.3), N1 = P(shoulder + hw * 0.3, hw * 0.3), R0 = P(0, hw), R1 = P(shoulder, hw), T = P(tip, 0);
+    poly(c, [L0, L1, M1, M0]); c.fillStyle = paint(lin(c, ...L0, ...T, [[0, '#2c9e95'], [1, '#68d6c8']]), g, 0); c.fill();
+    poly(c, [M0, M1, N1, N0]); c.fillStyle = paint(lin(c, ...M0, ...T, [[0, '#5fd0c2'], [1, '#c9f6ef']]), g, 1); c.fill();
+    poly(c, [N0, N1, R1, R0]); c.fillStyle = paint(lin(c, ...N0, ...T, [[0, '#105a5a'], [1, '#22857f']]), g, 2); c.fill();
+    poly(c, [L1, T, M1]); c.fillStyle = paint('#8fe6da', g, 3); c.fill();
+    poly(c, [M1, T, N1]); c.fillStyle = paint('#dffbf6', g, 4); c.fill();
+    poly(c, [N1, T, R1]); c.fillStyle = paint('#2a948c', g, 5); c.fill();
+    if (MODE === 'color') {   // a white streak along the bright face
+      const a = P(shoulder * 0.35, -hw * 0.02), b = P(shoulder * 0.85, -hw * 0.02);
+      c.strokeStyle = 'rgba(255,255,255,0.75)'; c.lineWidth = 0.45 * U; c.beginPath(); c.moveTo(a[0] * U, a[1] * U); c.lineTo(b[0] * U, b[1] * U); c.stroke();
+    }
+  };
+  prism(1, 8.6, 15.4, 0.2, 14.8, 3.1);     // main, leaning right, behind
+  prism(2, 6.8, 15.6, -0.6, 8.6, 2.2);     // left
+  prism(3, 10.2, 15.6, 0.75, 7.4, 2.0);    // right
+  // a dark foot so the bases read as one cluster
+  blob(c, [[5.6, 14.6], [8.2, 14.0], [11.2, 14.6], [10.4, 15.8], [6.2, 15.8]]); c.fillStyle = paint('#0f4f50', 4); c.fill();
+}, true);
+
+// ---------------------------------------------------------------- orange dough block: wood-like grain
+// v2 (user: "the stripes are much denser on the left than on the right"): the grain is a DISTANCE field - the
+// smallest distance to a few sources (a spiral knot, a ring knot, and wavy lines running down the tile). A distance
+// grows by exactly one per unit in every direction, so the bands are evenly spaced everywhere; where two families meet
+// they form the V-shaped seams of real wood grain.
+const SP = 2.7;   // band width in units (= pixels in the 16 px texture)
+function doughBand(x, y) {
+  const T = TAU / 16, wo = (a, b) => { let t = a - b; t -= 16 * Math.round(t / 16); return t; };
+  const kA = Math.hypot(wo(x, 4), wo(y, 4.5)) + (Math.atan2(wo(y, 4.5), wo(x, 4)) / TAU + 0.5) * SP;   // spiral knot
+  const kB = Math.hypot(wo(x, 12.5), wo(y, 12)) + 0.4;                                                   // ring knot
+  const flow = Math.abs(wo(x, 9.5 + 1.4 * Math.sin(T * y + 0.8))) + 1.2;                                 // stripes down the tile
+  return Math.min(kA, kB, flow) / SP;
+}
+job('block__orange_dough', true, c => {
+  const img = c.createImageData(S, S), d = img.data;
+  const cols = [[104, 36, 9], [160, 60, 14], [205, 92, 22], [236, 132, 40], [250, 176, 82]];
+  for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) {
+    const x = (px + 0.5) / U, y = (py + 0.5) / U, h = doughBand(x, y), band = Math.floor(h), f = h - band;
+    const o = (py * S + px) * 4;
+    if (MODE !== 'color') { const rgb = idRGB(1 + band * 8); d.set([...rgb, 255], o); continue; }
+    // each band: a dark groove at its start, rising to a light crest
+    let t = 0.42 + 0.38 * (0.5 - 0.5 * Math.cos(f * TAU));
+    if (f < 0.16) t = 0.14;
+    const fz = Math.min(0.999, t) * (cols.length - 1), i = Math.floor(fz), fr = fz - i;
+    cols[i].forEach((v, k) => d[o + k] = v + (cols[i + 1][k] - v) * fr); d[o + 3] = 255;
+  }
+  c.putImageData(img, 0, 0);
+}, true);
+
+// ---------------------------------------------------------------- orange dough lump: a soft ball of dough with grain
+job('item__orange_dough_lump', false, c => {
+  const shape = [[8, 1.6], [11.6, 2.6], [14.2, 5.6], [14.6, 9.4], [12.8, 13.2], [8.8, 14.8], [4.6, 14.0], [1.8, 10.8], [1.6, 6.6], [4.0, 3.0]];
+  blob(c, shape); c.fillStyle = rad(c, 6, 5.5, 0.5, 8, 8.5, 7.6, [[0, '#fbbd62'], [0.45, '#ee8a2e'], [0.8, '#cc5c17'], [1, '#9a3c0e']]); c.fill();
+  c.save(); blob(c, shape); c.clip();
+  // grain: a spiral knot up-left and two long arcs, as soft dark strokes
+  c.strokeStyle = 'rgba(120,40,8,0.85)'; c.lineWidth = 0.75 * U; c.lineCap = 'round';
+  c.beginPath(); for (let a = 0.9; a < 2.7 * Math.PI; a += 0.05) { const r = 0.72 * a; const x = 6.2 + r * Math.cos(a), y = 6.4 + r * Math.sin(a) * 0.92; a < 0.95 ? c.moveTo(x * U, y * U) : c.lineTo(x * U, y * U); } c.stroke();
+  c.beginPath(); c.arc(6.2 * U, 6.4 * U, 8.0 * U, 0.25, 1.7); c.stroke();
+  c.beginPath(); c.arc(15.5 * U, 15.5 * U, 5.6 * U, 3.35, 4.55); c.stroke();
+  // a soft highlight on the lit side
+  c.fillStyle = rad(c, 5, 4.5, 0, 5, 4.5, 3.2, [[0, 'rgba(255,230,170,0.75)'], [1, 'rgba(255,230,170,0)']]); c.fillRect(0, 0, S, S);
+  c.restore();
+});
+
+// ---------------------------------------------------------------- flak shell: a dark steel ball
+job('item__flak_shell', false, c => {
+  c.beginPath(); c.arc(8 * U, 8 * U, 6.6 * U, 0, TAU);
+  c.fillStyle = rad(c, 5.6, 5.4, 0.2, 8, 8, 6.6, [[0, '#a7b3b8'], [0.3, '#6f7d84'], [0.75, '#3a454b'], [1, '#232b2f']]); c.fill();
+  // reflected light on the lower right rim
+  c.save(); c.clip();
+  c.fillStyle = rad(c, 11.5, 11.8, 0, 11.5, 11.8, 3.4, [[0, 'rgba(120,136,144,0.5)'], [1, 'rgba(120,136,144,0)']]); c.fillRect(0, 0, S, S);
+  // a faint seam arc and the specular spot
+  c.strokeStyle = 'rgba(25,32,36,0.6)'; c.lineWidth = 0.35 * U; c.beginPath(); c.arc(14 * U, 2 * U, 9.2 * U, 1.7, 2.75); c.stroke();
+  c.fillStyle = rad(c, 5.3, 5.0, 0, 5.3, 5.0, 1.6, [[0, 'rgba(235,242,245,0.95)'], [1, 'rgba(235,242,245,0)']]); c.fillRect(0, 0, S, S);
+  c.restore();
+});
+
+// ---------------------------------------------------------------- pebbles: three round river stones
+job('item__pebble', false, c => {
+  const stone = (cx, cy, rx, ry, rot, seed) => {
+    const r = rnd(seed), pts = [];
+    for (let i = 0; i < 8; i++) { const a = i / 8 * TAU + rot, k = 0.93 + r() * 0.12; pts.push([cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k]); }
+    blob(c, pts); c.lineWidth = 0.9 * U; c.strokeStyle = '#4a3f39'; c.stroke();
+    blob(c, pts);
+    c.fillStyle = rad(c, cx - rx * 0.35, cy - ry * 0.4, 0.2, cx, cy, Math.max(rx, ry) * 1.05, [[0, '#ddd0c4'], [0.45, '#ac9e93'], [0.85, '#7a6d65'], [1, '#5d524b']]);
+    c.fill();
+    c.save(); blob(c, pts); c.clip();
+    // one softly lit chipped plane on the upper left, a faint shadowed plane low right
+    poly(c, [[cx - rx, cy - ry * 0.2], [cx - rx * 0.1, cy - ry], [cx + rx * 0.2, cy - ry * 0.3], [cx - rx * 0.4, cy + ry * 0.2]]);
+    c.fillStyle = 'rgba(240,230,220,0.18)'; c.fill();
+    poly(c, [[cx + rx * 0.2, cy + ry], [cx + rx, cy + ry * 0.1], [cx + rx * 0.6, cy + ry * 0.6]]);
+    c.fillStyle = 'rgba(60,50,45,0.22)'; c.fill();
+    c.restore();
+  };
+  stone(8.4, 5.6, 4.3, 3.7, 0.3, 3);
+  stone(4.6, 11.0, 3.9, 3.4, 0.8, 5);
+  stone(11.6, 11.2, 3.9, 3.4, 0.1, 9);
+});
+
+// ---------------------------------------------------------------- machine scrap block: a dense tangle of small parts
+function part(c, g, kind, x, y, s, rot) {
+  c.save(); c.translate(x * U, y * U); c.rotate(rot); c.scale(s, s);
+  const steel = (r0) => rad(c, -0.6 * r0, -0.7 * r0, 0, 0, 0, r0 * 1.3, [[0, '#e0e2e2'], [0.45, '#9a9d9f'], [1, '#4b4e52']]);
+  c.lineWidth = 0.3 * U; c.strokeStyle = '#1b1918';
+  const F = (style, face = 0) => paint(style, g, face), stroke = () => { if (MODE === 'color') c.stroke(); };
+  if (kind === 'nut') {
+    poly(c, Array.from({ length: 6 }, (_, i) => [Math.cos(i / 6 * TAU) * 1.5, Math.sin(i / 6 * TAU) * 1.5])); c.fillStyle = F(steel(1.5)); c.fill(); stroke();
+    c.beginPath(); c.arc(0, 0, 0.6 * U, 0, TAU); c.fillStyle = F('#211d1b', 1); c.fill();
+  } else if (kind === 'washer') {
+    c.beginPath(); c.arc(0, 0, 1.2 * U, 0, TAU); c.fillStyle = F(steel(1.2)); c.fill(); stroke();
+    c.beginPath(); c.arc(0, 0, 0.5 * U, 0, TAU); c.fillStyle = F('#211d1b', 1); c.fill();
+  } else if (kind === 'gear') {
+    const pts = [];
+    for (let i = 0; i < 32; i++) { const a = i / 32 * TAU, tooth = (i % 4) < 2; pts.push([Math.cos(a) * (tooth ? 2.4 : 1.85), Math.sin(a) * (tooth ? 2.4 : 1.85)]); }
+    poly(c, pts); c.fillStyle = F(steel(2.2)); c.fill(); stroke();
+    c.beginPath(); c.arc(0, 0, 0.7 * U, 0, TAU); c.fillStyle = F('#211d1b', 1); c.fill();
+  } else if (kind === 'bolt') {
+    poly(c, [[-2.4, -0.9], [-1.2, -0.9], [-1.2, 0.9], [-2.4, 0.9]]); c.fillStyle = F(steel(1.2)); c.fill(); stroke();
+    poly(c, [[-1.2, -0.5], [2.4, -0.5], [2.4, 0.5], [-1.2, 0.5]]); c.fillStyle = F(lin(c, 0, -0.5, 0, 0.5, [[0, '#c9cbcc'], [1, '#55585b']])); c.fill(); stroke();
+    if (MODE === 'color') c.strokeStyle = 'rgba(30,28,27,0.7)'; else c.strokeStyle = F('', 1); c.lineWidth = 0.18 * U; for (let k = -0.6; k < 2.4; k += 0.6) { c.beginPath(); c.moveTo(k * U, -0.5 * U); c.lineTo((k + 0.3) * U, 0.5 * U); c.stroke(); }
+  } else if (kind === 'rod') {
+    poly(c, [[-2.6, -0.55], [2.6, -0.55], [2.6, 0.55], [-2.6, 0.55]]); c.fillStyle = F(lin(c, 0, -0.55, 0, 0.55, [[0, '#d6d8d8'], [0.5, '#8e9194'], [1, '#45484b']])); c.fill(); stroke();
+  } else if (kind === 'plate') {
+    poly(c, [[-2.2, -1.3], [1.8, -1.6], [2.3, 1.1], [-1.9, 1.4]]); c.fillStyle = F(lin(c, -2, -1.5, 2, 1.4, [[0, '#d2d4d4'], [1, '#5d6064']])); c.fill(); stroke();
+    for (const [rx, ry] of [[-1.4, -0.7], [1.3, -0.9], [1.5, 0.6]]) { c.beginPath(); c.arc(rx * U, ry * U, 0.28 * U, 0, TAU); c.fillStyle = F('#eceeee', 2); c.fill(); }
+  } else if (kind === 'rust') {
+    poly(c, [[-2, -1], [2, -1.2], [2.2, 1], [-1.8, 1.1]]); c.fillStyle = F(lin(c, -2, -1, 2, 1, [[0, '#8a5a3a'], [1, '#4a2e1e']])); c.fill(); stroke();
+  }
+  c.restore();
+}
+job('block__junk_block', true, c => {
+  // background: dark, with a few deep gaps and rusty glints
+  c.fillStyle = paint('#2c2623', 0); c.fillRect(0, 0, S, S);
+  const r = rnd(7);
+  if (MODE === 'color') tiled(c, c => {
+    for (let i = 0; i < 14; i++) { c.fillStyle = r() < 0.5 ? '#1a1615' : '#463428'; c.beginPath(); c.arc(r() * S, r() * S, (0.6 + r()) * U, 0, TAU); c.fill(); }
+  });
+  // wires behind the parts: a red one and a dark grey cable
+  tiled(c, c => {
+    c.lineCap = 'round';
+    c.strokeStyle = paint('#ad442b', 1); c.lineWidth = 1.1 * U; c.beginPath(); c.moveTo(-1 * U, 9 * U); c.bezierCurveTo(4 * U, 5 * U, 9 * U, 13 * U, 17 * U, 9 * U); c.stroke();
+    c.strokeStyle = paint('#5b666c', 2); c.lineWidth = 1.0 * U; c.beginPath(); c.moveTo(-1 * U, 3 * U); c.bezierCurveTo(5 * U, 0 * U, 10 * U, 6 * U, 17 * U, 3 * U); c.stroke();
+  });
+  // the parts, packed and overlapping, each small
+  const parts = [['gear', 3.4, 3.4, 1.3, 0.2], ['plate', 10.4, 2.6, 1.1, -0.3], ['rod', 7.0, 7.4, 1.0, -0.55], ['nut', 13.6, 7.6, 1.2, 0.4],
+    ['washer', 2.6, 10.0, 1.2, 0], ['gear', 9.4, 12.0, 1.25, 0.7], ['bolt', 3.6, 14.4, 1.0, 0.3], ['rust', 14.6, 13.2, 0.9, 0.3]];
+  tiled(c, c => parts.forEach((p, i) => part(c, 3 + i, ...p)));
+}, true);
+
+// ---------------------------------------------------------------- machine scrap item: one compact heap
+job('item__scrap', false, c => {
+  // the dark heap underneath
+  blob(c, [[3.2, 10.2], [5.2, 8.0], [8.2, 7.4], [11.8, 8.0], [13.6, 10.4], [12.8, 14.0], [8.2, 14.8], [3.8, 13.8]]);
+  c.fillStyle = paint(rad(c, 7, 8, 0, 8, 10, 7, [[0, '#4e4644'], [1, '#2a2423']]), 1); c.fill();
+  // a riveted strap lying across the top, a bolt, a blade shard, a red wire, a hex nut in front
+  part(c, 2, 'plate', 9.0, 4.6, 1.6, -0.35);
+  part(c, 3, 'bolt', 12.0, 9.6, 1.45, 0.9);
+  c.save(); c.translate(4.4 * U, 8.6 * U); c.rotate(-0.8); c.scale(1.35, 1.35);
+  poly(c, [[-3.2, 0], [1.6, -1.1], [1.8, 1.0]]); c.fillStyle = paint(lin(c, -3, -1, 2, 1, [[0, '#eef0f0'], [1, '#6b6e72']]), 4); c.fill(); c.lineWidth = 0.3 * U; c.strokeStyle = '#1b1918'; if (MODE === 'color') c.stroke();
+  c.restore();
+  c.lineCap = 'round'; c.strokeStyle = paint('#b04a2e', 5); c.lineWidth = 1.2 * U; c.beginPath(); c.moveTo(2.4 * U, 12.6 * U); c.bezierCurveTo(5 * U, 9.6 * U, 9 * U, 14.6 * U, 13.6 * U, 11.6 * U); c.stroke();
+  part(c, 6, 'nut', 7.4, 11.6, 2.0, 0.3);
+}, true);
+
+// ---------------------------------------------------------------- render and save
+const row = document.getElementById('row'), log = document.getElementById('log');
+(async () => {
+  for (const j of jobs) {
+    const cv = document.createElement('canvas'); cv.width = cv.height = S;
+    const fig = document.createElement('figure'); fig.append(cv, Object.assign(document.createElement('figcaption'), { textContent: j.name })); row.append(fig);
+    const c = cv.getContext('2d'); MODE = 'color'; j.draw(c);
+    const save = async (canvas, name) => { const b = await new Promise(r => canvas.toBlob(r, 'image/png')); const res = await fetch('/save?name=' + name, { method: 'POST', body: b }); log.textContent += (await res.text()) + ' · '; };
+    await save(cv, j.name);
+    if (j.regions) { const iv = document.createElement('canvas'); iv.width = iv.height = S; MODE = 'id'; j.draw(iv.getContext('2d')); MODE = 'color'; await save(iv, j.name + '_id'); }
+  }
+  log.textContent += 'done';
+  window.__done = true;
+})();
+</script>

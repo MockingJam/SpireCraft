@@ -71,12 +71,29 @@ public final class ModBlocks {
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).requiresCorrectToolForDrops().strength(1.5F).sound(SoundType.AMETHYST).lightLevel(s -> 12));
     public static final RegistryObject<Block> CRACKED_CORE_CRYSTAL_BLOCK = register("cracked_core_crystal_block", Block::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).requiresCorrectToolForDrops().strength(1.2F).sound(SoundType.AMETHYST).lightLevel(s -> 5));
-    /** Issue #36 (the Regent's meteor crater): the fallen star's rock - night-sky indigo with star specks. */
-    public static final RegistryObject<Block> METEORITE = register("meteorite", Block::new,
-            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(4.0F, 9.0F).sound(SoundType.DEEPSLATE));
+    // (2026-11-25, user: the meteorite block is gone - the crater is lined with blackstone and basalt)
     /** Issue #36: STS2 Orange Dough - the glowing orange clumps in the crater, the material of the Regent's weapons. */
     public static final RegistryObject<Block> ORANGE_DOUGH = register("orange_dough", Block::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.8F).sound(SoundType.HONEY_BLOCK).lightLevel(s -> 9));
+
+    /** 2026-11-25 (the Defect's automaton factory): polished automaton alloy (brass) and a brass lamp - a redstone lamp,
+     *  so the factory's lights can be switched from its control room. */
+    public static final RegistryObject<Block> POLISHED_AUTOMATON_ALLOY = register("polished_automaton_alloy", Block::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).requiresCorrectToolForDrops().strength(5.0F, 6.0F).sound(SoundType.COPPER));
+    public static final RegistryObject<Block> AUTOMATON_ALLOY_LAMP = register("automaton_alloy_lamp", net.minecraft.world.level.block.RedstoneLampBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(0.6F).sound(SoundType.COPPER)
+                    .lightLevel(s -> s.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT) ? 15 : 0));
+    /** 2026-11-25 (the Regent's starship, shaped like the Regent's radiant-star head): Orange Dough worked into building
+     *  blocks, a radiant star lamp and an orange-gold glass. */
+    public static final RegistryObject<Block> POLISHED_ORANGE_DOUGH = register("polished_orange_dough", Block::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(1.2F).sound(SoundType.HONEY_BLOCK).lightLevel(s -> 6));
+    public static final RegistryObject<Block> ORANGE_DOUGH_BRICKS = register("orange_dough_bricks", Block::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(1.5F).sound(SoundType.HONEY_BLOCK).lightLevel(s -> 4));
+    public static final RegistryObject<Block> STAR_LAMP = register("star_lamp", Block::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.GOLD).strength(0.3F).sound(SoundType.GLASS).lightLevel(s -> 15));
+    public static final RegistryObject<Block> STAR_GLASS = register("star_glass", p -> new net.minecraft.world.level.block.StainedGlassBlock(net.minecraft.world.item.DyeColor.ORANGE, p),
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.3F).sound(SoundType.GLASS).noOcclusion()
+                    .isValidSpawn((s, l, p, e) -> false).isRedstoneConductor((s, l, p) -> false).isSuffocating((s, l, p) -> false).isViewBlocking((s, l, p) -> false));
 
     /** Deepslate only (the orichalcum vein never reaches stone layers). */
     public static final RegistryObject<Block> ORICHALCUM_ORE = register("orichalcum_ore",
@@ -130,6 +147,10 @@ public final class ModBlocks {
     public static final StoneSet HARBOUR_ROCK = new StoneSet("harbour_rock", () -> stone(MapColor.COLOR_BLUE).sound(SoundType.TUFF));
     /** v3.2: barnacle rock is gone (barnacles are a layer block now); its polished form is polished harbour rock. */
     public static final StoneSet POLISHED_HARBOUR_ROCK = new StoneSet("polished_harbour_rock", () -> stone(MapColor.COLOR_BLUE).sound(SoundType.POLISHED_TUFF));
+    /** 2026-11-25: the harbour rock spire (港岩石锥) - stacks like pointed dripstone, no dripping (block/HarbourSpireBlock). */
+    public static final RegistryObject<Block> HARBOUR_ROCK_SPIRE = register("harbour_rock_spire", com.mockingjam.spirecraft.block.HarbourSpireBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).sound(SoundType.POINTED_DRIPSTONE).strength(1.5F, 3.0F).noOcclusion()
+                    .requiresCorrectToolForDrops().pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY));
     /** Like mud, but slows walkers down (half of soul sand's slowdown). */
     public static final RegistryObject<Block> SLUDGE = register("sludge", Block::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_PURPLE).strength(0.5F).speedFactor(0.7F).jumpFactor(0.8F).sound(SoundType.MUD));

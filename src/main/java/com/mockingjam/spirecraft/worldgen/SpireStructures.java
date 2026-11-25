@@ -150,6 +150,7 @@ public final class SpireStructures {
             if (mode.equals("shore")) return shore(ctx, id, size, x, z);
             if (mode.equals("open_ground")) return openGround(ctx, id, size, x, z);
             if (mode.equals("stilts")) return stilts(ctx, id, size, x, z);
+            if (mode.equals("buried")) return buried(ctx, id, size, x, z, r);
             // a cave floor: air with headroom over solid rock, here and at the template's corners
             NoiseColumn col = ctx.chunkGenerator().getBaseColumn(x, z, ctx.heightAccessor(), ctx.randomState());
             List<Integer> floors = new ArrayList<>();
@@ -168,6 +169,29 @@ public final class SpireStructures {
             Rotation rot = Rotation.getRandom(r);
             BlockPos pivot = new BlockPos(hw, sink, hd);
             return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot, dry))));
+        }
+
+        /**
+         * 2026-11-25 (the Defect's automaton factory, deep underground): the template is sealed inside solid rock - a
+         * depth between min_y and max_y where the middle and the four corners of the footprint are rock over the
+         * template's whole height (so it does not hang in a cave or open onto a ravine). The template brings its own
+         * air. Tries a few depths.
+         */
+        private Optional<GenerationStub> buried(GenerationContext ctx, ResourceLocation id, net.minecraft.core.Vec3i size, int x, int z, RandomSource r) {
+            int hw = size.getX() / 2, hd = size.getZ() / 2, h = size.getY();
+            NoiseColumn[] cols = new NoiseColumn[5];
+            int[][] off = { { 0, 0 }, { -hw, -hd }, { hw, -hd }, { -hw, hd }, { hw, hd } };
+            for (int k = 0; k < 5; k++) cols[k] = ctx.chunkGenerator().getBaseColumn(x + off[k][0], z + off[k][1], ctx.heightAccessor(), ctx.randomState());
+            for (int tries = 0; tries < 6; tries++) {
+                int y = minY + r.nextInt(Math.max(1, maxY - minY));
+                boolean ok = true;
+                for (NoiseColumn col : cols) for (int dy = -1; dy <= h && ok; dy += 3) ok = solid(col, y + dy);
+                if (!ok) continue;
+                BlockPos anchor = new BlockPos(x, y, z), pivot = new BlockPos(hw, 0, hd);
+                Rotation rot = Rotation.getRandom(r);
+                return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot, dry))));
+            }
+            return Optional.empty();
         }
 
         private static boolean open(NoiseColumn col, int y) {
@@ -302,6 +326,163 @@ public final class SpireStructures {
         @Override
         protected void handleDataMarker(String name, BlockPos pos, ServerLevelAccessor level, RandomSource r, BoundingBox box) {
         }
+
+        @Override
+        public void postProcess(WorldGenLevel level, StructureManager sm, ChunkGenerator gen, RandomSource random, BoundingBox box, ChunkPos chunk, BlockPos pos) {
+            boolean tribe = templateName.contains("jungle_tribe"), giant = templateName.contains("necrobinder_giant");
+            if (tribe || giant) fellTrees(level, box, chunk);
+            super.postProcess(level, sm, gen, random, box, chunk, pos);
+            if (templateName.contains("regent_starship")) scorch(level, box);
+            if (tribe) tidy(level, box, (x, z) -> Math.hypot(x - 22, z - 22) <= 21.5, 1);
+            if (giant) tidy(level, box, TemplatePiece::giantClearing, 10);
+            if (templateName.contains("forbidden_library")) foundation(level, box, Blocks.END_STONE.defaultBlockState());
+        }
+
+        /**
+         * The jungle tribe (2026-11-25, user: "the village cuts away the lower half of the jungle trees and leaves their
+         * tops floating"): before the village is placed, every natural tree rooted in its clearing is taken out whole -
+         * the trunk and everything joined to it (logs, natural leaves, vines, cocoa) up into the crown, even where the
+         * crown reaches into the next chunks. The village's own trees are jungle wood with persistent leaves, so they are
+         * never touched.
+         */
+        private void fellTrees(WorldGenLevel level, BoundingBox box, ChunkPos chunk) {
+            BoundingBox me = getBoundingBox();
+            double cx = (me.minX() + me.maxX()) / 2.0, cz = (me.minZ() + me.maxZ()) / 2.0, rad = (me.maxX() - me.minX()) / 2.0;
+            java.util.ArrayDeque<long[]> queue = new java.util.ArrayDeque<>();   // {pos, trunk x, trunk z}
+            java.util.Set<BlockPos> seen = new java.util.HashSet<>();
+            for (int x = Math.max(box.minX(), me.minX()); x <= Math.min(box.maxX(), me.maxX()); x++)
+                for (int z = Math.max(box.minZ(), me.minZ()); z <= Math.min(box.maxZ(), me.maxZ()); z++) {
+                    if (Math.hypot(x - cx, z - cz) > rad) continue;
+                    for (int y = me.minY(); y <= me.minY() + 24; y++) {
+                        BlockPos p = new BlockPos(x, y, z);
+                        if (naturalLog(level.getBlockState(p)) && seen.add(p)) queue.add(new long[] { p.asLong(), x, z });
+                    }
+                }
+            int budget = 40000;
+            while (!queue.isEmpty() && budget-- > 0) {
+                long[] node = queue.poll();
+                BlockPos p = BlockPos.of(node[0]);
+                level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                for (int dx = -1; dx <= 1; dx++) for (int dy = -1; dy <= 1; dy++) for (int dz = -1; dz <= 1; dz++) {
+                    BlockPos q = p.offset(dx, dy, dz);
+                    if (q.getY() < me.minY() || Math.abs((q.getX() >> 4) - chunk.x) > 1 || Math.abs((q.getZ() >> 4) - chunk.z) > 1 || seen.contains(q)) continue;
+                    BlockState s = level.getBlockState(q);
+                    boolean orth = Math.abs(dx) + Math.abs(dy) + Math.abs(dz) == 1;
+                    if (Math.hypot(q.getX() - node[1], q.getZ() - node[2]) > 9) continue;   // this tree's crown, not the whole canopy
+                    if (naturalLog(s) || (orth && (s.is(Blocks.VINE) || s.is(Blocks.COCOA)
+                            || (s.is(BlockTags.LEAVES) && s.hasProperty(net.minecraft.world.level.block.LeavesBlock.PERSISTENT) && !s.getValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT))))) {
+                        seen.add(q);
+                        queue.add(new long[] { q.asLong(), node[1], node[2] });
+                    }
+                }
+            }
+        }
+
+        /**
+         * 2026-11-25 (user: "the village squeezes the trees out and leaves leaves floating"; "the giant's skeleton pushes
+         * out trees and mossy stone, leaving blocks floating"): over the ground the structure cleared (local template
+         * columns where {@code cleared} holds), everything natural left hanging above it goes - leaves that are not the
+         * structure's own (its leaves are persistent), natural logs, vines, cocoa - and mossy cobblestone, cobblestone and
+         * moss carpet with nothing under them (the halves of forest boulders the clearing cut), from the bottom up.
+         */
+        private void tidy(WorldGenLevel level, BoundingBox box, java.util.function.BiPredicate<Integer, Integer> cleared, int groundY) {
+            var size = template.getSize();
+            int y0 = templatePosition.getY() + groundY, y1 = y0 + 60;
+            BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+            for (int lx = -2; lx < size.getX() + 2; lx++) for (int lz = -2; lz < size.getZ() + 2; lz++) {
+                boolean near = false;
+                for (int dx = -2; dx <= 2 && !near; dx++) for (int dz = -2; dz <= 2 && !near; dz++) if (cleared.test(lx + dx, lz + dz)) near = true;
+                if (!near) continue;
+                BlockPos w = StructureTemplate.calculateRelativePosition(placeSettings, new BlockPos(lx, 0, lz)).offset(templatePosition);
+                if (w.getX() < box.minX() || w.getX() > box.maxX() || w.getZ() < box.minZ() || w.getZ() > box.maxZ()) continue;
+                boolean inside = cleared.test(lx, lz);
+                for (int y = y0; y <= y1; y++) {
+                    BlockState s = level.getBlockState(p.set(w.getX(), y, w.getZ()));
+                    if (s.isAir()) continue;
+                    boolean natural = (s.is(BlockTags.LEAVES) && s.hasProperty(net.minecraft.world.level.block.LeavesBlock.PERSISTENT) && !s.getValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT))
+                            || naturalLog(s) || s.is(Blocks.VINE) || s.is(Blocks.COCOA);
+                    boolean loose = (s.is(Blocks.MOSSY_COBBLESTONE) || s.is(Blocks.COBBLESTONE) || s.is(Blocks.MOSS_CARPET)) && level.getBlockState(p.below()).isAir();
+                    if ((natural && inside) || loose) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                }
+            }
+        }
+
+        /**
+         * The forbidden library (2026-11-25, user: "it generates floating"): under every column of the building the gap
+         * down to the island is filled with end stone, deepest under the middle and shallower towards the edges, like the
+         * underside of an End island, so it never hangs over the void.
+         */
+        private void foundation(WorldGenLevel level, BoundingBox box, BlockState fill) {
+            BoundingBox me = getBoundingBox();
+            BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+            for (int x = Math.max(box.minX(), me.minX()); x <= Math.min(box.maxX(), me.maxX()); x++)
+                for (int z = Math.max(box.minZ(), me.minZ()); z <= Math.min(box.maxZ(), me.maxZ()); z++) {
+                    if (level.getBlockState(p.set(x, me.minY(), z)).isAir()) continue;     // not under the building
+                    int edge = Math.min(Math.min(x - me.minX(), me.maxX() - x), Math.min(z - me.minZ(), me.maxZ() - z));
+                    int depth = 6 + edge * 2 + (int) (rand(x * 31L + z, x, 0, z) * 3);
+                    for (int y = me.minY() - 1; y >= me.minY() - depth && y > level.getMinY(); y--) {
+                        BlockState s = level.getBlockState(p.set(x, y, z));
+                        if (!s.isAir() && s.getFluidState().isEmpty()) break;       // reached the island
+                        level.setBlock(p, fill, 2);
+                    }
+                }
+        }
+
+        /** The giant's cleared ground in its template's own columns (tools/structures/build.js necrobinderGiant). */
+        private static boolean giantClearing(int x, int z) {
+            double e = Math.min((Math.hypot((x - 17) / 12.5, (z - 23.5) / 24.5) - 1) * 12.5,
+                    Math.min(segDist(x, z, 26, 25, 36, 16) - 4, Math.hypot(x - 37, z - 13) - 9));
+            return e <= 0.5;
+        }
+
+        private static double segDist(double px, double pz, double ax, double az, double bx, double bz) {
+            double vx = bx - ax, vz = bz - az, t = Math.max(0, Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz)));
+            return Math.hypot(px - ax - t * vx, pz - az - t * vz);
+        }
+
+        private static boolean naturalLog(BlockState s) {
+            if (!s.is(BlockTags.LOGS)) return false;
+            String path = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(s.getBlock()).getPath();
+            return path.endsWith("_log") && !path.startsWith("stripped_");
+        }
+
+        /**
+         * The Regent's starship (2026-11-25, user: "the grass round it should be gone - coarse dirt, podzol"): round the
+         * landed ship the land's own surface is burnt - grass blocks turn to coarse dirt, podzol, dirt and rooted dirt
+         * (all of it near the ship, thinning out towards 17 blocks), the plants on them are burnt away (a dead bush now
+         * and then), and pieces of hull lie scattered on the real ground. Seeded by position, so chunk borders agree.
+         */
+        private void scorch(WorldGenLevel level, BoundingBox box) {
+            BoundingBox me = getBoundingBox();
+            int cx = (me.minX() + me.maxX()) / 2, cz = (me.minZ() + me.maxZ()) / 2;
+            net.minecraft.world.level.block.Block[] burnt = { Blocks.COARSE_DIRT, Blocks.COARSE_DIRT, Blocks.PODZOL, Blocks.DIRT, Blocks.ROOTED_DIRT, Blocks.COARSE_DIRT };
+            net.minecraft.world.level.block.Block[] debris = { ModBlocks.ORANGE_DOUGH.get(), ModBlocks.ORANGE_DOUGH_BRICKS.get(), ModBlocks.POLISHED_ORANGE_DOUGH.get(), ModBlocks.STAR_GLASS.get() };
+            BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+            for (int x = Math.max(box.minX(), me.minX()); x <= Math.min(box.maxX(), me.maxX()); x++)
+                for (int z = Math.max(box.minZ(), me.minZ()); z <= Math.min(box.maxZ(), me.maxZ()); z++) {
+                    double d = Math.hypot(x - cx, z - cz);
+                    if (d > 17) continue;
+                    RandomSource r = RandomSource.create(net.minecraft.util.Mth.getSeed(x, 77, z));
+                    if (d > 9 && r.nextDouble() > (17 - d) / 8) continue;   // the burn thins out towards its edge
+                    for (int y = Math.min(box.maxY(), me.maxY()); y >= me.minY(); y--) {
+                        BlockState s = level.getBlockState(p.set(x, y, z));
+                        if (s.isAir()) continue;
+                        if (s.is(BlockTags.FLOWERS) || s.is(Blocks.SHORT_GRASS) || s.is(Blocks.TALL_GRASS) || s.is(Blocks.FERN) || s.is(Blocks.LARGE_FERN) || s.is(BlockTags.SAPLINGS)) {
+                            level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                            continue;
+                        }
+                        if (s.is(Blocks.GRASS_BLOCK) || s.is(Blocks.DIRT)) {
+                            level.setBlock(p, burnt[r.nextInt(burnt.length)].defaultBlockState(), 2);
+                            BlockPos up = p.above();
+                            if (level.getBlockState(up).isAir()) {
+                                if (d > 8 && r.nextInt(14) == 0) level.setBlock(up, debris[r.nextInt(debris.length)].defaultBlockState(), 2);
+                                else if (r.nextInt(30) == 0) level.setBlock(up, Blocks.DEAD_BUSH.defaultBlockState(), 2);
+                            }
+                        }
+                        break;   // the first solid block is the ground (or the ship itself)
+                    }
+                }
+        }
     }
 
     // ------------------------------------------------------------------ carved structures
@@ -336,7 +517,7 @@ public final class SpireStructures {
         protected Optional<GenerationStub> findGenerationPoint(GenerationContext ctx) {
             RandomSource r = ctx.random();
             int x = ctx.chunkPos().getMiddleBlockX(), z = ctx.chunkPos().getMiddleBlockZ();
-            if (kind.equals("meteor_crater")) return crater(ctx, x, z);
+            if (kind.equals("meteor_crater") || kind.equals("sand_pit")) return crater(ctx, x, z);
             int y = minY + r.nextInt(Math.max(1, maxY - minY));
             int surface = ctx.chunkGenerator().getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG, ctx.heightAccessor(), ctx.randomState());
             boolean kaiser = kind.equals("kaiser_cave");
@@ -400,6 +581,7 @@ public final class SpireStructures {
         CarvedPiece(String kind, BlockPos c, long seed) {
             super(CARVED_PIECE.get(), 0, kind.equals("kaiser_cave") ? new BoundingBox(c.getX() - 30, c.getY() - 16, c.getZ() - 30, c.getX() + 30, c.getY() + 18, c.getZ() + 30)
                     : kind.equals("meteor_crater") ? new BoundingBox(c.getX() - 30, c.getY() - 15, c.getZ() - 30, c.getX() + 30, c.getY() + 16, c.getZ() + 30)
+                    : kind.equals("sand_pit") ? new BoundingBox(c.getX() - 32, c.getY() - 24, c.getZ() - 32, c.getX() + 32, c.getY() + 12, c.getZ() + 32)
                     : kind.equals("beekeeper_hollow") ? new BoundingBox(c.getX() - 16, c.getY() - 6, c.getZ() - 12, c.getX() + 16, c.getY() + 7, c.getZ() + 12)
                     : kind.equals("mycelium_shrine") ? new BoundingBox(c.getX() - 15, c.getY() - 7, c.getZ() - 15, c.getX() + 15, c.getY() + 12, c.getZ() + 15)
                     : new BoundingBox(c.getX() - 11, c.getY() - 8, c.getZ() - 11, c.getX() + 11, c.getY() + 11, c.getZ() + 11));
@@ -431,6 +613,7 @@ public final class SpireStructures {
                 case "mycelium_shrine" -> shrine(level, box);
                 case "beekeeper_hollow" -> beekeeper(level, box);
                 case "meteor_crater" -> crater(level, box);
+                case "sand_pit" -> sandPit(level, box);
                 default -> web(level, box);
             }
         }
@@ -544,15 +727,14 @@ public final class SpireStructures {
         }
 
         /**
-         * The Regent's meteor crater (issue #36). A star fell here; the Regent forged by it before going on to the Spire.
-         * A round bowl 26-32 across and 8-9 deep under a raised rim of thrown-up ground, scorched rock lining it
-         * (blackstone, basalt and a little magma round the middle, tuff and gravel further up, the biome's own ground at
-         * the lip). The fallen star lies in the middle half sunk in the floor: a mass of meteorite split open along one
-         * crack, its core of glowing Orange Dough showing, three end rods standing in the crack like rays of light.
-         * More dough clumps lie in the bowl's floor and walls. Rays of ejecta (gravel, coarse dirt, tuff) and meteorite
-         * fragments run out over the land around. On a flattened terrace part way down: the Regent's abandoned forge
-         * (chipped anvil, smithing table, grindstone, the main chest, two barrels, a lantern); on the far rim a pole
-         * with an orange banner.
+         * The Regent's meteor crater (issue #36). A star fell here. v2 (user 2026-11-25: a purely natural structure - no
+         * forge, no work blocks, no chests; far more meteorite): a round bowl 26-32 across and 8-9 deep under a raised rim
+         * of thrown-up ground, scorched rock lining it (blackstone and basalt round the middle,
+         * tuff and gravel further up, the biome's own ground at the lip). The fallen star lies in the middle half sunk in
+         * the floor: a big mass of meteorite split open along one crack over its core of glowing Orange Dough. Meteorite
+         * boulders lie on the slopes, dough clumps in the floor and walls, and rays of ejecta (gravel, coarse dirt, tuff)
+         * with many meteorite fragments run out over the land. The Regent's things are buried: a few blocks of suspicious
+         * gravel in the floor of the bowl hold them (brush them, vanilla archaeology).
          * Every shape is worked out from the seed and the column (the natural ground height read from the chunk being
          * cut), so the parts cut in different chunks fit together. All draws from {@code r} come before any placing.
          */
@@ -560,15 +742,19 @@ public final class SpireStructures {
             RandomSource r = RandomSource.create(seed);
             float R = 13.5F + r.nextFloat() * 2.5F, rimH = 2.0F + r.nextFloat() * 1.2F, rimW = 7;
             int D = 8 + r.nextInt(2);
-            double ph1 = r.nextDouble() * Math.PI * 2, ph2 = r.nextDouble() * Math.PI * 2, crackA = r.nextDouble() * Math.PI, forgeA = r.nextDouble() * Math.PI * 2;
-            float ma = 3.4F + r.nextFloat() * 0.8F, mb = 2.8F + r.nextFloat() * 0.5F, mc = 3.0F + r.nextFloat() * 0.8F;
+            double ph1 = r.nextDouble() * Math.PI * 2, ph2 = r.nextDouble() * Math.PI * 2, crackA = r.nextDouble() * Math.PI;
+            float ma = 4.8F + r.nextFloat() * 0.9F, mb = 3.6F + r.nextFloat() * 0.6F, mc = 4.3F + r.nextFloat() * 0.9F;
             long lootSeed = r.nextLong();
             int cx = c.getX(), cz = c.getZ(), H = c.getY(), floorY = H - D;
-            // the forge terrace, part way down the bowl (flat, radius 3.5)
-            int fx = (int) Math.round(Math.cos(forgeA) * R * 0.48), fz = (int) Math.round(Math.sin(forgeA) * R * 0.48);
-            double uf = Math.sqrt(fx * fx + fz * fz) / R;
-            int forgeY = (int) Math.round(floorY + (D + rimH) * uf * uf);
-            BlockState dough = ModBlocks.ORANGE_DOUGH.get().defaultBlockState(), rock = ModBlocks.METEORITE.get().defaultBlockState();
+            // meteorite boulders on the slopes of the bowl: angle, relative radius, size
+            int nb = 10 + r.nextInt(5);   // round 3 (user): far more meteorite
+            double[][] boulders = new double[nb][];
+            for (int i = 0; i < nb; i++) boulders[i] = new double[] { r.nextDouble() * Math.PI * 2, 0.38 + r.nextDouble() * 0.5, 1.3 + r.nextDouble() * 1.3 };
+            // suspicious gravel spots in the floor (the buried loot)
+            int ns = 3 + r.nextInt(2);
+            double[][] digs = new double[ns][];
+            for (int i = 0; i < ns; i++) digs[i] = new double[] { r.nextDouble() * Math.PI * 2, 0.2 + r.nextDouble() * 0.3 };
+            BlockState dough = ModBlocks.ORANGE_DOUGH.get().defaultBlockState();
             BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
 
             for (int x = box.minX(); x <= box.maxX(); x++) for (int z = box.minZ(); z <= box.maxZ(); z++) {
@@ -583,10 +769,9 @@ public final class SpireStructures {
                 double n = 0.6 * Math.sin(dx * 0.41 + dz * 0.23 + ph1) + 0.45 * Math.cos(dz * 0.37 - dx * 0.19 + ph2);
                 double a = Math.atan2(dz, dx), ray = 0.6 * Math.sin(a * 7 + ph1) + 0.4 * Math.sin(a * 13 + ph2);
                 if (u <= 1) {
-                    boolean terrace = (dx - fx) * (dx - fx) + (dz - fz) * (dz - fz) <= 12.25;
                     double bowl = floorY + (D + rimH) * u * u + n * Math.min(1, u * 1.5);
                     if (d > R - 3) { double w = (d - (R - 3)) / 3; bowl = bowl * (1 - w) + (nat + rimH + n * 0.5) * w; }   // meet the rim
-                    int target = terrace ? forgeY : (int) Math.round(Math.max(floorY, bowl));
+                    int target = (int) Math.round(Math.max(floorY, bowl));
                     for (int y = target + 1; y <= box.maxY(); y++) {                     // dig out (water too)
                         BlockState s = level.getBlockState(p.set(x, y, z));
                         if (!s.isAir() && clearable(s)) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
@@ -597,8 +782,7 @@ public final class SpireStructures {
                         BlockState s = level.getBlockState(p.set(x, target - k, z));
                         if (k > 1 && s.isSolid() && s.getFluidState().isEmpty()) continue;
                         if (!clearable(s)) continue;
-                        level.setBlock(p, terrace && k == 0 ? (rand(seed, x, target, z) < 0.25F ? Blocks.CRACKED_DEEPSLATE_TILES : Blocks.DEEPSLATE_TILES).defaultBlockState()
-                                : crust(u, k, x, target - k, z, surf, under, dough), 2);
+                        level.setBlock(p, crust(u, k, x, target - k, z, surf, under, dough), 2);
                     }
                 } else {
                     double t = u * R < R + rimW ? 1 - (d - R) / rimW : 0;                 // the rim: thrown-up ground on the land
@@ -608,25 +792,24 @@ public final class SpireStructures {
                     if (target > nat) level.setBlock(p.set(x, nat, z), steady(under), 2);
                     for (int y = nat + 1; y < target; y++) {
                         float q2 = rand(seed, x, y, z);
-                        level.setBlock(p.set(x, y, z), q2 < 0.2F ? Blocks.GRAVEL.defaultBlockState() : q2 < 0.3F ? Blocks.COBBLESTONE.defaultBlockState() : steady(under), 2);
+                        level.setBlock(p.set(x, y, z), q2 < 0.25F ? land(surf, under, true) : steady(under), 2);
                     }
                     if (thrown || target > nat) {
                         float q3 = rand(seed ^ 0x74L, x, 0, z);
-                        level.setBlock(p.set(x, target, z), !thrown ? surf : q3 < 0.35F ? Blocks.GRAVEL.defaultBlockState() : q3 < 0.65F ? Blocks.COARSE_DIRT.defaultBlockState()
-                                : q3 < 0.85F ? Blocks.TUFF.defaultBlockState() : Blocks.COBBLESTONE.defaultBlockState(), 2);
+                        level.setBlock(p.set(x, target, z), !thrown ? surf : q3 < 0.35F ? charred(x, target, z) : q3 < 0.7F ? land(surf, under, false) : land(surf, under, true), 2);
                     }
                     // fragments of the star thrown out, more of them along the rays
                     float f = rand(seed ^ 0x66L, x, 1, z);
-                    if (f < 0.022F * fall * (ray > 0.2 ? 1.6F : 0.6F) && level.getBlockState(p.set(x, target + 1, z)).isAir()) {
-                        level.setBlock(p, f < 0.003F ? dough : rock, 2);
-                        if (f < 0.007F && level.getBlockState(p.set(x, target + 2, z)).isAir()) level.setBlock(p, rock, 2);
+                    if (f < 0.14F * fall * (ray > 0.2 ? 1.6F : 0.7F) && level.getBlockState(p.set(x, target + 1, z)).isAir()) {
+                        level.setBlock(p, charred(x, target + 1, z), 2);
+                        if (f < 0.02F && level.getBlockState(p.set(x, target + 2, z)).isAir()) level.setBlock(p, charred(x, target + 2, z), 2);
                     }
                 }
             }
 
             // the fallen star: a meteorite mass half sunk in the floor, split open along a crack over its dough core
             double kx = Math.cos(crackA), kz = Math.sin(crackA);
-            for (int dx = -6; dx <= 6; dx++) for (int dz = -6; dz <= 6; dz++) for (int dy = -4; dy <= 5; dy++) {
+            for (int dx = -8; dx <= 8; dx++) for (int dz = -8; dz <= 8; dz++) for (int dy = -5; dy <= 6; dy++) {
                 p.set(cx + dx, floorY + 1 + dy, cz + dz);
                 if (!box.isInside(p)) continue;
                 double e = (dx / ma) * (dx / ma) + (dy / mb) * (dy / mb) + (dz / mc) * (dz / mc)
@@ -634,44 +817,84 @@ public final class SpireStructures {
                 if (e > 1) continue;
                 double split = Math.abs(dx * kz - dz * kx);
                 if (dy >= 0 && split < 0.7 + dy * 0.45) { level.setBlock(p, Blocks.AIR.defaultBlockState(), 2); continue; }
-                level.setBlock(p, e < 0.45 || rand(seed ^ 0x6dL, p.getX(), p.getY(), p.getZ()) < 0.06F ? dough : rock, 2);
+                level.setBlock(p, e < 0.45 || rand(seed ^ 0x6dL, p.getX(), p.getY(), p.getZ()) < 0.06F ? dough : charred(p.getX(), p.getY(), p.getZ()), 2);
             }
-            for (int t = -2; t <= 2; t += 2) {                                             // rays of light from the crack
-                p.set(cx + (int) Math.round(t * kx), floorY + 1, cz + (int) Math.round(t * kz));
-                if (box.isInside(p) && level.getBlockState(p).isAir() && level.getBlockState(p.below()).isSolid())
-                    level.setBlock(p, Blocks.END_ROD.defaultBlockState(), 2);
+            // meteorite boulders lying on the slopes, half sunk (each a lumpy ball, a few dough specks in it)
+            for (double[] b : boulders) {
+                int bx = cx + (int) Math.round(Math.cos(b[0]) * R * b[1]), bz = cz + (int) Math.round(Math.sin(b[0]) * R * b[1]);
+                int by = (int) Math.round(floorY + (D + rimH) * b[1] * b[1]);
+                int rr = (int) Math.ceil(b[2]);
+                for (int dx = -rr; dx <= rr; dx++) for (int dz = -rr; dz <= rr; dz++) for (int dy = -rr; dy <= rr; dy++) {
+                    double e = (dx * dx + dz * dz + dy * dy * 1.4) / (b[2] * b[2]) + 0.25 * (rand(seed ^ 0x62L, bx + dx, by + dy, bz + dz) - 0.5);
+                    if (e > 1) continue;
+                    p.set(bx + dx, by + dy, bz + dz);
+                    if (!box.isInside(p) || !clearable(level.getBlockState(p))) continue;
+                    level.setBlock(p, charred(p.getX(), p.getY(), p.getZ()), 2);
+                }
+            }
+            // the buried things: suspicious gravel in the floor of the bowl (vanilla brushing)
+            for (double[] g : digs) {
+                int gx = cx + (int) Math.round(Math.cos(g[0]) * R * g[1]), gz = cz + (int) Math.round(Math.sin(g[0]) * R * g[1]);
+                double ug = g[1];
+                int gy = (int) Math.round(Math.max(floorY, floorY + (D + rimH) * ug * ug));
+                p.set(gx, gy, gz);
+                if (!box.isInside(p) || !level.getBlockState(p.above()).isAir()) continue;
+                level.setBlock(p, Blocks.SUSPICIOUS_GRAVEL.defaultBlockState(), 2);
+                if (level.getBlockEntity(p) instanceof net.minecraft.world.level.block.entity.BrushableBlockEntity be)
+                    be.setLootTable(ResourceKey.create(Registries.LOOT_TABLE, SpireCraft.id("archaeology/regent_crater")), lootSeed + gx * 31L + gz);
             }
 
-            // the Regent's forge on the terrace, its front to the middle of the crater
-            Direction in = Math.abs(fx) > Math.abs(fz) ? (fx > 0 ? Direction.WEST : Direction.EAST) : (fz > 0 ? Direction.NORTH : Direction.SOUTH);
-            Direction side = in.getClockWise(), out = in.getOpposite();
-            BlockPos f0 = new BlockPos(cx + fx, forgeY + 1, cz + fz);
-            RandomSource lootR = RandomSource.create(lootSeed);
-            place(level, box, f0, Blocks.CHIPPED_ANVIL.defaultBlockState().setValue(net.minecraft.world.level.block.AnvilBlock.FACING, side));
-            place(level, box, f0.relative(side), Blocks.SMITHING_TABLE.defaultBlockState());
-            place(level, box, f0.relative(side.getOpposite()).relative(out), Blocks.GRINDSTONE.defaultBlockState()
-                    .setValue(net.minecraft.world.level.block.GrindstoneBlock.FACE, net.minecraft.world.level.block.state.properties.AttachFace.FLOOR)
-                    .setValue(net.minecraft.world.level.block.GrindstoneBlock.FACING, side));
-            BlockPos chest = f0.relative(side.getOpposite());
-            if (place(level, box, chest, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, in)))
-                RandomizableContainer.setBlockEntityLootTable(level, lootR, chest, ResourceKey.create(Registries.LOOT_TABLE, SpireCraft.id("chests/regent_crater")));
-            for (BlockPos b : new BlockPos[] { f0.relative(out), f0.relative(out).relative(side) }) {
-                if (place(level, box, b, Blocks.BARREL.defaultBlockState().setValue(net.minecraft.world.level.block.BarrelBlock.FACING, Direction.UP)))
-                    RandomizableContainer.setBlockEntityLootTable(level, lootR, b, ResourceKey.create(Registries.LOOT_TABLE, SpireCraft.id("chests/regent_supply")));
-            }
-            place(level, box, f0.relative(out).relative(side).above(), Blocks.LANTERN.defaultBlockState());
-            place(level, box, f0.relative(in), Blocks.BLUE_CARPET.defaultBlockState());
-            place(level, box, f0.relative(in).relative(side), Blocks.BLUE_CARPET.defaultBlockState());
+        }
 
-            // the banner pole on the far rim, its flag turned to the crater
-            int px = cx - (int) Math.round(Math.cos(forgeA) * (R + 2)), pz = cz - (int) Math.round(Math.sin(forgeA) * (R + 2));
-            if (box.isInside(new BlockPos(px, box.minY(), pz))) {
-                int base = box.maxY() - 6;                                              // the first air over the (built-up) rim
-                while (base > box.minY() && !level.getBlockState(p.set(px, base - 1, pz)).isSolid()) base--;
-                for (int h = 0; h < 5; h++) place(level, box, new BlockPos(px, base + h, pz), Blocks.STRIPPED_DARK_OAK_LOG.defaultBlockState());
-                int rot = Math.floorMod((int) Math.round((Math.atan2(cz - pz, cx - px) * 180 / Math.PI - 90) / 22.5), 16);   // 0 = south, clockwise
-                place(level, box, new BlockPos(px, base + 5, pz), Blocks.ORANGE_BANNER.defaultBlockState().setValue(net.minecraft.world.level.block.BannerBlock.ROTATION, rot));
+        /**
+         * The quicksand pit (2026-11-25, the Insatiable's lair to come): a wide funnel 40-47 across and about 13 deep
+         * in the desert, sand over sandstone on its slopes, a pool of quicksand 17-21 across and 7 deep at the bottom
+         * (round 3, user: no bones over it, the quicksand wider and deeper); dead bushes and sandstone outcrops on the slopes;
+         * a few blocks of suspicious sand to brush. Like the crater, every shape comes from the seed and the column.
+         */
+        private void sandPit(WorldGenLevel level, BoundingBox box) {
+            RandomSource r = RandomSource.create(seed);
+            float R = 20F + r.nextFloat() * 3.5F, pool = 8.5F + r.nextFloat() * 2F;   // round 3 (user): the quicksand wider and deeper
+            int D = 12 + r.nextInt(3);
+            double ph1 = r.nextDouble() * Math.PI * 2, ph2 = r.nextDouble() * Math.PI * 2;
+            long lootSeed = r.nextLong();
+            int cx = c.getX(), cz = c.getZ(), H = c.getY(), floorY = H - D;
+            BlockState sand = Blocks.SAND.defaultBlockState(), stone = Blocks.SANDSTONE.defaultBlockState(), quick = ModBlocks.QUICKSAND.get().defaultBlockState();
+            BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+            for (int x = box.minX(); x <= box.maxX(); x++) for (int z = box.minZ(); z <= box.maxZ(); z++) {
+                int dx = x - cx, dz = z - cz;
+                double d = Math.sqrt(dx * dx + dz * dz), u = d / R;
+                if (u > 1.3) continue;
+                int nat = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z) - 1;
+                if (nat < box.minY() + 6 || nat > box.maxY() - 2) continue;
+                double n = 0.5 * Math.sin(dx * 0.33 + dz * 0.21 + ph1) + 0.4 * Math.cos(dz * 0.29 - dx * 0.17 + ph2);
+                // a funnel: steep near the pool, easing out to the land; the outer band blends back into the dunes
+                double prof = floorY + D * Math.pow(u, 1.6) + n * Math.min(1, u * 2);
+                if (u > 0.9) { double w = (u - 0.9) / 0.4; prof = prof * (1 - w) + nat * w; }
+                int target = (int) Math.round(Math.min(nat, prof));
+                for (int y = target + 1; y <= box.maxY(); y++) {
+                    BlockState s = level.getBlockState(p.set(x, y, z));
+                    if (!s.isAir() && clearable(s)) level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+                }
+                boolean inPool = d < pool + n * 0.6;
+                for (int k = 0; k <= (inPool ? 7 : 4); k++) {
+                    p.set(x, target - k, z);
+                    if (!clearable(level.getBlockState(p))) continue;
+                    level.setBlock(p, inPool ? (k <= 6 ? quick : stone) : k <= 1 ? sand : stone, 2);
+                }
+                if (inPool) continue;
+                // dead bushes and the odd outcrop of sandstone on the slopes
+                float q = rand(seed ^ 0x51L, x, target, z);
+                p.set(x, target + 1, z);
+                if (u > 0.35 && u < 1.0 && q < 0.025F) level.setBlock(p, Blocks.DEAD_BUSH.defaultBlockState(), 2);
+                else if (u > 0.4 && u < 0.95 && q > 0.992F) { level.setBlock(p, stone, 2); if (q > 0.996F) level.setBlock(p.set(x, target + 2, z), Blocks.CHISELED_SANDSTONE.defaultBlockState(), 2); }
+                else if (u > 0.3 && u < 0.6 && q > 0.985F && q <= 0.988F) {
+                    level.setBlock(p.set(x, target, z), Blocks.SUSPICIOUS_SAND.defaultBlockState(), 2);
+                    if (level.getBlockEntity(p) instanceof net.minecraft.world.level.block.entity.BrushableBlockEntity be)
+                        be.setLootTable(ResourceKey.create(Registries.LOOT_TABLE, SpireCraft.id("archaeology/sand_pit")), lootSeed + x * 31L + z);
+                }
             }
+            // (round 3, user: no bones over the pit - the rib arches are gone)
         }
 
         private static boolean clearable(BlockState s) {
@@ -695,13 +918,28 @@ public final class SpireStructures {
         /** The crater's lining at relative radius u, layer k down from the surface: scorched in the middle, the land's own ground at the lip. */
         private BlockState crust(double u, int k, int x, int y, int z, BlockState surf, BlockState under, BlockState dough) {
             float q = rand(seed, x, y, z);
-            if (k == 0 && (u < 0.45 ? q < 0.12F : u < 0.92 && q < 0.03F)) return dough;     // clumps lying in the pit
-            if (k > 0 && u > 0.66) return steady(under);
-            if (u < 0.32) return (q < 0.45F ? Blocks.BLACKSTONE : q < 0.7F ? Blocks.BASALT : q < 0.78F ? Blocks.MAGMA_BLOCK : Blocks.TUFF).defaultBlockState();
-            if (u < 0.66) return k > 0 ? (q < 0.6F ? Blocks.TUFF : Blocks.BLACKSTONE).defaultBlockState()
-                    : (q < 0.4F ? Blocks.TUFF : q < 0.6F ? Blocks.BLACKSTONE : q < 0.85F ? Blocks.GRAVEL : Blocks.COBBLESTONE).defaultBlockState();
-            if (u > 0.85 && q < 0.4F) return surf;
-            return q < 0.3F ? Blocks.GRAVEL.defaultBlockState() : q < 0.6F ? Blocks.COARSE_DIRT.defaultBlockState() : q < 0.85F ? steady(under) : Blocks.COBBLESTONE.defaultBlockState();
+            // v3 (user, round 3: "too little meteorite - it should cover much of the crater; less stone, and the stone the
+            // land's own - dirt, sandstone, stone or sand; the orange dough a little more to the middle"): the bowl is
+            // lined mostly with meteorite, the rest the land's own ground; the dough lies in clumps round the middle
+            if (k == 0 && (u < 0.3 ? q < 0.2F : u < 0.5 && q < 0.04F)) return dough;
+            if (k > 0 && u > 0.75) return steady(under);
+            if (u < 0.75) return q < 0.88F ? charred(x, y, z) : land(surf, under, k > 0);
+            if (u < 0.92) return q < 0.55F ? charred(x, y, z) : land(surf, under, q < 0.75F);
+            return q < 0.2F ? charred(x, y, z) : q < 0.6F ? surf : land(surf, under, false);
+        }
+
+        /** The fallen star's scorched rock (2026-11-25, user: no meteorite block - black stone and basalt): blackstone, basalt, a little smooth basalt. */
+        private BlockState charred(int x, int y, int z) {
+            float q = rand(seed ^ 0x6bL, x, y, z);
+            return (q < 0.55F ? Blocks.BLACKSTONE : q < 0.88F ? Blocks.BASALT : Blocks.SMOOTH_BASALT).defaultBlockState();
+        }
+
+        /** The land's own ground kind for the crater: sand and sandstone in the desert, dirt where it was grass, else gravel and stone. */
+        private static BlockState land(BlockState surf, BlockState under, boolean firm) {
+            if (surf.is(Blocks.SAND) || surf.is(Blocks.SANDSTONE) || under.is(Blocks.SANDSTONE)) return (firm ? Blocks.SANDSTONE : Blocks.SAND).defaultBlockState();
+            if (surf.is(Blocks.RED_SAND) || under.is(Blocks.RED_SANDSTONE)) return (firm ? Blocks.RED_SANDSTONE : Blocks.RED_SAND).defaultBlockState();
+            if (surf.is(BlockTags.DIRT) || surf.is(Blocks.GRASS_BLOCK)) return (firm ? Blocks.DIRT : Blocks.COARSE_DIRT).defaultBlockState();
+            return (firm ? Blocks.STONE : Blocks.GRAVEL).defaultBlockState();
         }
 
         private static boolean geode(BlockState s) {

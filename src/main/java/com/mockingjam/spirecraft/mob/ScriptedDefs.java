@@ -192,7 +192,7 @@ public final class ScriptedDefs {
             OG_PLAIN = List.of(ModBiomes.OVERGROWTH, ModBiomes.MUSHROOM_OVERGROWTH), DOCKS = List.of(ModBiomes.STONE_FOREST_DOCKS, ModBiomes.BEACH_DOCKS),
             STONE_DOCKS = List.of(ModBiomes.STONE_FOREST_DOCKS), BEACH = List.of(ModBiomes.BEACH_DOCKS), SEA_SHORE = List.of(ModBiomes.BEACH_DOCKS, ModBiomes.POLLUTED_SEA),
             HIVE = List.of(ModBiomes.HIVE_CAVES, ModBiomes.SPARSE_HIVE_CAVES, ModBiomes.EGG_HIVE_CAVES), EGG_HIVE = List.of(ModBiomes.EGG_HIVE_CAVES),
-            QUICKSAND = List.of(ModBiomes.QUICKSAND_CAVES), INK = List.of(ModBiomes.INK_SPRING_CAVES);
+            DESERT = List.of(net.minecraft.world.level.biome.Biomes.DESERT), INK = List.of(ModBiomes.INK_SPRING_CAVES);
 
     static {
         // ============================================================================ Act 1: the Overgrowth
@@ -419,7 +419,7 @@ public final class ScriptedDefs {
                 .pattern(ids(1, 2), m(3));
         ALL.get("tunneler").moves.get(1).burrow = true;
         ALL.get("tunneler").burrowMove = 3;
-        ALL.get("tunneler").spawn(10, 1, 1, HIVE).spawn(15, 1, 1, QUICKSAND).drop(Items.FLINT, 1, 2).drop(Items.SAND, 1, 3);
+        ALL.get("tunneler").spawn(10, 1, 1, HIVE).spawn(15, 1, 1, DESERT).drop(Items.FLINT, 1, 2).drop(Items.SAND, 1, 3);
 
         def("thieving_hopper", "Thieving Hopper", "偷窃草蜢").hp(36).speed(0.34F).size(0.8F, 1.0F, 1)
                 .moves(melee(6.8F).steal(6), buff().self(RESIST, 100, 1).anim(Anim.SHAKE), melee(8.4F).wind(18).anim(Anim.LUNGE), melee(5.6F), buff())

@@ -309,6 +309,20 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(Items.MUD), has(Items.MUD)).save(output);
         // v3.5: junk (nine scrap, and back); paving stones from cobblestone too
         storage(ModItems.SCRAP.get(), ModBlocks.JUNK_BLOCK.get());
+        // 2026-11-25: orange dough lumps and core crystals, four to a block and back
+        lumps(ModItems.ORANGE_DOUGH_LUMP.get(), ModBlocks.ORANGE_DOUGH.get(), "orange_dough");
+        lumps(ModItems.CORE_CRYSTAL.get(), ModBlocks.CORE_CRYSTAL_BLOCK.get(), "core_crystal");
+        // 2026-11-25: polished alloy and the brass lamp; worked Orange Dough, the radiant star lamp and glass
+        twoByTwo(ModBlocks.POLISHED_AUTOMATON_ALLOY.get(), ModBlocks.AUTOMATON_ALLOY_BLOCK.get());
+        stonecut(ModBlocks.AUTOMATON_ALLOY_BLOCK.get(), ModBlocks.POLISHED_AUTOMATON_ALLOY.get(), 1);
+        shaped(RecipeCategory.REDSTONE, ModBlocks.AUTOMATON_ALLOY_LAMP.get(), 1).define('A', ModItems.AUTOMATON_ALLOY_INGOT.get()).define('L', Items.REDSTONE_LAMP)
+                .pattern(" A ").pattern("ALA").pattern(" A ").unlockedBy(getHasName(ModItems.AUTOMATON_ALLOY_INGOT.get()), has(ModItems.AUTOMATON_ALLOY_INGOT.get())).save(output);
+        twoByTwo(ModBlocks.POLISHED_ORANGE_DOUGH.get(), ModBlocks.ORANGE_DOUGH.get());
+        twoByTwo(ModBlocks.ORANGE_DOUGH_BRICKS.get(), ModBlocks.POLISHED_ORANGE_DOUGH.get());
+        shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.STAR_LAMP.get(), 1).requires(ModBlocks.ORANGE_DOUGH.get()).requires(Items.GLOWSTONE).requires(ModItems.GALACTIC_DUST.get())
+                .unlockedBy(getHasName(ModItems.GALACTIC_DUST.get()), has(ModItems.GALACTIC_DUST.get())).save(output);
+        shaped(RecipeCategory.BUILDING_BLOCKS, ModBlocks.STAR_GLASS.get(), 8).define('G', Items.GLASS).define('D', ModItems.ORANGE_DOUGH_LUMP.get())
+                .pattern("GGG").pattern("GDG").pattern("GGG").unlockedBy(getHasName(ModItems.ORANGE_DOUGH_LUMP.get()), has(ModItems.ORANGE_DOUGH_LUMP.get())).save(output);
         stonecut(Items.COBBLESTONE, ModBlocks.PAVING_STONES.get(), 3);
         // v3.3: hive building blocks like the vanilla mud and stone bricks; silk, thatch, twigs
         shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.PACKED_HIVE_SOIL.get()).requires(ModBlocks.HIVE_SOIL.get()).requires(Items.WHEAT)
@@ -335,6 +349,14 @@ public class ModRecipeProvider extends RecipeProvider {
     private void stonecut(ItemLike from, ItemLike to, int count) {
         SingleItemRecipeBuilder.stonecutting(Ingredient.of(from), RecipeCategory.BUILDING_BLOCKS, to, count)
                 .unlockedBy(getHasName(from), has(from)).save(output, key(getItemName(to) + "_from_" + getItemName(from) + "_stonecutting"));
+    }
+
+    /** Four loose pieces make the block (2x2), the block gives four back (like a 2x2 storage block). */
+    private void lumps(ItemLike piece, ItemLike block, String name) {
+        shaped(RecipeCategory.BUILDING_BLOCKS, block, 1).define('#', piece).pattern("##").pattern("##")
+                .unlockedBy(getHasName(piece), has(piece)).save(output, key(name + "_block_from_pieces"));
+        shapeless(RecipeCategory.MISC, piece, 4).requires(block)
+                .unlockedBy(getHasName(block), has(block)).save(output, key(name + "_pieces_from_block"));
     }
 
     private void twoByTwo(ItemLike result, ItemLike from) {
