@@ -360,6 +360,8 @@ public final class ModLanguageProvider {
             add(ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK.get(), "Derelict Automaton Alloy");
             add(ModBlocks.CORE_CRYSTAL_BLOCK.get(), "Core Crystal Block");
             add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), "Cracked Core Crystal Block");
+            add(ModBlocks.METEORITE.get(), "Meteorite");
+            add(ModBlocks.ORANGE_DOUGH.get(), "Orange Dough");
             add(ModBlocks.NETHER_BRIMSTONE_ORE.get(), "Nether Brimstone Ore");
             add(ModBlocks.BRIMSTONE_BLOCK.get(), "Block of Brimstone");
             add(ModBlocks.LAVA_ROCK_ORE.get(), "Lava Rock Ore");
@@ -737,6 +739,8 @@ public final class ModLanguageProvider {
             add(ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK.get(), "废弃机巧合金块");
             add(ModBlocks.CORE_CRYSTAL_BLOCK.get(), "核心晶块");
             add(ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(), "破损核心晶块");
+            add(ModBlocks.METEORITE.get(), "陨石");
+            add(ModBlocks.ORANGE_DOUGH.get(), "橙色团块");
             add(ModBlocks.NETHER_BRIMSTONE_ORE.get(), "下界硫磺矿石");
             add(ModBlocks.BRIMSTONE_BLOCK.get(), "硫磺块");
             add(ModBlocks.LAVA_ROCK_ORE.get(), "熔岩石矿");

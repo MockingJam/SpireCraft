@@ -1,13 +1,13 @@
-// 1.21.10	2026-11-19T02:03:11.0018783	Tags for minecraft:block mod id spirecraft
-ffdcbf608bc28c4f90e336c2939fb4fd6cd682e2 data/c/tags/block/ores.json
+// 1.21.10	2026-11-24T15:14:26.4269153	Tags for minecraft:block mod id spirecraft
+0b0a65c0d532539900939156862f76c596895236 data/c/tags/block/ores.json
 8d7e2b8118d8e5a7fe0f889b7b4a3fea1934b82b data/minecraft/tags/block/climbable.json
-b3571b1d6137590fd91dbb793128e66c9ff410fd data/minecraft/tags/block/coal_ores.json
+222526c98732cdbb7f024e410bdfecfe0d590b0e data/minecraft/tags/block/coal_ores.json
 ee418ce2e5da8c0f929f078b4378b5daccf99c8c data/minecraft/tags/block/completes_find_tree_tutorial.json
 5b0aa2bbb497c13021ae93a5790d4d45e1d9f735 data/minecraft/tags/block/copper_ores.json
 3971099357f10f4ab54cb89008846fa5290e2080 data/minecraft/tags/block/coral_plants.json
-fd2d7ca1cb264c6ac72e28784e4189dfda857763 data/minecraft/tags/block/diamond_ores.json
+93b53998f41df041a66cb3c2b03b261c85d02b76 data/minecraft/tags/block/diamond_ores.json
 d255e0cedd74b401580dcc5b42bd3ea6b2c7c671 data/minecraft/tags/block/dirt.json
-41bbed7076ed24692b42085f1f76d9a1c78bad0e data/minecraft/tags/block/emerald_ores.json
+d5f8cdcb2364edf48fc2d552514f6fe8a29d5352 data/minecraft/tags/block/emerald_ores.json
 edf93cd6b3e4db798a413ad20b49260c1beaecbd data/minecraft/tags/block/enderman_holdable.json
 a0770890927ca114c7ce9ba622b5c6906f384987 data/minecraft/tags/block/fence_gates.json
 ba1b9515d83bc902949e33e20b58402890512a25 data/minecraft/tags/block/gold_ores.json
@@ -20,13 +20,13 @@ f9cf649b9c533d7adbf1eb0389d40174b32d01e6 data/minecraft/tags/block/iron_ores.jso
 ee418ce2e5da8c0f929f078b4378b5daccf99c8c data/minecraft/tags/block/logs_that_burn.json
 771c6b9297bec5b934d8bb50e1cff9223a2fe835 data/minecraft/tags/block/mineable/axe.json
 d3102174ea17ac137c9883a13c2292a614ea8941 data/minecraft/tags/block/mineable/hoe.json
-1f59be0dfcb28cb774e501f9676b0f9b86040aeb data/minecraft/tags/block/mineable/pickaxe.json
-89d0bf4c8327890792f37f9672022e55f647adac data/minecraft/tags/block/mineable/shovel.json
-eeb34889484cf89d0afd9230c066c17691a5bba7 data/minecraft/tags/block/needs_iron_tool.json
-9761e9031b4dbbe8f1011e323e430eabbd2aa7cc data/minecraft/tags/block/needs_stone_tool.json
+184223da0c56e89c2c8e4da08295303408e74d37 data/minecraft/tags/block/mineable/pickaxe.json
+4780d21c524c12980a26cdfe734524a585b36e8b data/minecraft/tags/block/mineable/shovel.json
+0427edaf7720ded80a2528063873b9a91480752c data/minecraft/tags/block/needs_iron_tool.json
+2af76af2d0496253983a13cc7783f4a36d0c646d data/minecraft/tags/block/needs_stone_tool.json
 e1c63031a85f066c8d95e826060f9236d2c66697 data/minecraft/tags/block/overworld_natural_logs.json
 30321ecf8f0cf6fe7c4e8dc629b4f09ca783196d data/minecraft/tags/block/planks.json
-93a3a2aef09e748b672a7e1a2a8c4d095e09c835 data/minecraft/tags/block/redstone_ores.json
+ed706774370db0337ca4fe57005f5270e3b13d55 data/minecraft/tags/block/redstone_ores.json
 d5847b2601ca27a3358b30c774f36cacc574ff5e data/minecraft/tags/block/replaceable_by_trees.json
 d666247592eb73347c3902df31f94908a8eb4fb6 data/minecraft/tags/block/sand.json
 fc83b08823293a06469cc58fdbfebe6dcaa806c3 data/minecraft/tags/block/saplings.json

@@ -1,0 +1,8 @@
+{
+  "type": "spirecraft:carved",
+  "biomes": "#spirecraft:has_structure/regent_crater",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "kind": "meteor_crater"
+}

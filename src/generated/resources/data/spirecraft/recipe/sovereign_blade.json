@@ -5,11 +5,12 @@
     "D": "spirecraft:galactic_dust",
     "G": "minecraft:gold_ingot",
     "O": "spirecraft:orichalcum_ingot",
-    "S": "minecraft:stick"
+    "S": "minecraft:stick",
+    "X": "spirecraft:orange_dough"
   },
   "pattern": [
     "GDG",
-    " O ",
+    "XOX",
     " S "
   ],
   "result": {
