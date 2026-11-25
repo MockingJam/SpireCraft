@@ -1541,6 +1541,212 @@ const defectTemplates = [defectStation(1)];
 // spruces (top_layer_modification) so the site clears them, and before the snow, which then settles on the open tops
 special('defect_station', 'spirecraft:cave_template', ['minecraft:snowy_plains', 'minecraft:ice_spikes', 'minecraft:snowy_taiga'],
   50, 17, { templates: defectTemplates, mode: 'open_ground', sink: 1, terrain_adaptation: 'beard_box', step: 'top_layer_modification' });
+/** The Necrobinder's giant (issue #40, soul and doom): the skeleton of an ancient giant lying half-buried on its back in
+ * the dark forest / pale garden, in a clearing where nothing grows. Its ribs arch out of the ground into a hall where she
+ * lived (purple curtains, books, soul lanterns hanging from the ribs); the skull, its jaw dropped open on the ground
+ * towards +z (the open side, SpireStructures.CaveTemplate.openGround), holds her phylactery altar and the main chest,
+ * soul fire burning in the eye sockets. One arm lies along the ground east of the ribs, its hand reaching up out of it.
+ * A small ossuary under the spine (a skeleton spawner, two supply barrels), down a stair under trapdoors in the hall.
+ * Layer G is the top soil; the long axis is z: pelvis at 0, ribs 10-25, neck, skull 30-44, jaw to 47. */
+loot('necrobinder_giant', [
+  { rolls: [4, 7], items: [['bone', 12, 2, 8], ['bone_block', 6, 1, 3], ['wither_rose', 4, 1, 2], ['soul_soil', 6, 2, 6], ['book', 6, 1, 3], ['amethyst_shard', 6, 2, 5], ['ink_sac', 5, 1, 4]] },
+  { rolls: [1, 2], items: [potion('doom', 1)] },
+  { rolls: 1, items: [['empty', 65], ['spirecraft:scythe', 9], ['spirecraft:scourge', 9], ['spirecraft:dirge_flute', 7], ['spirecraft:forbidden_grimoire', 6], ['spirecraft:danse_macabre', 4]] },
+]);
+loot('necrobinder_supply', [
+  { rolls: [2, 5], items: [['bone', 8, 1, 4], ['rotten_flesh', 8, 1, 3], ['candle', 5, 1, 3], ['paper', 6, 1, 4], ['book', 3, 1, 2], ['ink_sac', 4, 1, 3], ['string', 4, 1, 3], ['soul_torch', 5, 2, 6], ['bread', 5, 1, 3]] },
+]);
+function necrobinderGiant(seed) {
+  // 46 wide so the clearing round the hand (east) is not cut off at the template's edge, where trees would stay
+  const r = rng(seed), W = 46, D = 48, G = 10, H = G + 16, c = 17, s = new Struct(W, H, D);
+  const BONE = a => `bone_block[axis=${a}]`, PB = 'polished_blackstone', PBB = 'polished_blackstone_bricks';
+  const line = (ax, az, bx, bz, fn) => { const n = Math.max(Math.abs(bx - ax), Math.abs(bz - az)) * 2; for (let i = 0; i <= n; i++) fn(Math.round(ax + (bx - ax) * i / n), Math.round(az + (bz - az) * i / n), i / n); };
+  const segDist = (px, pz, [ax, az], [bx, bz]) => { const vx = bx - ax, vz = bz - az, t = Math.max(0, Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz))); return Math.hypot(px - ax - t * vx, pz - az - t * vz); };
+  const SH = [c + 9, 25], EL = [c + 16, 21], WR = [c + 19, 16], PALM = [c + 20, 13];
+
+  // ---- the clearing: air over it (cuts the dark oaks out), dead ground, earth under it where the land dips
+  const GROUND = ['grass_block[snowy=false]', 'grass_block[snowy=false]', 'coarse_dirt', 'podzol[snowy=false]', 'rooted_dirt', 'coarse_dirt'];
+  for (let x = 0; x < W; x++) for (let z = 0; z < D; z++) {
+    const e = Math.min((Math.hypot((x - c) / 12.5, (z - 23.5) / 24.5) - 1) * 12.5, segDist(x, z, SH, WR) - 4, Math.hypot(x - PALM[0], z - PALM[1]) - 9);
+    if (e > 0 || (e > -1.5 && r.chance(0.5))) continue;
+    s.set(x, G, z, r.pick(GROUND));
+    for (let y = G - 4; y < G; y++) s.set(x, y, z, 'dirt');
+    for (let y = G + 1; y < H; y++) s.set(x, y, z, 'air');
+  }
+  // ---- the hall floor between the ribs (review: not a checkerboard): worn dark oak with a few ragged patches of pale
+  // oak where it was mended, a few boards gone to the earth under them; the spine down the middle
+  const PATCHES = Array.from({ length: 5 }, () => [c + r.int(-6, 6), r.int(10, 25), 1.2 + r() * 1.4]);
+  for (let x = c - 7; x <= c + 7; x++) for (let z = 9; z <= 26; z++) {
+    const pale = PATCHES.some(([px, pz, pr]) => Math.hypot(x - px, (z - pz) * 0.8) < pr + r() * 0.9 - 0.45);
+    s.set(x, G, z, r.chance(0.04) ? r.pick(['coarse_dirt', 'rooted_dirt']) : pale ? 'pale_oak_planks'
+      : r.chance(0.07) ? 'stripped_dark_oak_log[axis=z]' : 'dark_oak_planks');
+  }
+  for (let z = 0; z <= 30; z++) {
+    s.set(c, G, z, BONE('z')).set(c, G - 1, z, BONE('z'));
+    if ((z <= 8 || z >= 27) && z % 2 === 0) s.set(c, G + 1, z, BONE('y'));   // the spinous processes, outside the hall
+  }
+
+  // ---- the ribs: 6 pairs of arches from under the ground, their ends 1-2 apart over the middle
+  const RIBS = [[10, 8.5, 7.5], [13, 9.5, 8.5], [16, 10, 9], [19, 10, 9], [22, 9.5, 8.5], [25, 8.5, 7.5]];   // z, half-width, height above G+3
+  const ribCells = new Map();   // z -> [[x, y, side]]
+  const arch = (z, rx, ry, yc, stopAt, place) => {
+    for (const side of [-1, 1]) {
+      const stop = stopAt(side);
+      let prev = null;
+      for (let t = Math.asin(Math.max(-1, (G - 1 - yc) / ry)); t <= Math.PI / 2; t += 0.01) {
+        const x = Math.round(c + side * rx * Math.cos(t)), y = Math.round(yc + ry * Math.sin(t));
+        if (Math.abs(x - c) < stop) break;
+        const axis = Math.abs(ry * Math.cos(t)) > Math.abs(rx * Math.sin(t)) ? 'y' : 'x';
+        if (prev && prev[0] !== x && prev[1] !== y) place(prev[0], y, z, axis, side);   // no diagonal gaps
+        place(x, y, z, axis, side);
+        prev = [x, y];
+      }
+    }
+  };
+  for (const [z, rx, ry] of RIBS) {
+    const cells = [];
+    arch(z, rx, ry, G + 3, side => (side < 0 ? 1 : r.int(1, 2)), (x, y, zz, axis, side) => { s.set(x, y, zz, BONE(axis)); cells.push([x, y, side]); });
+    ribCells.set(z, cells);
+  }
+  // the pelvis (two wings curving up either side of the spine) and the stubs of the thigh bones going on under the ground
+  for (const [z, rx, ry] of [[4, 5.5, 3.5], [5, 6, 4], [6, 5.5, 3.5]]) arch(z, rx, ry, G, () => 2, (x, y, zz, axis) => s.set(x, y, zz, BONE(axis)));
+  for (const side of [-1, 1]) {
+    for (let z = 0; z <= 3; z++) s.set(c + side * 4, G, z, BONE('z')).set(c + side * 4, G - 1, z, BONE('z'));
+    s.set(c + side * 4, G + 1, 3, BONE('y'));
+  }
+
+  // ---- the skull, its face to +z: a shell of bone, a floor of polished blackstone under a purple carpet
+  const SZ = 37, SY = G + 4, ell = (x, y, z, k) => ((x - c) / (6.8 - k)) ** 2 + ((y - SY) / (6 - k)) ** 2 + ((z - SZ) / (6.8 - k)) ** 2;
+  for (let x = c - 7; x <= c + 7; x++) for (let y = G; y <= G + 10; y++) for (let z = SZ - 7; z <= SZ + 7; z++) {
+    if (ell(x, y, z, 0) > 1) continue;
+    const inner = ell(x, y, z, 1.1) <= 1;
+    if (y === G) s.set(x, y, z, inner ? PB : BONE('y'));
+    else s.set(x, y, z, inner ? 'air' : r.chance(0.12) ? 'calcite' : BONE('y'));
+    if (y === G + 1 && inner) s.set(x, y, z, 'purple_carpet');
+  }
+  const front = (x, y) => { for (let z = SZ + 7; z > SZ; z--) if (ell(x, y, z, 0) <= 1) return z; return null; };
+  const carve = (x, y) => { for (let z = SZ + 2; z <= SZ + 7; z++) if (ell(x, y, z, 0) <= 1) s.set(x, y, z, 'air'); };
+  // the mouth (the way in), the upper teeth hanging over it
+  for (let x = c - 3; x <= c + 3; x++) for (let y = G + 1; y <= G + 3; y++) carve(x, y);
+  for (const dx of [-3, -1, 1, 3]) { const z = front(c + dx, G + 3); if (z) s.set(c + dx, G + 3, z - 1, BONE('y')); }
+  // the nose, and soul fire in the eye sockets
+  for (const [x, y] of [[c, G + 4], [c, G + 5], [c - 1, G + 4], [c + 1, G + 4]]) carve(x, y);
+  for (const x of [c - 4, c - 3, c + 3, c + 4]) {
+    const z = front(x, G + 6);
+    carve(x, G + 6); carve(x, G + 7);
+    if (z) s.set(x, G + 5, z - 1, 'soul_soil').set(x, G + 6, z - 1, 'soul_fire');
+  }
+  // the lower jaw dropped flat on the ground in front of the mouth, its teeth up
+  for (const side of [-1, 1]) {
+    for (let z = SZ + 5; z <= SZ + 9; z++) s.set(c + side * 5, G, z, BONE('z'));
+    s.set(c + side * 4, G, SZ + 10, BONE('x'));
+    for (const z of [SZ + 6, SZ + 8]) s.set(c + side * 5, G + 1, z, BONE('y'));
+    s.set(c + side * 4, G + 1, SZ + 10, BONE('y')).set(c + side * 2, G + 1, SZ + 10, BONE('y'));
+  }
+  for (let x = c - 3; x <= c + 3; x++) s.set(x, G, SZ + 10, BONE('x'));
+  // the phylactery altar: a decorated pot on polished blackstone, amethyst at its corners, soul campfires either side
+  for (let x = c - 1; x <= c + 1; x++) for (let z = SZ - 1; z <= SZ + 1; z++) s.set(x, G + 1, z, PBB);
+  s.set(c, G + 2, SZ, 'decorated_pot[facing=south]');
+  for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) s.set(c + dx, G + 2, SZ + dz, 'amethyst_cluster[facing=up]');
+  for (const dx of [-3, 3]) s.set(c + dx, G + 1, SZ, 'soul_campfire[lit=true,facing=south]');
+  s.chest(c, G + 1, SZ - 4, 'south', 'necrobinder_giant');
+  for (const dx of [-2, 2]) s.set(c + dx, G + 1, SZ - 4, 'purple_candle[candles=3,lit=false]');
+  s.set(c, G + 7, SZ, 'soul_lantern[hanging=true]');
+  if (s.get(c, G + 8, SZ) === 'air') s.set(c, G + 8, SZ, 'iron_chain[axis=y]');
+
+  // ---- the arm along the ground east of the ribs, and the hand reaching up out of it
+  line(...SH, ...EL, (x, z) => s.set(x, G, z, BONE('x')).set(x, G - 1, z, BONE('x')));
+  for (const dx of [0, 1]) line(EL[0] + dx, EL[1], WR[0] + dx, WR[1], (x, z, t) => s.set(x, t > 0.6 ? G + 1 : G, z, BONE('z')).set(x, G - 1, z, BONE('z')));
+  for (const [x, z] of [SH, EL, WR]) s.set(x, G + 1, z, BONE('y'));
+  for (let x = PALM[0] - 3; x <= PALM[0] + 3; x++) for (let z = PALM[1] - 2; z <= PALM[1] + 2; z++) {
+    s.set(x, G, z, BONE('x'));
+    if (Math.abs(x - PALM[0]) > 1 || Math.abs(z - PALM[1]) > 1) s.set(x, G + 1, z, BONE('x'));   // cupped
+  }
+  // four fingers from the far edge of the palm, curling back over it like claws; tall enough (to G+11) to stand over the
+  // canopy of the trees that grow in from the neighbouring chunks after the clearing is cut
+  [8, 9, 9, 7].forEach((h, i) => {
+    const x = PALM[0] - 3 + i * 2, z = PALM[1] - 3;
+    for (let y = G; y <= G + h + 1; y++) s.set(x, y, z, BONE('y'));
+    s.set(x, G + h + 1, z + 1, BONE('z')).set(x, G + h, z + 2, BONE('y'));
+  });
+  s.set(PALM[0] - 4, G + 1, PALM[1] + 1, BONE('x'));   // the thumb
+  for (let y = G + 1; y <= G + 5; y++) s.set(PALM[0] - 5, y, PALM[1] + 1, BONE('y'));
+  s.set(PALM[0] - 4, G + 6, PALM[1] + 1, BONE('x')).set(PALM[0] - 3, G + 5, PALM[1] + 1, BONE('y'));
+
+  // ---- the hall: her books and bed against the ribs, curtains hung between them, soul lanterns on chains
+  for (const z of [11, 12, 17, 18]) s.set(c - 7, G + 1, z, 'bookshelf').set(c - 7, G + 2, z, 'bookshelf');
+  for (const z of [14, 15]) s.set(c + 7, G + 1, z, 'bookshelf').set(c + 7, G + 2, z, 'bookshelf');
+  s.set(c - 7, G + 3, 11, 'purple_candle[candles=2,lit=false]').set(c + 7, G + 3, 15, 'purple_candle[candles=1,lit=false]');
+  s.set(c - 7, G + 1, 14, 'lectern[facing=east,has_book=true]', { id: 'minecraft:lectern', Book: { id: 'minecraft:writable_book', count: 1 }, Page: 0 });
+  s.set(c - 7, G + 1, 20, 'brewing_stand').set(c - 7, G + 1, 21, 'cauldron');
+  s.set(c + 7, G + 1, 11, 'purple_bed[facing=north,part=head]').set(c + 7, G + 1, 12, 'purple_bed[facing=north,part=foot]');
+  for (let i = 0; i < 6; i++) {
+    const x = c + r.int(-5, 5), z = r.int(10, 26);
+    if (s.get(x, G + 1, z) === 'air' && x !== c + 6) s.set(x, G + 1, z, `purple_candle[candles=${r.int(1, 4)},lit=false]`);
+  }
+  for (let i = 0; i < RIBS.length - 1; i++) {   // the curtains, torn in places
+    const [z0] = RIBS[i], wider = RIBS[i][1] >= RIBS[i + 1][1] ? RIBS[i][0] : RIBS[i + 1][0];
+    for (const [x, y] of ribCells.get(wider)) if (y >= G + 1 && y <= G + 5) for (const z of [z0 + 1, z0 + 2]) if (r.chance(0.7)) s.set(x, y, z, 'purple_wool');
+  }
+  for (const z of [13, 22]) for (const side of [-1, 1]) {
+    const top = ribCells.get(z).filter(([x, , sd]) => sd === side && Math.abs(x - c) === 3).reduce((m, [, y]) => Math.max(m, y), 0);
+    if (!top) continue;
+    s.set(c + side * 3, top - 1, z, 'iron_chain[axis=y]').set(c + side * 3, top - 2, z, 'iron_chain[axis=y]').set(c + side * 3, top - 3, z, 'soul_lantern[hanging=true]');
+  }
+  for (let i = 0; i < 10; i++) {   // cobwebs up between the ribs
+    const z = r.pick(RIBS)[0], cells = ribCells.get(z).filter(([, y]) => y >= G + 5), [x, y] = r.pick(cells);
+    const zz = z + r.pick([1, -1]);
+    if (s.get(x, y, zz) === 'air') s.set(x, y, zz, 'cobweb');
+  }
+
+  // ---- the ossuary under the hall: bone and blackstone walls, skulls in niches, a skeleton spawner
+  const WALL = [BONE('y'), PBB, PBB, 'calcite', PB, 'cracked_polished_blackstone_bricks'];
+  for (let x = c - 8; x <= c + 8; x++) for (let y = 1; y <= 8; y++) for (let z = 13; z <= 23; z++) {
+    const inside = x >= c - 6 && x <= c + 6 && z >= 15 && z <= 21 && y >= 2 && y <= 6;
+    s.set(x, y, z, inside ? 'air' : y === 1 && x >= c - 6 && x <= c + 6 && z >= 15 && z <= 21 ? 'soul_soil' : r.pick(WALL));
+  }
+  for (const z of [15, 21]) for (const dx of [-3, 3]) for (let y = 2; y <= 6; y++) s.set(c + dx, y, z, BONE('y'));
+  // skulls in niches (review: a few more, unevenly placed): random spots along three walls, at two heights, each
+  // turned a little (not in front of the bone pillars, nor by the stair on the east wall)
+  const niche = (x, z, rot) => { const y = r.pick([3, 3, 4]); s.set(x, y, z, `skeleton_skull[rotation=${(rot + r.int(-1, 1) + 16) % 16}]`).set(x, y + 1, z, 'air'); };
+  const some = (arr, k) => { const a = [...arr], out = []; while (out.length < k && a.length) out.push(a.splice(r.int(0, a.length - 1), 1)[0]); return out; };
+  for (const dx of some([-6, -5, -4, -2, -1, 0, 1, 2, 4, 5], 6)) niche(c + dx, 14, 0);
+  for (const dx of some([-6, -5, -4, -2, -1, 0, 1, 2], 4)) niche(c + dx, 22, 8);
+  for (const z of some([16, 17, 18, 19, 20], 3)) niche(c - 7, z, 12);
+  s.spawner(c, 2, 18, 'minecraft:skeleton');
+  s.barrel(c - 6, 2, 15, 'up', 'necrobinder_supply').barrel(c - 6, 2, 21, 'up', 'necrobinder_supply');
+  for (const dx of [-3, 3]) s.set(c + dx, 6, 18, 'soul_lantern[hanging=true]');
+  for (const [x, z] of [[c - 6, 16], [c + 5, 15], [c - 5, 21], [c + 2, 21]]) s.set(x, 6, z, 'cobweb');
+  s.set(c - 4, 2, 19, 'skeleton_skull[rotation=3]').set(c + 2, 2, 16, 'bone_block[axis=x]');
+  // the stair down along its east wall, from three trapdoors in the hall floor
+  const SX = c + 6;
+  for (let k = 0; k <= 7; k++) {
+    const z = 24 - k, y = G - 1 - k;
+    s.set(SX, y, z, 'polished_blackstone_brick_stairs[facing=south,half=bottom,shape=straight]');
+    for (let yy = 1; yy < y; yy++) s.set(SX, yy, z, PBB);
+    for (let yy = y + 1; yy <= y + 3; yy++) s.set(SX, yy, z, 'air');
+    if (y + 4 < G) s.set(SX, y + 4, z, PBB);
+    if (k <= 3) for (const dx of [-1, 1]) for (let yy = y; yy < G; yy++) if (yy >= 7 || k <= 2) s.set(SX + dx, yy, z, PBB);
+  }
+  for (const z of [22, 23, 24]) s.set(SX, G, z, 'dark_oak_trapdoor[facing=north,half=top,open=false]');
+
+  // ---- abandoned: bone gone chalky or fallen away, moss creeping over the floors
+  s.forEach((x, y, z, st) => {
+    if (y <= G || !st.startsWith('bone_block')) return;
+    if (r.chance(0.07)) s.set(x, y, z, 'calcite'); else if (r.chance(0.03)) s.set(x, y, z, 'air');
+  });
+  for (let x = c - 6; x <= c + 6; x++) for (let z = 9; z <= 26; z++) if (s.get(x, G + 1, z) === 'air' && s.get(x, G, z) !== 'dark_oak_trapdoor[facing=north,half=top,open=false]' && r.chance(0.06)) s.set(x, G + 1, z, 'moss_carpet');
+  return s.save(`necrobinder_giant/${seed}`);
+}
+const necrobinderTemplates = [necrobinderGiant(1)];
+// issue #40: open dry ground like the Ironclad camp, the jaw (+z) turned to the open side; placed after the trees
+// (top_layer_modification) so the clearing and the hall cut the trees out. No terrain adaptation: the template
+// reaches G blocks underground for the ossuary, and a beard from that deep would hollow the land out.
+// Biomes (review: far too rare): the draft's dark forest no longer exists in new worlds - WorldPresetProvider hands every
+// dark forest to the overgrowth (v2.4) - and the pale garden is rare and hilly (4 of the first 5 candidates rose 13-45),
+// so the gloomy old-growth taigas (dark spruce, podzol and moss, mostly gentle ground) stand in for the dark forest.
+special('necrobinder_giant', 'spirecraft:cave_template', ['minecraft:pale_garden', 'minecraft:old_growth_spruce_taiga', 'minecraft:old_growth_pine_taiga'],
+  50, 17, { templates: necrobinderTemplates, mode: 'open_ground', sink: 11, step: 'top_layer_modification' });
 
 // template ids used by worldgen/TemplateFeature placements (see BiomeData)
 console.log('ok', JSON.stringify(hiveTemplates), pierTemplates);
