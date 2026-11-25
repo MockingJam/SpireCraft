@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "spirecraft:defect_station",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 50,
+    "separation": 17,
+    "salt": 1530615853
+  }
+}
