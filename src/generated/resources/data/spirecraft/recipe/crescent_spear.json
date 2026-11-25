@@ -4,11 +4,12 @@
   "key": {
     "A": "minecraft:amethyst_shard",
     "G": "minecraft:gold_ingot",
-    "S": "minecraft:stick"
+    "S": "minecraft:stick",
+    "X": "spirecraft:orange_dough"
   },
   "pattern": [
-    "  G",
-    " A ",
+    " XG",
+    " AX",
     "S  "
   ],
   "result": {

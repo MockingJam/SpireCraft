@@ -1315,5 +1315,20 @@ const silentTemplates = [silentGathering(1)];
 special('silent_gathering', 'spirecraft:cave_template', ['minecraft:swamp', 'minecraft:mangrove_swamp', 'minecraft:jungle', 'minecraft:sparse_jungle'],
   50, 17, { templates: silentTemplates, mode: 'stilts', sink: 13, ignore_waterlogging: true, step: 'top_layer_modification' });
 
+/** The Regent's meteor crater (issue #36): carved into the land by worldgen/SpireStructures "meteor_crater" - the bowl,
+ * the split fallen star with its Orange Dough core, ejecta, the Regent's forge on a terrace (main chest, two barrels)
+ * and a banner pole on the far rim. Main chest: galactic dust, gold, lapis, amethyst, some Orange Dough, small chance of
+ * a Regent weapon. */
+loot('regent_crater', [
+  { rolls: [4, 7], items: [['spirecraft:galactic_dust', 12, 4, 10], ['gold_ingot', 8, 1, 4], ['gold_nugget', 6, 3, 9], ['lapis_lazuli', 8, 2, 7], ['amethyst_shard', 6, 2, 5], ['glowstone_dust', 5, 2, 6], ['spirecraft:orange_dough', 6, 1, 3], ['iron_ingot', 4, 1, 3]] },
+  { rolls: 1, items: [['empty', 55], ['spirecraft:regent_strike', 14], ['spirecraft:photon_cut', 8], ['spirecraft:crescent_spear', 8], ['spirecraft:heirloom_hammer', 6]] },
+]);
+loot('regent_supply', [
+  { rolls: [2, 5], items: [['bread', 6, 1, 3], ['cooked_mutton', 4, 1, 3], ['coal', 6, 2, 6], ['iron_nugget', 6, 2, 8], ['gold_nugget', 4, 1, 5], ['candle', 4, 1, 3], ['paper', 4, 1, 4], ['torch', 5, 2, 6], ['string', 3, 1, 3]] },
+]);
+// not on snowy plains: the snow laid after the structures buried the dough and the split star
+special('regent_crater', 'spirecraft:carved', ['minecraft:desert', 'minecraft:meadow'],
+  50, 17, { kind: 'meteor_crater', step: 'surface_structures' });
+
 // template ids used by worldgen/TemplateFeature placements (see BiomeData)
 console.log('ok', JSON.stringify(hiveTemplates), pierTemplates);

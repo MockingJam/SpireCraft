@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_glowstone_dust": {
+    "has_orange_dough": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:glowstone_dust"
+            "items": "spirecraft:orange_dough"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_glowstone_dust"
+      "has_orange_dough"
     ]
   ],
   "rewards": {
