@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "spirecraft:jungle_tribe",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 44,
+    "separation": 15,
+    "salt": 994664115
+  }
+}

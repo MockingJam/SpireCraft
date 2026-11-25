@@ -26,7 +26,9 @@ public final class ModCreativeTabs {
             ModBlocks.ORICHALCUM_ORE.get(), ModBlocks.ORICHALCUM_BLOCK.get(),
             ModBlocks.AUTOMATON_ALLOY_BLOCK.get(), ModBlocks.TARNISHED_AUTOMATON_ALLOY_BLOCK.get(), ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK.get(),
             ModBlocks.CORE_CRYSTAL_BLOCK.get(), ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK.get(),
-            ModBlocks.METEORITE.get(), ModBlocks.ORANGE_DOUGH.get(),
+            ModBlocks.ORANGE_DOUGH.get(),
+            ModBlocks.POLISHED_AUTOMATON_ALLOY.get(), ModBlocks.AUTOMATON_ALLOY_LAMP.get(), ModBlocks.POLISHED_ORANGE_DOUGH.get(), ModBlocks.ORANGE_DOUGH_BRICKS.get(),
+            ModBlocks.STAR_LAMP.get(), ModBlocks.STAR_GLASS.get(), ModBlocks.HARBOUR_ROCK_SPIRE.get(),
             ModBlocks.NETHER_BRIMSTONE_ORE.get(), ModBlocks.BRIMSTONE_BLOCK.get(),
             ModBlocks.LAVA_ROCK_ORE.get()));
 
@@ -34,7 +36,7 @@ public final class ModCreativeTabs {
             ModItems.RAW_TUNGSTEN.get(), ModItems.TUNGSTEN_INGOT.get(), ModItems.TUNGSTEN_ALLOY_INGOT.get(), ModItems.AUTOMATON_ALLOY_INGOT.get(),
             ModItems.RAW_ORICHALCUM.get(), ModItems.ORICHALCUM_INGOT.get(),
             ModItems.BRIMSTONE.get(), ModItems.LAVA_ROCK_SHARD.get(), ModItems.LAVA_ROCK.get(), ModItems.GALACTIC_DUST.get(),
-            ModItems.SCRAP.get(), ModItems.PEBBLE.get(), ModItems.FLAK_SHELL.get()));
+            ModItems.SCRAP.get(), ModItems.PEBBLE.get(), ModItems.FLAK_SHELL.get(), ModItems.ORANGE_DOUGH_LUMP.get(), ModItems.CORE_CRYSTAL.get()));
 
     public static final RegistryObject<CreativeModeTab> EQUIPMENT = tab("equipment", ModItems.ORICHALCUM_SWORD, () -> List.of(
             ModItems.TUNGSTEN_HELMET.get(), ModItems.TUNGSTEN_CHESTPLATE.get(), ModItems.TUNGSTEN_LEGGINGS.get(), ModItems.TUNGSTEN_BOOTS.get(),

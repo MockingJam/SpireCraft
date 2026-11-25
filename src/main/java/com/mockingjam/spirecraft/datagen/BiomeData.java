@@ -110,13 +110,13 @@ public final class BiomeData {
             SURFACE_OVERGROWTH = ours("surface_overgrowth", RAW), SURFACE_MISTY = ours("surface_misty_overgrowth", RAW),
             SURFACE_MUSHROOM = ours("surface_mushroom_overgrowth", RAW),
             STONE_INK = ours("cave_stone_ink", UNDER), STONE_HIVE = ours("cave_stone_hive", UNDER), STONE_SPARSE_HIVE = ours("cave_stone_sparse_hive", UNDER),
-            STONE_EGG_HIVE = ours("cave_stone_egg_hive", UNDER), STONE_QUICKSAND = ours("cave_stone_quicksand", UNDER),
+            STONE_EGG_HIVE = ours("cave_stone_egg_hive", UNDER),
             STONE_SPIKES = ours("stone_spikes", LOCAL), STONE_SPIKES_SPARSE = ours("stone_spikes_sparse", LOCAL), STONE_SPIKES_WATER = ours("stone_spikes_water", LOCAL), MUD_DISKS = ours("overgrowth_mud_disks", LOCAL), PUDDLES = ours("puddles", LOCAL),
             STONE_PILES = ours("stone_piles", LOCAL), FALLEN_LOGS = ours("fallen_rotten_logs", LOCAL), ROTTEN_STUMPS = ours("rotten_stumps", LOCAL),
             DOCK_WALL = ours("dock_wall", LOCAL), RUIN_PILLAR = ours("ruin_pillar", LOCAL),
             CLIFF_SPRINGS = ours("cliff_springs", LOCAL), INK_POOLS = ours("ink_pools", LOCAL), HIVE_NESTS = ours("hive_nests", LOCAL),
             HIVE_NESTS_SPARSE = ours("hive_nests_sparse", LOCAL), EGG_CLUTCHES = ours("egg_clutches", LOCAL),
-            EGG_CLUTCHES_DENSE = ours("egg_clutches_dense", LOCAL), DARK_RUINS = ours("dark_ruins", TOP), QUICKSAND_POOLS = ours("quicksand_pools", LOCAL), SURFACE_QUICKSAND = ours("surface_quicksand", LOCAL),
+            EGG_CLUTCHES_DENSE = ours("egg_clutches_dense", LOCAL), DARK_RUINS = ours("dark_ruins", TOP), SURFACE_QUICKSAND = ours("surface_quicksand", LOCAL),
             TREES_GNARLWOOD = ours("trees_tall_gnarlwood", VEG), TREES_GNARLWOOD_SPARSE = ours("trees_tall_gnarlwood_sparse", VEG),
             GIANT_LANTERN = ours("giant_lantern_caps", VEG), GIANT_CORAL = ours("giant_coral_caps", VEG),
             GIANT_BLUEBELL = ours("giant_bluebells", VEG), HUGE_FOGCAP = ours("huge_fogcaps", VEG), GIANT_HIVE_SHROOMS = ours("giant_hive_shrooms", VEG), SHROOM_GROVES = ours("shroom_groves", VEG), MYCELIUM_PATCHES = ours("mycelium_patches", TOP),
@@ -129,9 +129,9 @@ public final class BiomeData {
             PATCH_HIVE_SHROOM = ours("patch_hive_shroom", VEG), PATCH_HIVE_SHROOM_FEW = ours("patch_hive_shroom_few", VEG);
 
     static final List<Ours> OURS = List.of(SURFACE_STONE_FOREST, SURFACE_BEACH_DOCKS, SURFACE_POLLUTED_SEA, SURFACE_WATERFALLS, SURFACE_OVERGROWTH,
-            SURFACE_MISTY, SURFACE_MUSHROOM, STONE_INK, STONE_HIVE, STONE_SPARSE_HIVE, STONE_EGG_HIVE, STONE_QUICKSAND,
+            SURFACE_MISTY, SURFACE_MUSHROOM, STONE_INK, STONE_HIVE, STONE_SPARSE_HIVE, STONE_EGG_HIVE,
             STONE_SPIKES, STONE_SPIKES_SPARSE, STONE_SPIKES_WATER, MUD_DISKS, PUDDLES, STONE_PILES, FALLEN_LOGS, ROTTEN_STUMPS, DOCK_WALL, RUIN_PILLAR, CLIFF_SPRINGS,
-            INK_POOLS, HIVE_NESTS, HIVE_NESTS_SPARSE, EGG_CLUTCHES, EGG_CLUTCHES_DENSE, QUICKSAND_POOLS,
+            INK_POOLS, HIVE_NESTS, HIVE_NESTS_SPARSE, EGG_CLUTCHES, EGG_CLUTCHES_DENSE,
             TREES_GNARLWOOD, TREES_GNARLWOOD_SPARSE, GIANT_LANTERN, GIANT_CORAL, GIANT_BLUEBELL, HUGE_FOGCAP, GIANT_HIVE_SHROOMS, SHROOM_GROVES,
             POLLUTED_REEFS, POLLUTED_SEAGRASS, POLLUTED_KELP, SHORE_REEDS, PATCH_ROTTEN_SHRUB, PATCH_SPIRE_FERN, PATCH_FOGCAP,
             PATCH_LANTERN_CAP, PATCH_CORAL_CAP, PATCH_BLUEBELL_CAP, PATCH_GLOW_SHRUB, PATCH_GLOW_MOSS, PATCH_MOSS_CARPET, MUSHROOMS_DENSE, GLOWVINES,
@@ -245,7 +245,6 @@ public final class BiomeData {
         caveStone(ctx, cfOf(STONE_HIVE), ModBiomes.HIVE_CAVES, 1);
         caveStone(ctx, cfOf(STONE_SPARSE_HIVE), ModBiomes.SPARSE_HIVE_CAVES, 2);
         caveStone(ctx, cfOf(STONE_EGG_HIVE), ModBiomes.EGG_HIVE_CAVES, 3);
-        caveStone(ctx, cfOf(STONE_QUICKSAND), ModBiomes.QUICKSAND_CAVES, 4);
     }
 
     private static void template(BootstrapContext<ConfiguredFeature<?, ?>> ctx, ResourceKey<ConfiguredFeature<?, ?>> key, String mode, int sink, String... ids) {
@@ -297,7 +296,7 @@ public final class BiomeData {
         HolderGetter<ConfiguredFeature<?, ?>> cf = ctx.lookup(Registries.CONFIGURED_FEATURE);
         // once per chunk, at the chunk origin (the features check the biome per column / per cell themselves)
         for (Ours o : List.of(SURFACE_STONE_FOREST, SURFACE_BEACH_DOCKS, SURFACE_POLLUTED_SEA, SURFACE_WATERFALLS, SURFACE_OVERGROWTH, SURFACE_MISTY,
-                SURFACE_MUSHROOM, STONE_INK, STONE_HIVE, STONE_SPARSE_HIVE, STONE_EGG_HIVE, STONE_QUICKSAND, DARK_RUINS, MYCELIUM_PATCHES)) {
+                SURFACE_MUSHROOM, STONE_INK, STONE_HIVE, STONE_SPARSE_HIVE, STONE_EGG_HIVE, DARK_RUINS, MYCELIUM_PATCHES)) {
             PlacementUtils.register(ctx, o.key(), cf.getOrThrow(cfOf(o)));
         }
         reg(ctx, cf, STONE_SPIKES, CF_STONE_SPIKE, count(2, PlacementUtils.HEIGHTMAP_OCEAN_FLOOR));
@@ -320,7 +319,6 @@ public final class BiomeData {
         reg(ctx, cf, HIVE_NESTS_SPARSE, CF_HIVE_NEST, cave(2));
         reg(ctx, cf, EGG_CLUTCHES, CF_EGG_CLUTCH, cave(2));
         reg(ctx, cf, EGG_CLUTCHES_DENSE, CF_EGG_CLUTCH, cave(7));
-        reg(ctx, cf, QUICKSAND_POOLS, CF_QUICKSAND_POOL, cave(12));
         // v3.2: quicksand pits on the desert surface (added to the desert by a biome modifier)
         reg(ctx, cf, SURFACE_QUICKSAND, CF_QUICKSAND_POOL, rarity(4, PlacementUtils.HEIGHTMAP_WORLD_SURFACE));
 
@@ -406,7 +404,6 @@ public final class BiomeData {
         ctx.register(ModBiomes.HIVE_CAVES, cave(pf, carvers, ModBiomes.HIVE_CAVES));
         ctx.register(ModBiomes.SPARSE_HIVE_CAVES, cave(pf, carvers, ModBiomes.SPARSE_HIVE_CAVES));
         ctx.register(ModBiomes.EGG_HIVE_CAVES, cave(pf, carvers, ModBiomes.EGG_HIVE_CAVES));
-        ctx.register(ModBiomes.QUICKSAND_CAVES, cave(pf, carvers, ModBiomes.QUICKSAND_CAVES));
     }
 
     /** Adds the wanted subset of {@link #OURS} in the global order. */
@@ -572,10 +569,6 @@ public final class BiomeData {
             // vanilla stone and cave light; dark rock only around the ink pools, whose vents give off white smoke
             addOurs(g, INK_POOLS, PATCH_INK_BUBBLE);
             effects = effects(0xc0d8ff, 0x2a1e3a, 0x0a0612, 0x78a7ff, 0x5a6a50, 0x4a5a40);
-        } else if (which == ModBiomes.QUICKSAND_CAVES) {
-            addOurs(g, STONE_QUICKSAND, QUICKSAND_POOLS);
-            spawns.addSpawn(MobCategory.MONSTER, 40, new MobSpawnSettings.SpawnerData(EntityType.HUSK, 2, 4));
-            effects = effects(0xc8a870, 0x3a8a8a, 0x0a2a2a, 0xd0b080, 0xbfb755, 0xaea42a);
         } else {
             // hive caves: normal, sparse (few mounds, hive shrooms), eggs everywhere
             boolean sparse = which == ModBiomes.SPARSE_HIVE_CAVES, eggs = which == ModBiomes.EGG_HIVE_CAVES;

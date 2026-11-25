@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_orange_dough": {
+      "conditions": {
+        "items": [
+          {
+            "items": "spirecraft:orange_dough"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "spirecraft:orange_dough_pieces_from_block"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_orange_dough"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "spirecraft:orange_dough_pieces_from_block"
+    ]
+  }
+}

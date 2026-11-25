@@ -114,7 +114,7 @@ public final class ModItems {
     public static final RegistryObject<Item> KIN_IDOL = summon("kin_idol", "kin_priest", com.mockingjam.spirecraft.worldgen.ModBiomes.OVERGROWTHS);
     public static final RegistryObject<Item> STEAM_WHISTLE = summon("steam_whistle", "waterfall_giant", java.util.List.of(com.mockingjam.spirecraft.worldgen.ModBiomes.WATERFALLS, com.mockingjam.spirecraft.worldgen.ModBiomes.STONE_FOREST_DOCKS, com.mockingjam.spirecraft.worldgen.ModBiomes.BEACH_DOCKS));
     public static final RegistryObject<Item> SLUMBER_HORN = summon("slumber_horn", "lagavulin_matriarch", java.util.List.of(com.mockingjam.spirecraft.worldgen.ModBiomes.STONE_FOREST_DOCKS, com.mockingjam.spirecraft.worldgen.ModBiomes.BEACH_DOCKS, com.mockingjam.spirecraft.worldgen.ModBiomes.POLLUTED_SEA));
-    public static final RegistryObject<Item> SAND_LURE = summon("sand_lure", "insatiable", java.util.List.of(com.mockingjam.spirecraft.worldgen.ModBiomes.QUICKSAND_CAVES));
+    public static final RegistryObject<Item> SAND_LURE = summon("sand_lure", "insatiable", java.util.List.of(net.minecraft.world.level.biome.Biomes.DESERT));
     public static final java.util.List<RegistryObject<Item>> BOSS_SUMMONS = java.util.List.of(BLACK_QUILL, KIN_IDOL, STEAM_WHISTLE, SLUMBER_HORN, SAND_LURE);
 
     private static RegistryObject<Item> summon(String name, String boss, java.util.List<net.minecraft.resources.ResourceKey<net.minecraft.world.level.biome.Biome>> biomes) {
@@ -220,6 +220,9 @@ public final class ModItems {
     // ---- v2.2 ammo: slingshot pebbles, scrap (junk), flak shells
     public static final RegistryObject<Item> PEBBLE = register("pebble");
     public static final RegistryObject<Item> SCRAP = register("scrap");
+    /** 2026-11-25: the loose forms of two blocks (four make the block, the block gives four back). */
+    public static final RegistryObject<Item> ORANGE_DOUGH_LUMP = register("orange_dough_lump");
+    public static final RegistryObject<Item> CORE_CRYSTAL = register("core_crystal");
     /** v3.3: a brick of fired harbour mud (smelted from packed mud); four make dock bricks. */
     public static final RegistryObject<Item> DOCK_BRICK = register("dock_brick");
     public static final RegistryObject<Item> FLAK_SHELL = register("flak_shell");

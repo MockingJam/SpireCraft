@@ -1,0 +1,13 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/automaton_factory",
+  "step": "underground_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:automaton_factory/1"
+  ],
+  "mode": "buried",
+  "min_y": -48,
+  "max_y": -24
+}

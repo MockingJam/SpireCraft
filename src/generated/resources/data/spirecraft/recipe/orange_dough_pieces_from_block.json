@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "spirecraft:orange_dough"
+  ],
+  "result": {
+    "count": 4,
+    "id": "spirecraft:orange_dough_lump"
+  }
+}

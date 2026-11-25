@@ -1,0 +1,12 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/forbidden_library",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_box",
+  "templates": [
+    "spirecraft:forbidden_library/1"
+  ],
+  "mode": "open_ground",
+  "sink": 1
+}

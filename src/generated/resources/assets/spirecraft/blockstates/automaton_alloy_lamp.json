@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "spirecraft:block/automaton_alloy_lamp"
+    },
+    "lit=true": {
+      "model": "spirecraft:block/automaton_alloy_lamp_on"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "spirecraft:orange_dough",
+    "minecraft:glowstone",
+    "spirecraft:galactic_dust"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spirecraft:star_lamp"
+  }
+}

@@ -185,7 +185,8 @@ public class ModModelProvider extends ModelProvider {
             // v3.3: thatch (+ stairs, slab), twig nest, webbed hive soil, the hive building blocks
             family(ModBlocks.THATCH.get()).generateFor(new BlockFamily.Builder(ModBlocks.THATCH.get()).stairs(ModBlocks.THATCH_STAIRS.get()).slab(ModBlocks.THATCH_SLAB.get()).getFamily());
             for (var cube : List.of(ModBlocks.AUTOMATON_ALLOY_BLOCK, ModBlocks.TARNISHED_AUTOMATON_ALLOY_BLOCK, ModBlocks.DERELICT_AUTOMATON_ALLOY_BLOCK,
-                    ModBlocks.CORE_CRYSTAL_BLOCK, ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK, ModBlocks.METEORITE, ModBlocks.ORANGE_DOUGH)) {
+                    ModBlocks.CORE_CRYSTAL_BLOCK, ModBlocks.CRACKED_CORE_CRYSTAL_BLOCK, ModBlocks.ORANGE_DOUGH,
+                    ModBlocks.POLISHED_AUTOMATON_ALLOY, ModBlocks.POLISHED_ORANGE_DOUGH, ModBlocks.ORANGE_DOUGH_BRICKS, ModBlocks.STAR_LAMP, ModBlocks.STAR_GLASS)) {
                 createTrivialCube(cube.get());
                 itemModelOutput.accept(cube.get().asItem(), ItemModelUtils.plainModel(ModelLocationUtils.getModelLocation(cube.get())));
             }
@@ -193,6 +194,26 @@ public class ModModelProvider extends ModelProvider {
                 createTrivialCube(cube.get());
             }
             itemModelOutput.accept(ModBlocks.SILK_HIVE.get().asItem(), ItemModelUtils.plainModel(ModelLocationUtils.getModelLocation(ModBlocks.SILK_HIVE.get())));
+            // the harbour rock spire: pointed-dripstone models by direction and thickness, a flat item
+            Block spire = ModBlocks.HARBOUR_ROCK_SPIRE.get();
+            blockStateOutput.accept(net.minecraft.client.data.models.blockstates.MultiVariantGenerator.dispatch(spire).with(
+                    net.minecraft.client.data.models.blockstates.PropertyDispatch.initial(com.mockingjam.spirecraft.block.HarbourSpireBlock.TIP_DIRECTION,
+                                    com.mockingjam.spirecraft.block.HarbourSpireBlock.THICKNESS)
+                            .generate((dir, t) -> {
+                                String suffix = "_" + dir.getSerializedName() + "_" + t.getSerializedName();
+                                return plainVariant(ModelTemplates.POINTED_DRIPSTONE.createWithSuffix(spire, suffix,
+                                        TextureMapping.cross(TextureMapping.getBlockTexture(spire, suffix)), modelOutput));
+                            })));
+            itemModelOutput.accept(spire.asItem(), ItemModelUtils.plainModel(ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(spire.asItem()),
+                    TextureMapping.layer0(SpireCraft.id("item/harbour_rock_spire")), modelOutput)));
+            // the brass lamp: off / on models by its LIT state, like the redstone lamp
+            Block lamp = ModBlocks.AUTOMATON_ALLOY_LAMP.get();
+            var lampOff = ModelTemplates.CUBE_ALL.create(lamp, TextureMapping.cube(lamp), modelOutput);
+            var lampOn = ModelTemplates.CUBE_ALL.createWithSuffix(lamp, "_on", TextureMapping.cube(TextureMapping.getBlockTexture(lamp, "_on")), modelOutput);
+            blockStateOutput.accept(net.minecraft.client.data.models.blockstates.MultiVariantGenerator.dispatch(lamp).with(
+                    net.minecraft.client.data.models.blockstates.PropertyDispatch.initial(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT)
+                            .generate(lit -> plainVariant(lit ? lampOn : lampOff))));
+            itemModelOutput.accept(lamp.asItem(), ItemModelUtils.plainModel(lampOff));
             Block sword = ModBlocks.SWORD_STATUE.get();
             blockStateOutput.accept(net.minecraft.client.data.models.blockstates.MultiVariantGenerator.dispatch(sword).with(
                     net.minecraft.client.data.models.blockstates.PropertyDispatch.initial(com.mockingjam.spirecraft.block.SwordStatueBlock.FACING,
@@ -300,7 +321,7 @@ public class ModModelProvider extends ModelProvider {
                 generateFlatItem(weapon.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
             }
             weaponStates();
-            for (var ammo : List.of(ModItems.PEBBLE, ModItems.SCRAP, ModItems.FLAK_SHELL, ModItems.INK_BUBBLE, ModItems.DOCK_BRICK, ModItems.AUTOMATON_ALLOY_INGOT)) generateFlatItem(ammo.get(), ModelTemplates.FLAT_ITEM);
+            for (var ammo : List.of(ModItems.PEBBLE, ModItems.SCRAP, ModItems.ORANGE_DOUGH_LUMP, ModItems.CORE_CRYSTAL, ModItems.FLAK_SHELL, ModItems.INK_BUBBLE, ModItems.DOCK_BRICK, ModItems.AUTOMATON_ALLOY_INGOT)) generateFlatItem(ammo.get(), ModelTemplates.FLAT_ITEM);
             generateFlatItem(com.mockingjam.spirecraft.fluid.ModFluids.INK_BUCKET.get(), ModelTemplates.FLAT_ITEM);
             generateFlatItem(ModItems.RELIC_POUCH.get(), ModelTemplates.FLAT_ITEM);
             generateFlatItem(ModItems.ANCHOR.get(), ModelTemplates.FLAT_ITEM);

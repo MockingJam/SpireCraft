@@ -44,7 +44,7 @@
                   "function": "minecraft:explosion_decay"
                 }
               ],
-              "name": "minecraft:prismarine_crystals"
+              "name": "spirecraft:core_crystal"
             }
           ]
         }
