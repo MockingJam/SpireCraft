@@ -76,8 +76,12 @@ public final class ClientShots {
             }
             return;
         }
+        // the script has run out (no quit line): hand the game back to the player, Esc menu and all
+        if (LINES.isEmpty() && wait == 0 && !useHeld) return;
         mc.options.pauseOnLostFocus = false;
         if (mc.screen instanceof net.minecraft.client.gui.screens.PauseScreen) mc.setScreen(null);   // the window lost focus
+        // a script that opens a chest (use on) goes on: the opening is what it tests
+        if (mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> && mc.player != null) mc.player.closeContainer();
         if (mc.player == null || mc.getSingleplayerServer() == null || mc.screen != null) return;
         if (useHeld) mc.options.keyUse.setDown(true);   // closing a pause screen re-reads the real keyboard
         if (wait > 0) { wait--; return; }
@@ -159,6 +163,35 @@ public final class ClientShots {
                 + " " + (best.getZ() + 0.5 + dist) + " 180 25");
     }
 
+    /**
+     * {@code locate <structure>}: teleport to the middle of the nearest generated structure of that kind (its bounding
+     * box centre), standing on the ground there; later relative {@code tp} lines can orbit it.
+     */
+    private static void locate(net.minecraft.server.MinecraftServer server, ServerPlayer sp, String arg) {
+        var level = (net.minecraft.server.level.ServerLevel) sp.level();
+        var registry = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+        var holder = registry.get(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE, ResourceLocation.parse(arg.strip())));
+        if (holder.isEmpty()) {
+            LOG.warn("[Shots] no structure {}", arg);
+            return;
+        }
+        var found = level.getChunkSource().getGenerator().findNearestMapStructure(level, net.minecraft.core.HolderSet.direct(holder.get()), sp.blockPosition(), 100, false);
+        if (found == null) {
+            LOG.warn("[Shots] {} not found", arg);
+            return;
+        }
+        var start = level.structureManager().getStructureAt(found.getFirst(), holder.get().value());
+        net.minecraft.core.BlockPos p = found.getFirst();
+        if (start.isValid()) {
+            var box = start.getBoundingBox();
+            p = new net.minecraft.core.BlockPos((box.minX() + box.maxX()) / 2, 0, (box.minZ() + box.maxZ()) / 2);
+        }
+        level.getChunk(p);
+        var top = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, p);
+        LOG.info("[Shots] {} at {} (box {})", arg, top, start.isValid() ? start.getBoundingBox() : "?");
+        server.getCommands().performPrefixedCommand(sp.createCommandSourceStack(), "tp @s " + (top.getX() + 0.5) + " " + top.getY() + " " + (top.getZ() + 0.5));
+    }
+
     private static void run(Minecraft mc, String line) {
         LOG.info("[Shots] {}", line);
         String[] a = line.split(" ", 2);
@@ -197,6 +230,11 @@ public final class ClientShots {
             case "shot" -> Screenshot.grab(mc.gameDirectory, arg + ".png", mc.getMainRenderTarget(), 1, msg -> LOG.info("[Shots] {}", msg.getString()));
             case "biome" -> server.execute(() -> goToBiome(server, sp, arg));
             case "find" -> server.execute(() -> find(server, sp, arg));
+            case "locate" -> server.execute(() -> locate(server, sp, arg));
+            case "fly" -> {   // keep the camera where it is put (creative flight), so it does not fall between shots
+                mc.player.getAbilities().flying = true;
+                mc.player.onUpdateAbilities();
+            }
             case "probe" -> {
                 // log what is around the camera: non-air blocks within 2, entities within 6, particles
                 var eye = net.minecraft.core.BlockPos.containing(mc.player.getEyePosition());
