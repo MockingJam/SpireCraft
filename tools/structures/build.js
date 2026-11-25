@@ -886,7 +886,7 @@ const HIVES = ['spirecraft:hive_caves', 'spirecraft:egg_hive_caves'], ALL_HIVES 
 function special(id, type, biomes, spacing, separation, extra) {
   writeJson(`tags/worldgen/biome/has_structure/${id}.json`, { values: biomes });
   writeJson(`worldgen/structure/${id}.json`, Object.assign({ type, biomes: `#spirecraft:has_structure/${id}`,
-    step: type === 'spirecraft:carved' ? 'underground_structures' : extra.mode === 'shore' ? 'surface_structures' : 'underground_decoration',
+    step: type === 'spirecraft:carved' ? 'underground_structures' : extra.mode === 'shore' || extra.mode === 'open_ground' ? 'surface_structures' : 'underground_decoration',
     spawn_overrides: {}, terrain_adaptation: 'none' }, extra));
   writeJson(`worldgen/structure_set/${id}.json`, { structures: [{ structure: `spirecraft:${id}`, weight: 1 }],
     placement: { type: 'minecraft:random_spread', spacing, separation, salt: [...id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 7) & 0x7fffffff } });
@@ -899,7 +899,421 @@ special('beekeeper_hollow', 'spirecraft:carved', HIVES, 14, 5, { kind: 'beekeepe
 special('man_sized_holes', 'spirecraft:cave_template', ALL_HIVES, 9, 3, { templates: hiveTemplates.holes, mode: 'cave_floor', sink: 9, min_y: -50, max_y: 40 });
 special('dock_pier', 'spirecraft:cave_template', ['spirecraft:stone_forest_docks', 'spirecraft:beach_docks'], 7, 2, { templates: pierTemplates, mode: 'shore', sink: 14 });
 special('web_nest', 'spirecraft:carved', ALL_HIVES, 12, 5, { kind: 'web_nest', min_y: -40, max_y: 30 });
-special('kaiser_crab_cave', 'spirecraft:carved', ALL_HIVES, 44, 18, { kind: 'kaiser_cave', min_y: -36, max_y: 0 });
+special('kaiser_crab_cave','spirecraft:carved', ALL_HIVES, 44, 18, { kind: 'kaiser_cave', min_y: -36, max_y: 0 });
+
+// ------------------------------------------------------------------ Ascender buildings (v3.7, issue #30)
+/** Ironclad camp (fire and blood): a palisaded war camp in the badlands / savanna. Abandoned - the Ironclad went on to
+ * the Spire. A stone forge with a smoking chimney and a stock of brimstone (north), the commander's tent with the main
+ * chest (west), two soldiers' tents (east), a tall flagpole with a red-and-black flag in the middle, a fire pit, training
+ * dummies and weapon racks by the south gate. */
+loot('ironclad_camp', [
+  { rolls: [4, 7], items: [['spirecraft:brimstone', 12, 3, 8], ['iron_ingot', 8, 1, 4], ['gunpowder', 8, 2, 6], ['coal', 6, 2, 6], ['iron_nugget', 6, 3, 9], ['leather', 4, 1, 3], ['bread', 4, 1, 3], ['blaze_powder', 2, 1, 2]] },
+  { rolls: [1, 2], items: [potion('blood', 4), potion('strength', 2), ['empty', 3]] },
+  { rolls: 1, items: [['empty', 70], ['spirecraft:bludgeon', 6], ['spirecraft:morning_star', 6], ['spirecraft:bloodletting_dagger', 6], ['spirecraft:cleaver', 6], ['spirecraft:tank_shield', 4], ['spirecraft:infernal_blade', 2]] },
+  { rolls: 1, items: [['empty', 95], ['spirecraft:red_skull', 3], ['spirecraft:burning_blood', 2]] },
+]);
+loot('ironclad_supply', [
+  { rolls: [2, 5], items: [['coal', 10, 1, 5], ['iron_nugget', 8, 2, 7], ['arrow', 6, 3, 10], ['bread', 6, 1, 3], ['cooked_beef', 5, 1, 3], ['leather', 5, 1, 3], ['string', 4, 1, 4], ['spirecraft:brimstone', 3, 1, 2], ['torch', 5, 2, 6]] },
+]);
+function ironcladCamp(seed) {
+  const r = rng(seed), n = 31, c = 15, s = new Struct(n, 19, n);
+  const BB = 'polished_blackstone_bricks', DB = 'deepslate_bricks';
+  const inRing = (x, z) => Math.hypot(x - c, z - c) <= 12.6;
+  // clear the inside (hills, plants) and lay a trodden floor. v3.7 (user: sticks lying around): no red sand / coarse dirt
+  // on the floor - dead bushes grow on those, and they break into sticks when the ground under them changes
+  const FLOOR = ['dirt_path', 'dirt_path', 'packed_mud', 'gravel', 'packed_mud', 'mud_bricks'];
+  for (let x = 0; x < n; x++) for (let z = 0; z < n; z++) {
+    const d = Math.hypot(x - c, z - c);
+    if (d > 13.6) continue;
+    s.set(x, 0, z, r.pick(FLOOR));
+    for (let y = 1; y < 12; y++) s.set(x, y, z, 'air');
+  }
+  // the palisade: a ring of spruce stakes of uneven height (v3.7 user: no fence rails on top, low enough to see in),
+  // a few broken; the gate (+z) is turned to the open side by the structure
+  s.disc(c, 0, c, 13.6, (x, y, z) => {
+    if (z > c && Math.abs(x - c) <= 1) return;                    // the gateway
+    const gatePost = z > c && Math.abs(x - c) === 2;
+    const broken = !gatePost && r.chance(0.12);
+    const h = gatePost ? 5 : broken ? r.int(1, 2) : r.int(3, 4);
+    s.set(x, 0, z, 'packed_mud');
+    for (let k = 1; k <= h; k++) s.set(x, k, z, r.chance(0.7) ? 'spruce_log[axis=y]' : 'stripped_spruce_log[axis=y]');
+    if (gatePost) s.set(x, h + 1, z, 'campfire[lit=true,facing=south]');   // braziers on the gate posts
+  }, 12.6);
+  // a path from the gate to the flagpole
+  for (let z = c + 2; z <= n - 1; z++) for (let x = c - 1; x <= c + 1; x++) if (Math.hypot(x - c, z - c) <= 13.6) s.set(x, 0, z, r.chance(0.8) ? 'dirt_path' : 'gravel');
+
+  // the forge (north): a hearth of deepslate over magma, a chimney with a campfire inside so it always smokes
+  for (let x = c - 4; x <= c + 4; x++) for (let z = 4; z <= 9; z++) s.set(x, 0, z, r.chance(0.7) ? BB : 'blackstone');
+  s.fill(c - 3, 1, 4, c + 3, 3, 4, DB);                           // back wall
+  s.fill(c - 3, 1, 5, c - 3, 3, 6, DB).fill(c + 3, 1, 5, c + 3, 3, 6, DB);
+  s.fill(c - 2, 1, 5, c + 2, 1, 6, DB);
+  s.fill(c - 1, 1, 5, c + 1, 1, 5, 'magma_block');
+  s.fill(c - 2, 2, 5, c + 2, 3, 6, 'air');
+  s.fill(c - 2, 2, 5, c - 2, 3, 6, DB).fill(c + 2, 2, 5, c + 2, 3, 6, DB);
+  s.fill(c - 3, 4, 4, c + 3, 4, 6, `${BB.replace('bricks', 'brick')}_slab[type=bottom]`);
+  s.fill(c - 1, 4, 4, c + 1, 9, 6, DB);                           // the chimney, hollow in the middle
+  for (let y = 5; y <= 9; y++) s.set(c, y, 5, 'air');
+  s.set(c, 4, 5, 'campfire[lit=true,facing=south]');
+  for (const [x, z] of [[c - 1, 4], [c + 1, 4], [c - 1, 6], [c + 1, 6]]) s.set(x, 10, z, 'polished_blackstone_wall');
+  s.set(c - 3, 1, 6, 'blast_furnace[facing=south,lit=false]');
+  s.set(c - 3, 1, 8, 'chipped_anvil[facing=east]').set(c - 2, 1, 8, 'water_cauldron[level=3]');
+  s.set(c + 3, 1, 8, 'grindstone[face=floor,facing=north]').set(c + 2, 1, 8, 'smithing_table');
+  // the brimstone stock and coal by the forge
+  s.set(c + 4, 1, 4, 'coal_block').set(c + 4, 1, 5, 'spirecraft:brimstone_block').set(c + 4, 1, 6, 'spirecraft:brimstone_block').set(c + 4, 2, 5, 'spirecraft:brimstone_block');
+  s.set(c + 5, 1, 5, 'spirecraft:brimstone_block').barrel(c + 5, 1, 7, 'up', 'ironclad_supply');
+  weather(s, r, { [DB]: ['cracked_deepslate_bricks'], [BB]: ['cracked_polished_blackstone_bricks'] }, 0.25);
+
+  // tents (v3.7 user: big enough to walk into and open the chest): 7 wide, walls 2 high, a pitched roof to a ridge 5 up,
+  // a plank floor, the back closed and the front open. `front` is the open end ('south' = +z).
+  const militaryTent = (x0, z0, len, front, wool, ridge) => {
+    const z1 = z0 + len - 1, back = front === 'south' ? z0 : z1;
+    for (let z = z0; z <= z1; z++) {
+      for (let x = x0 + 1; x <= x0 + 5; x++) { s.set(x, 0, z, 'spruce_planks'); s.set(x, 1, z, 'air').set(x, 2, z, 'air'); }
+      s.set(x0, 1, z, wool).set(x0, 2, z, wool).set(x0 + 6, 1, z, wool).set(x0 + 6, 2, z, wool);
+      s.set(x0 + 1, 3, z, wool).set(x0 + 5, 3, z, wool).set(x0 + 2, 4, z, wool).set(x0 + 4, 4, z, wool).set(x0 + 3, 5, z, ridge);
+      s.set(x0 + 2, 3, z, 'air').set(x0 + 3, 3, z, 'air').set(x0 + 4, 3, z, 'air').set(x0 + 3, 4, z, 'air');
+    }
+    for (let x = x0 + 1; x <= x0 + 5; x++) s.set(x, 1, back, wool).set(x, 2, back, wool);
+    s.set(x0 + 2, 3, back, wool).set(x0 + 3, 3, back, wool).set(x0 + 4, 3, back, wool).set(x0 + 3, 4, back, wool);
+    // the front corners are dark oak poles; a lantern hangs from the ridge
+    const fz = front === 'south' ? z1 : z0;
+    s.set(x0, 1, fz, 'dark_oak_fence').set(x0, 2, fz, 'dark_oak_fence').set(x0 + 6, 1, fz, 'dark_oak_fence').set(x0 + 6, 2, fz, 'dark_oak_fence');
+    s.set(x0 + 3, 4, z0 + (len >> 1), 'lantern[hanging=true]');
+    const step = front === 'south' ? 1 : -1, bz = back + step;   // the inside row against the back wall
+    const facing = front === 'south' ? 'south' : 'north', toBack = front === 'south' ? 'north' : 'south';
+    return { bz, step, facing, toBack };
+  };
+  // the commander's tent (west, red with a black ridge): the main chest, a map table and his seat, a bed, a red carpet
+  {
+    const x0 = 4, t = militaryTent(x0, 11, 7, 'south', 'red_wool', 'black_wool');
+    s.chest(x0 + 1, 1, t.bz, t.facing, 'ironclad_camp');
+    s.set(x0 + 3, 1, t.bz, 'cartography_table').set(x0 + 3, 1, t.bz + t.step, `dark_oak_stairs[facing=${t.facing},half=bottom]`);
+    s.set(x0 + 5, 1, t.bz, `red_bed[facing=${t.toBack},part=head]`).set(x0 + 5, 1, t.bz + t.step, `red_bed[facing=${t.toBack},part=foot]`);
+    for (let k = 2; k <= 4; k++) s.set(x0 + 3, 1, t.bz + t.step * k, 'red_carpet');
+  }
+  // two soldiers' tents (east), their open ends facing each other across a lane: two beds each and a barrel
+  for (const [z0, front, wool, ridge, loot] of [[9, 'south', 'black_wool', 'red_wool', 'ironclad_supply'], [17, 'north', 'red_wool', 'black_wool', null]]) {
+    const x0 = 19, t = militaryTent(x0, z0, 6, front, wool, ridge);
+    for (const x of [x0 + 1, x0 + 5]) s.set(x, 1, t.bz, `red_bed[facing=${t.toBack},part=head]`).set(x, 1, t.bz + t.step, `red_bed[facing=${t.toBack},part=foot]`);
+    if (loot) s.barrel(x0 + 3, 1, t.bz, 'up', loot); else s.set(x0 + 3, 1, t.bz, 'barrel[facing=up]');
+  }
+  const banner = (x, z, rot) => s.set(x, 1, z, `red_banner[rotation=${rot}]`, { id: 'minecraft:banner', patterns: [{ pattern: 'minecraft:stripe_middle', color: 'black' }, { pattern: 'minecraft:border', color: 'black' }] });
+  banner(11, 18, 0); banner(18, 14, 4); banner(18, 17, 4);
+
+  // the flagpole: a blackstone base, a dark oak pole, a red flag with a black band, torn at the end
+  s.fill(c - 1, 0, c - 1, c + 1, 0, c + 1, BB).set(c, 1, c, 'polished_blackstone_wall');
+  for (let y = 2; y <= 17; y++) s.set(c, y, c, 'dark_oak_fence');
+  for (let x = c + 1; x <= c + 5; x++) for (let y = 13; y <= 16; y++) {
+    if (x === c + 5 && r.chance(0.5)) continue;
+    s.set(x, y, c, y === 14 || y === 15 ? (y === 14 ? 'black_wool' : 'red_wool') : 'red_wool');
+  }
+  s.set(c + 1, 14, c, 'black_wool').set(c + 2, 14, c, 'black_wool').set(c + 3, 14, c, 'black_wool').set(c + 4, 14, c, 'black_wool');
+  // the fire pit south of the pole, with log seats
+  s.set(c, 0, c + 4, 'stone').set(c, 1, c + 4, 'campfire[lit=false,facing=north]');
+  s.set(c - 2, 1, c + 4, 'stripped_dark_oak_log[axis=z]').set(c + 2, 1, c + 4, 'stripped_dark_oak_log[axis=z]').set(c - 2, 1, c + 5, 'stripped_dark_oak_log[axis=z]');
+  // training dummies (west of the gate): a post, a hay body, a pumpkin head, and a scuffed patch around them
+  for (const [x, z] of [[6, 21], [8, 24], [11, 26]]) {
+    s.set(x, 1, z, 'spruce_fence').set(x, 2, z, 'hay_block').set(x, 3, z, 'carved_pumpkin[facing=east]');
+    s.set(x + 1, 0, z, 'gravel').set(x, 0, z + 1, 'packed_mud');
+  }
+  // weapon racks (east of the gate): armour stands in worn iron, a rack of fences and a barrel
+  const worn = (id, dmg) => ({ id: 'minecraft:' + id, count: 1, components: { 'minecraft:damage': dmg } });
+  const stand = (x, z, yaw, eq) => s.entity(x, 1, z, { id: 'minecraft:armor_stand', ShowArms: true, Rotation: [{ t: 5, v: yaw }, { t: 5, v: 0 }], equipment: eq });
+  stand(19, 24, 0, { head: worn('iron_helmet', 120), chest: worn('chainmail_chestplate', 160), mainhand: worn('iron_sword', 180) });
+  stand(22, 23, 0, { head: worn('chainmail_helmet', 120), mainhand: worn('iron_axe', 180), offhand: worn('shield', 200) });
+  s.fill(18, 1, 26, 20, 1, 26, 'spruce_fence').fill(18, 2, 26, 20, 2, 26, 'spruce_slab[type=bottom]');
+  s.set(17, 1, 26, 'barrel[facing=up]');
+  // supply barrels by the commander's tent
+  s.barrel(11, 1, 12, 'up', 'ironclad_supply').set(11, 1, 13, 'barrel[facing=up]').set(11, 2, 12, 'barrel[facing=up]').set(11, 1, 14, 'lantern[hanging=false]');
+  return s.save(`ironclad_camp/${seed}`);
+}
+const ironcladTemplates = [ironcladCamp(1)];
+// v3.7: the Ironclad camp on open flat dry ground, its gate turned to the open side (SpireStructures.CaveTemplate.openGround)
+special('ironclad_camp', 'spirecraft:cave_template', ['minecraft:badlands', 'minecraft:eroded_badlands', 'minecraft:wooded_badlands', 'minecraft:savanna', 'minecraft:savanna_plateau'],
+  50, 17, { templates: ironcladTemplates, mode: 'open_ground', sink: 1, terrain_adaptation: 'beard_box' });
+
+/** Silent: the hunters' gathering place (issue #37, poison and snakes). An abandoned den in the swamp / jungle: seven
+ * rooms and narrow corridors on short stilts (hall with a cold fire pit and knife targets, poison room with the stash
+ * cellar under a rug, store, skinning room, two small nooks with one bed each, the entry over a hollow stump) under a
+ * leaf canopy that reads as swamp trees from above. Two hidden poison-arrow tripwires: in the leaf tunnel to the stump,
+ * and in the corridor to the poison room.
+ * Layer G is the ground (the stilts go G blocks further down, to reach the floor of shallow water); the deck is at P. */
+loot('silent_gathering', [
+  { rolls: [4, 7], items: [['spider_eye', 10, 1, 4], ['poisonous_potato', 8, 1, 4], ['fermented_spider_eye', 4, 1, 2], ['string', 8, 2, 6], ['tripwire_hook', 5, 1, 3], ['arrow', 6, 4, 12], ['rabbit_hide', 6, 1, 4], ['leather', 5, 1, 3], ['feather', 5, 2, 6], ['spirecraft:throwing_knife', 8, 8, 16], ['slime_ball', 3, 1, 3]] },
+  { rolls: [1, 2], items: [['potion', 5, 1, 1, { potion: 'spirecraft:poison' }], ['splash_potion', 4, 1, 1, { potion: 'spirecraft:poison' }], potion('dexterity', 3), potion('weak', 2), ['empty', 2]] },
+  { rolls: 1, items: [['empty', 50], ['spirecraft:poisoned_dagger', 8], ['spirecraft:poison_flask', 8, 2, 4], ['spirecraft:snakebite', 6], ['spirecraft:ink_dagger', 3]] },
+  { rolls: 1, items: [['empty', 88], ['potion', 7, 1, 1, { potion: 'spirecraft:ghost_in_a_jar' }], ['spirecraft:shuriken', 5]] },
+]);
+loot('silent_supply', [
+  { rolls: [2, 5], items: [['rabbit_hide', 8, 1, 4], ['leather', 6, 1, 3], ['string', 6, 1, 4], ['arrow', 6, 3, 10], ['tipped_arrow', 3, 2, 6, { potion: 'minecraft:poison' }], ['cooked_rabbit', 5, 1, 3], ['cooked_chicken', 4, 1, 3], ['feather', 5, 1, 4], ['bone', 5, 1, 3], ['spider_eye', 4, 1, 2], ['brown_mushroom', 4, 1, 3], ['red_mushroom', 3, 1, 2], ['sweet_berries', 4, 2, 6]] },
+]);
+function silentGathering(seed) {
+  // v2 (user, issue #37: harder to find, traps better hidden, fewer beds and not together, bigger, lower, a tangle of
+  // rooms inside): a low den of rooms and narrow corridors on short stilts under a canopy roof that looks like the
+  // swamp trees around it. The only way up is a ladder inside a hollow stump, reached through a tunnel of leaves.
+  const r = rng(seed), n = 47, G = 12, P = G + 3, s = new Struct(n, 23, n);   // G: 12 down for the vault under the cellar
+  const LOG = 'mangrove_log[axis=y]', FENCE = 'dark_oak_fence';   // no red mangrove planks or fences: they show through the leaves
+  const LEAVES = ['jungle_leaves[persistent=true]', 'mangrove_leaves[persistent=true]', 'oak_leaves[persistent=true]', 'mangrove_leaves[persistent=true]'];
+  const leaf = () => r.pick(LEAVES);
+  const BYTE = v => ({ t: 1, v });
+  const FACE = { north: 2, south: 3, west: 4, east: 5 };
+  const knife = (x, y, z, facing) => s.entity(x, y, z, { id: 'minecraft:item_frame', Facing: BYTE(FACE[facing]), Invisible: BYTE(1), ItemRotation: BYTE(r.int(0, 7)), Item: { id: 'spirecraft:throwing_knife', count: 1 } });
+  const SUPPLY = { id: 'minecraft:barrel', LootTable: 'spirecraft:chests/silent_supply' };
+  const banner = (pat = []) => ({ id: 'minecraft:banner', patterns: pat });
+  const bandage = [{ pattern: 'minecraft:stripe_downright', color: 'white' }];
+  const snakeskin = [{ pattern: 'minecraft:small_stripes', color: 'green' }, { pattern: 'minecraft:curly_border', color: 'green' }];
+
+  // ---- the plan: floor cells of rooms (roofed) and the balcony (open); walls go round every roofed floor cell
+  const key = (x, z) => x + ',' + z, floor = new Map();
+  const room = (x0, z0, x1, z1, kind = 'room') => { for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) floor.set(key(x, z), kind); };
+  const path = list => list.forEach(([x, z]) => floor.set(key(x, z), 'room'));
+  const HALL = [19, 19, 27, 25], POISON = [9, 18, 14, 23], STORE = [20, 11, 24, 15], NOOK_W = [15, 11, 18, 14],
+    SKIN = [29, 12, 34, 17], NOOK_E = [31, 21, 35, 26], ENTRY = [20, 34, 24, 38];
+  for (const rm of [HALL, POISON, STORE, NOOK_W, SKIN, NOOK_E, ENTRY]) room(...rm);
+  room(37, 22, 39, 26, 'open');                                                             // the balcony
+  path([[22, 18], [22, 17], [22, 16]]);                                                     // hall - store
+  path([[19, 13]]);                                                                         // store - west nook, behind a tapestry
+  path([[18, 20], [17, 20], [16, 20], [16, 21], [16, 22], [16, 23], [15, 23]]);             // hall - poison room (trapped)
+  path([[28, 20], [29, 20], [29, 19], [29, 18]]);                                           // hall - skinning room
+  path([[28, 23], [29, 23], [30, 23]]);                                                     // hall - east nook
+  path([[36, 24]]);                                                                         // east nook - balcony
+  path([[25, 26], [25, 27], [25, 28], [25, 29], [25, 30], [24, 30], [23, 30], [22, 30], [21, 30], [20, 30], [19, 30], [21, 31], [21, 32], [21, 33]]);   // entry - hall, a dead end west
+  const kind = (x, z) => floor.get(key(x, z));
+  const wall = new Set(), rail = new Set();
+  for (let x = 0; x < n; x++) for (let z = 0; z < n; z++) {
+    if (floor.has(key(x, z))) continue;
+    let nearRoom = false, nearOpen = false;
+    for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+      const k = kind(x + dx, z + dz);
+      if (k === 'room') nearRoom = true; else if (k === 'open') nearOpen = true;
+    }
+    if (nearRoom) wall.add(key(x, z)); else if (nearOpen) rail.add(key(x, z));
+  }
+  const isWall = (x, z) => wall.has(key(x, z));
+  const covered = (x, z) => kind(x, z) === 'room' || isWall(x, z);
+  const shaded = (x, z) => covered(x, z) || floor.has(key(x, z)) || rail.has(key(x, z));   // the canopy reaches over the balcony too
+  const inRect = (x, z, [x0, z0, x1, z1]) => x >= x0 && x <= x1 && z >= z0 && z <= z1;
+  const WALLS = ['dark_oak_planks', 'dark_oak_planks', 'dark_oak_planks', 'stripped_dark_oak_log[axis=y]', 'spruce_planks'];
+
+  // ---- deck, walls, ceilings, stilts (the deck is 2 above the ground: room to crawl under it)
+  for (let x = 0; x < n; x++) for (let z = 0; z < n; z++) {
+    const k = kind(x, z), w = isWall(x, z), rl = rail.has(key(x, z));
+    if (!k && !w && !rl) continue;
+    s.set(x, P, z, r.pick(['dark_oak_planks', 'spruce_planks', 'spruce_planks', 'dark_oak_planks', 'stripped_spruce_log[axis=x]']));
+    if (x % 3 === 0 && z % 3 === 0) for (let y = 0; y < P; y++) s.set(x, y, z, LOG);
+    if (w) for (let y = P + 1; y <= P + 3; y++) s.set(x, y, z, x % 4 === 0 && z % 4 === 0 ? LOG : r.pick(WALLS));
+    else if (rl) { s.set(x, P + 1, z, FENCE); s.set(x, P + 2, z, 'air').set(x, P + 3, z, 'air'); }
+    else { for (let y = P + 1; y <= P + 3; y++) s.set(x, y, z, 'air'); if (k === 'room') s.set(x, P + 4, z, 'dark_oak_planks'); }
+  }
+  // roots round the feet of some stilts, like the mangroves around
+  s.forEach((x, y, z, st) => {
+    if (y !== G + 1 || st !== LOG) return;
+    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (!s.get(x + dx, y, z + dz) && r.chance(0.3)) {
+      s.set(x + dx, y, z + dz, 'mangrove_roots');
+      if (r.chance(0.4)) s.set(x + dx, y + 1, z + dz, 'mangrove_roots');
+    }
+  });
+
+  // ---- the canopy: leaves over the walls and out past them, then uneven clumps on top, like the swamp oaks
+  const near = (x, z) => { let d = 9; for (let dx = -3; dx <= 3; dx++) for (let dz = -3; dz <= 3; dz++) if (shaded(x + dx, z + dz)) d = Math.min(d, Math.max(Math.abs(dx), Math.abs(dz))); return d; };
+  const dist = [];
+  for (let x = 0; x < n; x++) { dist[x] = []; for (let z = 0; z < n; z++) dist[x][z] = near(x, z); }
+  for (let x = 0; x < n; x++) for (let z = 0; z < n; z++) {
+    const d = dist[x][z];
+    if (kind(x, z) !== 'room' && (d <= 1 || (d === 2 && r.chance(0.5)))) s.set(x, P + 4, z, leaf());
+    if (d <= 1 || (d === 2 && r.chance(0.3))) s.set(x, P + 5, z, leaf());   // no holes: they show as dark spots from above
+    if (d >= 1 && d <= 2 && s.get(x, P + 4, z) && !s.get(x, P + 3, z) && r.chance(0.3)) s.set(x, P + 3, z, 'vine[up=true]');
+  }
+  const roofed = [];
+  for (let x = 0; x < n; x++) for (let z = 0; z < n; z++) if (shaded(x, z)) roofed.push([x, z]);
+  for (let i = 0; i < 16; i++) {
+    const [cx, cz] = r.pick(roofed), rad = r.int(2, 3);
+    for (let dx = -rad; dx <= rad; dx++) for (let dz = -rad; dz <= rad; dz++) {
+      const h = Math.hypot(dx, dz);
+      if (h > rad + 0.3) continue;
+      s.set(cx + dx, P + 6, cz + dz, leaf());
+      if (h <= rad - 1.5 && r.chance(0.8)) s.set(cx + dx, P + 7, cz + dz, leaf());
+    }
+  }
+  // vines over the outside of the walls
+  for (const k of wall) {
+    const [x, z] = k.split(',').map(Number);
+    for (const [dx, dz, face] of [[1, 0, 'west'], [-1, 0, 'east'], [0, 1, 'north'], [0, -1, 'south']]) {
+      if (covered(x + dx, z + dz) || floor.has(key(x + dx, z + dz)) || rail.has(key(x + dx, z + dz))) continue;
+      for (let y = P + 1; y <= P + 3; y++) if (r.chance(0.55) && !s.get(x + dx, y, z + dz)) s.set(x + dx, y, z + dz, `vine[${face}=true]`);
+    }
+  }
+
+  // ---- the hall: a cold fire pit (no smoke to give them away), log seats, knife targets on the north wall
+  s.set(23, P, 22, 'mud_bricks').set(23, P + 1, 22, 'campfire[lit=false,facing=south]');
+  for (const [dx, dz] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]]) s.set(23 + dx, P, 22 + dz, 'packed_mud');
+  s.set(22, P + 1, 20, 'stripped_mangrove_log[axis=x]').set(23, P + 1, 20, 'stripped_mangrove_log[axis=x]');
+  s.set(21, P + 1, 22, 'stripped_mangrove_log[axis=z]').set(21, P + 1, 23, 'stripped_mangrove_log[axis=z]');
+  s.set(25, P + 1, 21, 'stripped_mangrove_log[axis=z]').set(25, P + 1, 22, 'stripped_mangrove_log[axis=z]');
+  s.set(24, P + 1, 24, 'spruce_stairs[facing=south,half=bottom]');
+  for (const x of [20, 26]) { s.set(x, P + 2, 18, 'target'); knife(x, P + 2, 19, 'south'); }
+  s.set(27, P + 1, 25, 'loom').set(21, P + 3, 25, 'lime_wall_banner[facing=north]', banner(snakeskin));
+  s.set(21, P + 3, 21, 'lantern[hanging=true]').set(25, P + 3, 24, 'lantern[hanging=true]');
+
+  // ---- the store: fletching table, supply barrels, hay; a low doorway west behind a tapestry
+  s.set(20, P + 1, 11, 'barrel[facing=up]', SUPPLY).set(24, P + 1, 11, 'barrel[facing=up]', SUPPLY);
+  s.set(21, P + 1, 11, 'barrel[facing=up]').set(21, P + 2, 11, 'barrel[facing=up]').set(23, P + 1, 11, 'fletching_table');
+  s.set(24, P + 1, 15, 'hay_block').set(24, P + 1, 14, 'hay_block').set(24, P + 2, 15, 'hay_block');
+  s.set(19, P + 3, 13, 'dark_oak_planks').set(20, P + 3, 13, 'green_wall_banner[facing=east]', banner(bandage));
+  s.set(22, P + 3, 13, 'lantern[hanging=true]');
+  // the west nook: one bed, a stack of white cloth (bandages)
+  s.set(15, P + 1, 11, 'green_bed[facing=north,part=head]').set(15, P + 1, 12, 'green_bed[facing=north,part=foot]');
+  s.set(18, P + 1, 11, 'white_wool').set(17, P + 1, 11, 'barrel[facing=up]').set(18, P + 2, 11, 'white_carpet');
+  s.set(16, P + 3, 13, 'lantern[hanging=true]');
+
+  // ---- the poison room: the bench, a shelf of jars, and a hatch under the rug down to the stash
+  s.set(9, P + 1, 19, 'brewing_stand').set(9, P + 1, 20, 'water_cauldron[level=2]');
+  s.set(9, P + 1, 21, 'barrel[facing=up]').set(9, P + 2, 21, 'green_candle[candles=3,lit=false]');
+  s.set(9, P + 1, 22, 'barrel[facing=up]').set(9, P + 2, 22, 'decorated_pot[facing=east]');
+  for (const x of [10, 11]) s.set(x, P + 2, 18, 'spruce_trapdoor[facing=south,half=top,open=false]');
+  s.set(10, P + 3, 18, 'potted_red_mushroom').set(11, P + 3, 18, 'green_candle[candles=2,lit=false]');
+  s.set(10, P + 1, 18, 'decorated_pot[facing=south]').set(11, P + 1, 18, 'potted_brown_mushroom');
+  s.set(14, P + 1, 18, 'barrel[facing=up]').set(14, P + 2, 18, 'barrel[facing=up]');
+  s.set(11, P + 3, 21, 'lantern[hanging=true]');
+  s.set(12, P, 18, 'spruce_trapdoor[facing=south,half=top,open=false]');
+  for (let x = 11; x <= 13; x++) for (let z = 18; z <= 19; z++) s.set(x, P + 1, z, x === 11 && z === 18 ? 'potted_brown_mushroom' : 'green_carpet');
+  // under it: a mud cellar 2 high between the stilts - a decoy, only a supply barrel; one moss carpet on its floor hides
+  // the hatch to the vault
+  for (let x = 11; x <= 15; x++) for (let z = 17; z <= 21; z++) {
+    const edge = x === 11 || x === 15 || z === 17 || z === 21;
+    s.set(x, G, z, edge ? 'mud_bricks' : 'packed_mud');
+    for (let y = G + 1; y <= G + 2; y++) s.set(x, y, z, edge ? r.pick(['mud_bricks', 'mud_bricks', 'packed_mud', 'mangrove_roots']) : 'air');
+  }
+  s.set(12, G + 1, 18, 'ladder[facing=south]').set(12, G + 2, 18, 'ladder[facing=south]');
+  s.barrel(14, G + 1, 20, 'up', 'silent_supply');
+  s.set(14, G + 1, 18, 'decorated_pot[facing=west]').set(12, G + 1, 20, 'lantern[hanging=false]');
+  for (const [x, z] of [[13, 18], [12, 19], [13, 19], [14, 19], [13, 20]]) s.set(x, G + 1, z, 'moss_carpet');
+  s.set(13, G, 19, 'spruce_trapdoor[facing=south,half=top,open=false]');
+
+  // ---- the vault, deep under the cellar: a shaft down, a trapped passage, a room, the main chest trapped too
+  const EARTH = ['mud_bricks', 'mud_bricks', 'packed_mud', 'mud', 'rooted_dirt'];
+  for (let x = 8; x <= 18; x++) for (let z = 17; z <= 31; z++) {
+    for (let y = 1; y <= 5; y++) s.set(x, y, z, r.pick(EARTH));
+    s.set(x, 0, z, 'packed_mud').set(x, 6, z, r.pick(['packed_mud', 'dirt', 'mud']));
+  }
+  // the shaft: a mud brick tube from under the hatch to the vault floor, the ladder on its north side
+  for (let y = 2; y < G; y++) for (let x = 12; x <= 14; x++) for (let z = 18; z <= 20; z++) s.set(x, y, z, x === 13 && z === 19 ? 'air' : 'mud_bricks');
+  for (let y = 2; y < G; y++) s.set(13, y, 19, 'ladder[facing=south]');
+  s.set(13, 2, 20, 'air').set(13, 3, 20, 'air');                                   // out at the bottom, to the south
+  // the passage south, 1 wide and 2 high; a tripwire across it at (13, 21). Each hook sits in a gap in the wall, hung on
+  // the earth behind it; on that block sits a dispenser, its mouth behind hanging roots at head height
+  for (const z of [21, 22]) s.set(13, 2, z, 'air').set(13, 3, z, 'air');
+  s.set(13, 2, 21, 'tripwire[attached=true,disarmed=false,powered=false,east=true,west=true,north=false,south=false]');
+  for (const [side, face] of [[-1, 'east'], [1, 'west']]) {
+    s.set(13 + 2 * side, 2, 21, 'mud_bricks');
+    s.set(13 + 2 * side, 3, 21, `dispenser[facing=${face},triggered=false]`, poisonArrows());
+    s.set(13 + side, 2, 21, `tripwire_hook[attached=true,facing=${face},powered=false]`);
+    s.set(13 + side, 3, 21, 'hanging_roots').set(13 + side, 4, 21, 'mud_bricks');
+  }
+  // the room
+  for (let x = 9; x <= 17; x++) for (let z = 23; z <= 28; z++) {
+    s.set(x, 1, z, r.pick(['mud_bricks', 'packed_mud', 'packed_mud']));
+    for (let y = 2; y <= 4; y++) s.set(x, y, z, 'air');
+    if (r.chance(0.22)) s.set(x, 4, z, 'hanging_roots');
+  }
+  s.set(13, 4, 25, 'lantern[hanging=true]');
+  // the treasure: a trapped chest in a recess 2 deep in the south wall; opening it powers the block under it, and the
+  // dispenser beside that block - the floor in front of the chest, under a moss carpet - shoots straight up
+  s.set(13, 2, 29, 'moss_carpet').set(13, 3, 29, 'air').set(13, 3, 30, 'air');
+  s.set(13, 1, 29, 'dispenser[facing=up,triggered=false]', poisonArrows()).set(13, 1, 30, 'mud_bricks');
+  s.chest(13, 2, 30, 'north', 'silent_gathering', 'trapped_chest');
+  for (const [x, z] of [[11, 28], [12, 28], [14, 28], [15, 27]]) s.set(x, 2, z, 'moss_carpet');
+  s.set(13, 4, 28, 'lime_wall_banner[facing=north]', banner(snakeskin));
+  // someone who opened it before: a skull in front of the recess
+  s.set(12, 2, 27, 'skeleton_skull[rotation=6]');
+  // knives and a dagger left on the north wall; pots of supplies in the corners
+  [[10, 'spirecraft:throwing_knife'], [11, 'spirecraft:poisoned_dagger'], [15, 'spirecraft:throwing_knife']].forEach(([x, item]) =>
+    s.entity(x, 3, 23, { id: 'minecraft:item_frame', Facing: BYTE(FACE.south), ItemRotation: BYTE(r.int(0, 7)), Item: { id: item, count: 1 } }));
+  for (const [x, z, f] of [[9, 23, 'east'], [17, 28, 'west'], [9, 28, 'east']]) s.set(x, 2, z, `decorated_pot[facing=${f}]`, { id: 'minecraft:decorated_pot', LootTable: 'spirecraft:chests/silent_supply' });
+
+  // ---- the skinning room: smoker, grindstone, hay, supply; hides drying on the outside of the east wall
+  s.set(34, P + 1, 12, 'smoker[facing=south,lit=false]').set(33, P + 1, 12, 'cauldron').set(32, P + 1, 12, 'grindstone[face=floor,facing=south]');
+  s.set(34, P + 1, 13, 'barrel[facing=up]', SUPPLY);
+  s.set(29, P + 1, 12, 'hay_block').set(30, P + 1, 12, 'hay_block').set(29, P + 2, 12, 'hay_block').set(29, P + 1, 13, 'hay_block');
+  s.set(31, P + 3, 15, 'lantern[hanging=true]');
+  [['brown', []], ['brown', [{ pattern: 'minecraft:gradient', color: 'black' }]], ['lime', snakeskin], ['brown', []]].forEach(([col, pat], i) =>
+    s.set(36, P + 3, 13 + i, `${col}_wall_banner[facing=east]`, banner(pat)));
+  // the east nook: the other bed, and a balcony over the water with a knife range
+  s.set(35, P + 1, 21, 'lime_bed[facing=north,part=head]').set(35, P + 1, 22, 'lime_bed[facing=north,part=foot]');
+  s.set(31, P + 1, 21, 'barrel[facing=up]').set(33, P + 1, 25, 'green_carpet').set(34, P + 1, 25, 'green_carpet');
+  s.set(33, P + 3, 24, 'lantern[hanging=true]');
+  for (const [x, z] of [[44, 22], [45, 26]]) {
+    for (let y = 0; y <= P; y++) s.set(x, y, z, LOG);
+    s.set(x, P + 1, z, 'target');
+    knife(x - 1, P + 1, z, 'west');
+  }
+  // the entry room above the stump
+  s.set(20, P + 1, 34, 'barrel[facing=up]').set(22, P + 3, 36, 'lantern[hanging=true]');
+
+  // ---- inside the corridor to the poison room: a tripwire; the hook in the north wall hangs on a log outside,
+  // and the dispenser on that log shoots through a curtain of vines at head height
+  s.set(17, P + 1, 18, 'mangrove_log[axis=y]');
+  s.set(17, P + 2, 18, 'dispenser[facing=south,triggered=false]', poisonArrows());
+  s.set(17, P + 2, 19, 'vine[north=true]');
+  s.set(17, P + 1, 19, 'tripwire_hook[attached=true,facing=south,powered=false]');
+  s.set(17, P + 1, 20, 'tripwire[attached=true,disarmed=false,powered=false,north=true,south=true,east=false,west=false]');
+  s.set(17, P + 1, 21, 'tripwire_hook[attached=true,facing=north,powered=false]').set(17, P + 1, 22, 'dark_oak_planks');
+  for (const [x, y, z] of [[17, P + 3, 18], [16, P + 1, 18], [16, P + 2, 18], [16, P + 3, 18], [17, P + 1, 17], [17, P + 2, 17], [17, P + 3, 17]]) s.set(x, y, z, leaf());
+
+  // ---- the hollow stump: a ring of mangrove logs under the entry room, the ladder inside it
+  const SX = 22, SZ = 38;
+  for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+    s.set(SX + dx, G, SZ + dz, 'mud');
+    if (dx === 0 && dz === 0) continue;
+    for (let y = G - 2; y < P; y++) s.set(SX + dx, y, SZ + dz, dx === 0 && dz === 1 && y > G && y <= G + 2 ? 'air' : LOG);
+  }
+  for (let y = G + 1; y <= P; y++) s.set(SX, y, SZ, 'ladder[facing=south]');
+  // the way in: a low tunnel of bushes to the stump's opening, and in it a tripwire between two hidden dispensers
+  for (let x = SX - 3; x <= SX + 3; x++) for (let z = SZ + 1; z <= SZ + 6; z++) {
+    s.set(x, G, z, r.pick(['grass_block[snowy=false]', 'grass_block[snowy=false]', 'mud', 'rooted_dirt'])).set(x, G - 1, z, 'dirt').set(x, G - 2, z, 'mud');
+    if (z === SZ + 1 && Math.abs(x - SX) <= 1) continue;
+    if (Math.abs(x - SX) === 1 && z <= SZ + 5) { s.set(x, G + 1, z, leaf()).set(x, G + 2, z, leaf()); continue; }
+    if (x === SX) { s.set(x, G + 1, z, 'air').set(x, G + 2, z, 'air'); if (z <= SZ + 4) s.set(x, G + 3, z, leaf()); continue; }
+    if (r.chance(0.6)) { s.set(x, G + 1, z, leaf()); if (r.chance(0.5)) s.set(x, G + 2, z, leaf()); }
+  }
+  for (let x = SX - 1; x <= SX + 1; x++) for (let z = SZ + 2; z <= SZ + 4; z++) s.set(x, G + 3, z, leaf());
+  const tz = SZ + 3;
+  for (const [side, face, out] of [[-1, 'east', 'west'], [1, 'west', 'east']]) {
+    s.set(SX + 2 * side, G + 1, tz, 'mangrove_log[axis=y]');
+    s.set(SX + 2 * side, G + 2, tz, `dispenser[facing=${face},triggered=false]`, poisonArrows());
+    s.set(SX + 2 * side, G + 3, tz, leaf());
+    // packed into the bush on every side but the vine-covered face
+    for (const [x, y, z] of [[SX + 3 * side, G + 1, tz], [SX + 3 * side, G + 2, tz], [SX + 2 * side, G + 1, tz - 1], [SX + 2 * side, G + 2, tz - 1],
+      [SX + 2 * side, G + 1, tz + 1], [SX + 2 * side, G + 2, tz + 1], [SX + 3 * side, G + 3, tz], [SX + 2 * side, G + 3, tz - 1], [SX + 2 * side, G + 3, tz + 1]]) s.set(x, y, z, leaf());
+    s.set(SX + side, G + 1, tz, `tripwire_hook[attached=true,facing=${face},powered=false]`);
+    s.set(SX + side, G + 2, tz, `vine[${out}=true]`);
+  }
+  s.set(SX, G + 1, tz, 'tripwire[attached=true,disarmed=false,powered=false,east=true,west=true,north=false,south=false]');
+  // the hunters' mark, a strip of white cloth at the stump's mouth
+  s.set(SX + 1, G + 2, SZ + 2, 'white_wall_banner[facing=south]', banner()).set(SX + 1, G + 2, SZ + 1, LOG);
+  // and a few more tied low on stilts under the deck
+  const posts = [];
+  s.forEach((x, y, z, st) => { if (y === G + 2 && st === LOG && !s.get(x, y, z + 1) && x > 2 && x < n - 3) posts.push([x, z]); });
+  for (let i = 0; i < 4 && posts.length; i++) { const [x, z] = posts.splice(r.int(0, posts.length - 1), 1)[0]; s.set(x, G + 2, z + 1, 'white_wall_banner[facing=south]', banner()); }
+
+  // ---- abandoned: a few boards gone, moss on the floors, cobwebs in the corners
+  for (const rm of [HALL, STORE, SKIN, NOOK_E, ENTRY]) for (let x = rm[0]; x <= rm[2]; x++) for (let z = rm[1]; z <= rm[3]; z++) {
+    if (s.get(x, P + 1, z) !== 'air' || (x === SX && z === SZ)) continue;
+    if (r.chance(0.03)) s.set(x, P, z, 'air');
+    else if (r.chance(0.07)) s.set(x, P + 1, z, 'moss_carpet');
+  }
+  for (const rm of [HALL, POISON, STORE, NOOK_W, SKIN, NOOK_E, ENTRY]) for (const [x, z] of [[rm[0], rm[1]], [rm[2], rm[1]], [rm[0], rm[3]], [rm[2], rm[3]]])
+    if (s.get(x, P + 3, z) === 'air' && r.chance(0.45)) s.set(x, P + 3, z, 'cobweb');
+  return s.save(`silent_gathering/${seed}`);
+}
+function poisonArrows() {
+  return { id: 'minecraft:dispenser', Items: [{ Slot: { t: 1, v: 0 }, id: 'minecraft:tipped_arrow', count: 16, components: { 'minecraft:potion_contents': { potion: 'minecraft:poison' } } }] };
+}
+const silentTemplates = [silentGathering(1)];
+// issue #37: on stilts over shallow water or flat jungle floor (SpireStructures.CaveTemplate.stilts); placed after the
+// trees (top_layer_modification) so the rooms cut them out instead of filling with leaves
+special('silent_gathering', 'spirecraft:cave_template', ['minecraft:swamp', 'minecraft:mangrove_swamp', 'minecraft:jungle', 'minecraft:sparse_jungle'],
+  50, 17, { templates: silentTemplates, mode: 'stilts', sink: 13, ignore_waterlogging: true, step: 'top_layer_modification' });
 
 // template ids used by worldgen/TemplateFeature placements (see BiomeData)
 console.log('ok', JSON.stringify(hiveTemplates), pierTemplates);

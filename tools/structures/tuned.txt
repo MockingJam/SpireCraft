@@ -1,0 +1,3 @@
+# 在游戏里手工微调过的结构模板，每行一个（例如 ironclad_camp/1）。
+# build.js 重新生成时会跳过这里列出的模板，不会覆盖你的修改。
+# Templates tuned by hand in the game, one per line. build.js leaves them alone.

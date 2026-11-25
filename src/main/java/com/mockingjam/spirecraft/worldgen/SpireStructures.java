@@ -35,8 +35,13 @@ import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockIgnoreProcessor;
+import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -63,6 +68,33 @@ public final class SpireStructures {
             () -> (StructurePieceType.StructureTemplateType) TemplatePiece::new);
     public static final RegistryObject<StructurePieceType> CARVED_PIECE = PIECES.register("carved_piece",
             () -> (StructurePieceType.ContextlessType) CarvedPiece::new);
+    public static final DeferredRegister<StructureProcessorType<?>> PROCESSORS = DeferredRegister.create(Registries.STRUCTURE_PROCESSOR, SpireCraft.MODID);
+    public static final RegistryObject<StructureProcessorType<HangingPosProcessor>> HANGING_POS = PROCESSORS.register("hanging_pos",
+            () -> () -> HangingPosProcessor.CODEC);
+
+    /**
+     * Issue #37 (item frames with throwing knives on the Silent's targets): a template's hanging entities carry no
+     * {@code block_pos}, so they log "Block-attached entity at invalid position" when placed. This writes the placed
+     * position in (Forge hands {@code processEntity} the already rotated and offset position).
+     */
+    public static final class HangingPosProcessor extends StructureProcessor {
+        static final HangingPosProcessor INSTANCE = new HangingPosProcessor();
+        static final MapCodec<HangingPosProcessor> CODEC = MapCodec.unit(INSTANCE);
+
+        @Override
+        public StructureTemplate.StructureEntityInfo processEntity(LevelReader level, BlockPos seed, StructureTemplate.StructureEntityInfo raw,
+                StructureTemplate.StructureEntityInfo info, StructurePlaceSettings settings, StructureTemplate template) {
+            if (!info.nbt.contains("Facing") || info.nbt.contains("block_pos")) return info;
+            CompoundTag tag = info.nbt.copy();
+            tag.store("block_pos", BlockPos.CODEC, info.blockPos);
+            return new StructureTemplate.StructureEntityInfo(info.pos, info.blockPos, tag);
+        }
+
+        @Override
+        protected StructureProcessorType<?> getType() {
+            return HANGING_POS.get();
+        }
+    }
 
     private static long hash(long seed, int x, int y, int z) {
         long h = seed ^ (x * 3129871L) ^ (z * 116129781L) ^ (long) y * 0x9E3779B97F4A7C15L;
@@ -83,19 +115,24 @@ public final class SpireStructures {
                 Codec.STRING.fieldOf("mode").forGetter(s -> s.mode),
                 Codec.INT.optionalFieldOf("sink", 1).forGetter(s -> s.sink),
                 Codec.INT.optionalFieldOf("min_y", -50).forGetter(s -> s.minY),
-                Codec.INT.optionalFieldOf("max_y", 40).forGetter(s -> s.maxY)).apply(i, CaveTemplate::new));
+                Codec.INT.optionalFieldOf("max_y", 40).forGetter(s -> s.maxY),
+                Codec.BOOL.optionalFieldOf("ignore_waterlogging", false).forGetter(s -> s.dry)).apply(i, CaveTemplate::new));
 
         final List<ResourceLocation> templates;
         final String mode;
         final int sink, minY, maxY;
+        /** Issue #37 (the Silent's vault flooded): place without taking in the ground water - blocks that can hold water
+         * stay dry instead of waterlogging (and spilling) where the template meets an aquifer or the swamp. */
+        final boolean dry;
 
-        CaveTemplate(StructureSettings settings, List<ResourceLocation> templates, String mode, int sink, int minY, int maxY) {
+        CaveTemplate(StructureSettings settings, List<ResourceLocation> templates, String mode, int sink, int minY, int maxY, boolean dry) {
             super(settings);
             this.templates = templates;
             this.mode = mode;
             this.sink = sink;
             this.minY = minY;
             this.maxY = maxY;
+            this.dry = dry;
         }
 
         @Override
@@ -111,6 +148,8 @@ public final class SpireStructures {
             if (size.getX() == 0) return Optional.empty();
             int x = ctx.chunkPos().getMiddleBlockX(), z = ctx.chunkPos().getMiddleBlockZ();
             if (mode.equals("shore")) return shore(ctx, id, size, x, z);
+            if (mode.equals("open_ground")) return openGround(ctx, id, size, x, z);
+            if (mode.equals("stilts")) return stilts(ctx, id, size, x, z);
             // a cave floor: air with headroom over solid rock, here and at the template's corners
             NoiseColumn col = ctx.chunkGenerator().getBaseColumn(x, z, ctx.heightAccessor(), ctx.randomState());
             List<Integer> floors = new ArrayList<>();
@@ -128,7 +167,7 @@ public final class SpireStructures {
             BlockPos anchor = new BlockPos(x, y, z);
             Rotation rot = Rotation.getRandom(r);
             BlockPos pivot = new BlockPos(hw, sink, hd);
-            return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot))));
+            return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot, dry))));
         }
 
         private static boolean open(NoiseColumn col, int y) {
@@ -159,25 +198,96 @@ public final class SpireStructures {
                 if (!water || Math.abs(surface - 1 - waterTop) > 2) continue;
                 Rotation rot = switch (d) { case WEST -> Rotation.CLOCKWISE_90; case NORTH -> Rotation.CLOCKWISE_180; case EAST -> Rotation.COUNTERCLOCKWISE_90; default -> Rotation.NONE; };
                 BlockPos anchor = new BlockPos(x, waterTop + 1, z), pivot = new BlockPos(size.getX() / 2, sink, 0);
-                return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot))));
+                return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot, dry))));
             }
             return Optional.empty();
+        }
+
+        private static int height(GenerationContext ctx, int x, int z, Heightmap.Types type) {
+            return ctx.chunkGenerator().getBaseHeight(x, z, type, ctx.heightAccessor(), ctx.randomState());
+        }
+
+        /**
+         * v3.7 (user: the Ironclad camp only on open, fairly flat dry ground, its gate facing the open side): the whole
+         * footprint must be dry land within 6 blocks of height; the template's +z side (the gate) is turned to the
+         * direction whose ground in front of the gate rises least above the camp.
+         */
+        private Optional<GenerationStub> openGround(GenerationContext ctx, ResourceLocation id, net.minecraft.core.Vec3i size, int x, int z) {
+            int r = Math.max(size.getX(), size.getZ()) / 2 - 1;
+            int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE, sum = 0, n = 0;
+            for (int dx = -r; dx <= r; dx += 4) for (int dz = -r; dz <= r; dz += 4) {
+                if (dx * dx + dz * dz > r * r) continue;
+                int s = height(ctx, x + dx, z + dz, Heightmap.Types.WORLD_SURFACE_WG);
+                if (s != height(ctx, x + dx, z + dz, Heightmap.Types.OCEAN_FLOOR_WG)) return Optional.empty();   // water
+                min = Math.min(min, s);
+                max = Math.max(max, s);
+                sum += s;
+                n++;
+            }
+            if (max - min > 6) return Optional.empty();
+            int ground = Math.round(sum / (float) n);
+            Direction best = Direction.SOUTH;
+            int bestScore = Integer.MAX_VALUE;
+            for (Direction d : Direction.Plane.HORIZONTAL) {
+                int score = 0;
+                for (int k = r + 3; k <= r + 15; k += 4) for (int side = -6; side <= 6; side += 6) {
+                    int px = x + d.getStepX() * k - d.getStepZ() * side, pz = z + d.getStepZ() * k + d.getStepX() * side;
+                    score += Math.max(0, height(ctx, px, pz, Heightmap.Types.WORLD_SURFACE_WG) - ground);
+                }
+                score = score * 4 + ctx.random().nextInt(4);   // ties broken at random
+                if (score < bestScore) { bestScore = score; best = d; }
+            }
+            Rotation rot = switch (best) { case WEST -> Rotation.CLOCKWISE_90; case NORTH -> Rotation.CLOCKWISE_180; case EAST -> Rotation.COUNTERCLOCKWISE_90; default -> Rotation.NONE; };
+            BlockPos anchor = new BlockPos(x, ground, z), pivot = new BlockPos(size.getX() / 2, sink, size.getZ() / 2);
+            return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot, dry))));
+        }
+
+        /**
+         * Issue #37 (the Silent's stilt village in the swamp / jungle): the footprint may be shallow water (at most 3
+         * deep) or land, but the template's stilts reach {@code sink - 1} blocks below the mean surface, so the floor must
+         * not drop further than that, and no ground may rise more than 2 above the mean (v2, user: lower - the deck
+         * stands only 2 above it).
+         */
+        private Optional<GenerationStub> stilts(GenerationContext ctx, ResourceLocation id, net.minecraft.core.Vec3i size, int x, int z) {
+            int r = Math.max(size.getX(), size.getZ()) / 2 - 1;
+            int minFloor = Integer.MAX_VALUE, maxSurface = Integer.MIN_VALUE, sum = 0, n = 0;
+            for (int dx = -r; dx <= r; dx += 4) for (int dz = -r; dz <= r; dz += 4) {
+                if (dx * dx + dz * dz > r * r) continue;
+                int s = height(ctx, x + dx, z + dz, Heightmap.Types.WORLD_SURFACE_WG), f = height(ctx, x + dx, z + dz, Heightmap.Types.OCEAN_FLOOR_WG);
+                if (s - f > 3) return Optional.empty();   // deep water
+                minFloor = Math.min(minFloor, f);
+                maxSurface = Math.max(maxSurface, s);
+                sum += s;
+                n++;
+            }
+            int ground = Math.round(sum / (float) n);
+            // the floor may not drop more than 4 below the mean: the stilts reach, and the Silent's vault (6 to 11 below
+            // the mean surface) keeps a solid roof of earth
+            if (ground - minFloor > Math.min(sink - 1, 4) || maxSurface - ground > 2) return Optional.empty();
+            Rotation rot = Rotation.getRandom(ctx.random());
+            BlockPos anchor = new BlockPos(x, ground, z), pivot = new BlockPos(size.getX() / 2, sink, size.getZ() / 2);
+            return Optional.of(new GenerationStub(anchor, b -> b.addPiece(new TemplatePiece(ctx.structureTemplateManager(), id, anchor.subtract(pivot), rot, pivot, dry))));
         }
     }
 
     public static final class TemplatePiece extends TemplateStructurePiece {
-        TemplatePiece(StructureTemplateManager manager, ResourceLocation id, BlockPos pos, Rotation rot, BlockPos pivot) {
-            super(TEMPLATE_PIECE.get(), 0, manager, id, id.toString(), settings(rot, pivot), pos);
+        private final boolean dry;
+
+        TemplatePiece(StructureTemplateManager manager, ResourceLocation id, BlockPos pos, Rotation rot, BlockPos pivot, boolean dry) {
+            super(TEMPLATE_PIECE.get(), 0, manager, id, id.toString(), settings(rot, pivot, dry), pos);
+            this.dry = dry;
         }
 
         TemplatePiece(StructureTemplateManager manager, CompoundTag tag) {
             super(TEMPLATE_PIECE.get(), tag, manager, id -> settings(tag.read("Rot", Rotation.LEGACY_CODEC).orElse(Rotation.NONE),
-                    new BlockPos(tag.getIntOr("PX", 0), 0, tag.getIntOr("PZ", 0))));
+                    new BlockPos(tag.getIntOr("PX", 0), 0, tag.getIntOr("PZ", 0)), tag.getBooleanOr("Dry", false)));
+            this.dry = tag.getBooleanOr("Dry", false);
         }
 
-        private static StructurePlaceSettings settings(Rotation rot, BlockPos pivot) {
+        private static StructurePlaceSettings settings(Rotation rot, BlockPos pivot, boolean dry) {
             return new StructurePlaceSettings().setRotation(rot).setRotationPivot(new BlockPos(pivot.getX(), 0, pivot.getZ()))
-                    .addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK);
+                    .addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK).addProcessor(HangingPosProcessor.INSTANCE)
+                    .setLiquidSettings(dry ? LiquidSettings.IGNORE_WATERLOGGING : LiquidSettings.APPLY_WATERLOGGING);
         }
 
         @Override
@@ -186,6 +296,7 @@ public final class SpireStructures {
             tag.store("Rot", Rotation.LEGACY_CODEC, placeSettings.getRotation());
             tag.putInt("PX", placeSettings.getRotationPivot().getX());
             tag.putInt("PZ", placeSettings.getRotationPivot().getZ());
+            tag.putBoolean("Dry", dry);
         }
 
         @Override
