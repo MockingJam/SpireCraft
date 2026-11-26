@@ -2,10 +2,11 @@
 // tools/mobs/specs.js exactly like the generated Java (MobLayers) — box UVs, bone pivots and rotations, inflate —
 // rasterises the textured boxes with a depth buffer and vanilla face shading (top 1.0, N/S 0.8, E/W 0.6, bottom 0.5).
 // Usage: node tools/mobs/render.js <out.png> [name filter] [--views front,side,back]
+const REPO_ROOT = require('path').resolve(__dirname, '..', '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const { readPng, writePng } = require('../png');
 const specs = require('./specs');
-const TEX = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/entity/';
+const TEX = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/entity/';
 const [out, filter] = process.argv.slice(2).filter(a => !a.startsWith('--'));
 const viewsArg = (process.argv.find(a => a.startsWith('--views=')) || '--views=front,side').slice(8).split(',');
 const VIEWS = { front: [-35, 22], side: [-90, 12], back: [145, 25], top: [-30, 60], down: [0, 85], face: [0, 5] };

@@ -3,9 +3,10 @@
 // no noise). Each orb has a moving interior: Lightning — a flickering bolt; Frost — a slowly turning snowflake;
 // Dark — a swirling vortex. Writes textures/mob_effect/<orb>.png (+ .mcmeta animation).
 // Usage: node tools/orbs.js [previewOut.png]
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const { writePng } = require('./png');
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/mob_effect/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/mob_effect/';
 const S = 18, C = 8.5, R = 7.25, FRAMES = 8;
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const ORBS = {

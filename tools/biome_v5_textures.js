@@ -5,9 +5,10 @@
 //   with gaps, cutout), the hiveshroom wood set, hive_mycelium_layer, mycelium_thread, bug_carcass, byrdonis_egg_*,
 //   junk_block, paving_stones.
 // Usage: node tools/biome_v5_textures.js <vfull dir>
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const { readPng, writePng } = require('./png');
 const V = process.argv[2] + '/assets/minecraft/textures/';
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/';
 const v = n => readPng(V + n + '.png');
 const own = n => readPng(OUT + n + '.png');
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));

@@ -75,6 +75,9 @@ public final class ModEntities {
     /** Phase 10: the Merchant (structures.md §3), a wandering-trader-like visitor. */
     public static final RegistryObject<EntityType<com.mockingjam.spirecraft.mob.SpireMerchant>> MERCHANT = mob("merchant", com.mockingjam.spirecraft.mob.SpireMerchant::new, MobCategory.CREATURE, 0.9F, 1.4F);   // sitting on his rug
 
+    /** Glory v2: the Frog Knights' mount - bred in the beetle training grounds, tameable and rideable. */
+    public static final RegistryObject<EntityType<com.mockingjam.spirecraft.mob.RhinoBeetle>> RHINO_BEETLE = mob("rhino_beetle", com.mockingjam.spirecraft.mob.RhinoBeetle::new, MobCategory.CREATURE, 1.3F, 1.0F);
+
     /** §11: every data-driven STS2 monster (mob/ScriptedDefs), by name. */
     public static final java.util.Map<String, RegistryObject<EntityType<com.mockingjam.spirecraft.mob.ScriptedMonster>>> SCRIPTED = new java.util.LinkedHashMap<>();
     static {

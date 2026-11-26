@@ -30,6 +30,24 @@ public final class HarbourPlants {
             return CODEC;
         }
 
+        /**
+         * 2026-11-26 (user: "breaking the top of a reed leaves the bottom standing"): breaking the top half takes the
+         * bottom half with it explicitly (and drops the reed once), not only through the neighbour shape update.
+         */
+        @Override
+        public BlockState playerWillDestroy(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.player.Player player) {
+            if (!level.isClientSide() && state.getValue(HALF) == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER) {
+                BlockPos below = pos.below();
+                BlockState low = level.getBlockState(below);
+                if (low.is(this) && low.getValue(HALF) == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER) {
+                    if (!player.preventsBlockDrops()) dropResources(low, level, below, null, player, player.getMainHandItem());
+                    level.setBlock(below, Blocks.AIR.defaultBlockState(), 35);
+                    level.levelEvent(player, 2001, below, net.minecraft.world.level.block.Block.getId(low));
+                }
+            }
+            return super.playerWillDestroy(level, pos, state, player);
+        }
+
         @Override
         protected boolean mayPlaceOn(BlockState s, BlockGetter level, BlockPos pos) {
             return s.is(Blocks.MUD) || s.is(ModBlocks.SLUDGE.get()) || s.is(Blocks.CLAY) || s.is(Blocks.GRAVEL) || s.is(BlockTags.DIRT) || s.is(BlockTags.SAND);

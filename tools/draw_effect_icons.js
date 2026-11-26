@@ -3,6 +3,7 @@
 // Shapes are 16x16 char maps. Upper-case letters are shaded regions (5-step ramp: shadow..highlight),
 // lower-case letters are flat colours (cracks, eyes, speculars). Outline and drop shadow are generated.
 // Shading per pixel: bevel from region edges (lit from top-left) + a diagonal gradient across the shape.
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 
 const circle = (r, ch, spec) => {
@@ -100,7 +101,7 @@ for (const [name, def] of Object.entries(ICONS)) {
   for (const row of def.rows) if (row.length !== 16) throw new Error(name + ': row length ' + row.length + ' "' + row + '"');
 }
 
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/mob_effect/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/mob_effect/';
 const code = `(() => {
 const ICONS = ${JSON.stringify(ICONS)};
 const OUT = ${JSON.stringify(OUT)};
@@ -149,7 +150,7 @@ for (const [name, def] of Object.entries(ICONS)) {
   Blockbench.writeFile(OUT + name + '.png', {content: url, savetype: 'image'});
   done.push(name);
 }
-const p = 'D:/MCmodev/SpireCraft/art/effects/mob_effect_icons.bbmodel';
+const p = REPO_ROOT + 'art/effects/mob_effect_icons.bbmodel';
 Blockbench.writeFile(p, {content: Codecs.project.compile({compressed: false})});
 Project.save_path = p; Project.saved = true;
 return done.join(',');

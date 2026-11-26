@@ -254,6 +254,9 @@ public final class ModBlocks {
             BlockBehaviour.Properties.of().mapColor(MapColor.DIRT).strength(1.0F, 3.0F).sound(SoundType.PACKED_MUD));
     public static final StoneSet HIVE_SOIL_BRICKS = new StoneSet("hive_soil_bricks", () -> BlockBehaviour.Properties.of().mapColor(MapColor.DIRT)
             .requiresCorrectToolForDrops().strength(1.5F, 3.0F).sound(SoundType.MUD_BRICKS));
+    // ---- Glory (docs/design/glory.md): the gates that drop across a boss room's ways in while the boss is awake
+    public static final RegistryObject<Block> GLORY_GATE = register("glory_gate", com.mockingjam.spirecraft.block.GloryGateBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.METAL).sound(SoundType.METAL).strength(-1.0F, 3600000.0F).noOcclusion().noLootTable().isViewBlocking((s, l, p) -> false));
     public static final RegistryObject<Block> CRACKED_HIVE_ROCK_BRICKS = register("cracked_hive_rock_bricks", Block::new, stone(MapColor.TERRACOTTA_ORANGE).sound(SoundType.TUFF_BRICKS));
     public static final RegistryObject<Block> CHISELED_HIVE_ROCK_BRICKS = register("chiseled_hive_rock_bricks", Block::new, stone(MapColor.TERRACOTTA_ORANGE).sound(SoundType.TUFF_BRICKS));
     /** Silk hive: the silk-wrapped walls of the web nests (盘丝巢穴). */

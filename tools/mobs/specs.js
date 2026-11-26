@@ -729,3 +729,8 @@ Object.assign(module.exports, require('./specs_v8'));   // v8 angled builds (202
 Object.assign(module.exports, require('./specs_v9'));   // v9 angled elites + refined normals (2026-11-19)
 Object.assign(module.exports, require('./specs_v9'));   // v9 fidelity review (2026-11-19)
 Object.assign(module.exports, require('./specs_v10'));   // v10 second fidelity review (2026-11-19)
+Object.assign(module.exports, require('./specs_glory'));   // Glory G1: the brass machines, the Globe Head, the Scroll of Biting (2026-11-26)
+Object.assign(module.exports, require('./specs_glory2'));   // Glory G2: the Queen, the Knight Gang, the Frog Knight... (2026-11-26)
+Object.assign(module.exports, require('./specs_glory3'));   // Glory G3: the Axebot, the Soul Nexus, the Test Subject (2026-11-26)
+Object.assign(module.exports, require('./specs_glory_v2a'));   // Glory v2: the people rebuilt, the Rhino Beetle, the Frog Trainer (2026-11-26)
+Object.assign(module.exports, require('./specs_glory_v2b'));   // Glory v2: the creatures and machines repainted; G4 the Owl Magistrate and the Aeonglass

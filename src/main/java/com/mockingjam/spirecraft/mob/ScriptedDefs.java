@@ -48,6 +48,24 @@ public final class ScriptedDefs {
         public SoundEvent sound;
         public int strength, absorb, heal, ritual, thorns, summonCount, steam, poison, doom, steal, effectTicks = 120, effectAmp, selfTicks = 100, selfAmp;
         public boolean wail, dropThorns, burrow, flee, explode, wake, hatch, once;
+        /** Glory G1: lightning strikes instead of a bolt; set the target alight (s); push searing embers into its inventory;
+         *  give an ally of the named kind this much absorption. */
+        public boolean lightning;
+        public int ignite, embers, guardAmount;
+        public String guardAlly;
+        /** Glory G2: pull the target in (the Frog Knight's tongue); a lingering cloud of the move's effect where the target
+         *  stands (the Slimed Berserker's ichor); a delayed blast on the target's spot (the Magi Knight's bomb); steal a
+         *  level of Strength / Dexterity (the Lost / the Forgotten); knock the shield out of the target's hands (the Flail
+         *  Knight); the move is called off if it takes this much damage while it winds up (the Sculptor's incantation);
+         *  strength for the guarded ally (the Queen's Burn Bright for Me); damage + what it has stolen (the Forgotten's Dread). */
+        public boolean pull, stealStr, stealDex, shieldBreak, dreadBonus;
+        public int cloudTicks, bombDelay, allyStrength;
+        public float bombDamage, interruptAt;
+        public Supplier<Holder<MobEffect>> effect3;
+        /** Glory G3: one more hit each time the move is used (the Test Subject's Multi-Claw); landed hits leave a Wound. */
+        public boolean growHits, wound;
+        /** Glory G4: grains of Wither Sand pushed into every player in the room (the Aeonglass's Escalate). */
+        public int witherSand;
         public String summon;
         public Supplier<Holder<MobEffect>> effect, effect2, selfEffect;
 
@@ -92,6 +110,23 @@ public final class ScriptedDefs {
         public MoveDef particle(ParticleOptions p) { particle = p; return this; }
         public MoveDef anim(Anim a) { anim = a; return this; }
         public MoveDef reach(float r) { reach = r; return this; }
+        public MoveDef lightning() { lightning = true; return this; }
+        public MoveDef ignite(int seconds) { ignite = seconds; return this; }
+        public MoveDef embers(int n) { embers = n; return this; }
+        public MoveDef guard(String ally, int amount) { guardAlly = ally; guardAmount = amount; return this; }
+        public MoveDef pull() { pull = true; return this; }
+        public MoveDef cloud(int ticks) { cloudTicks = ticks; return this; }
+        public MoveDef bomb(float dmg, int delay) { bombDamage = dmg; bombDelay = delay; return this; }
+        public MoveDef stealStr() { stealStr = true; return this; }
+        public MoveDef stealDex() { stealDex = true; return this; }
+        public MoveDef shieldBreak() { shieldBreak = true; return this; }
+        public MoveDef interruptAt(float dmg) { interruptAt = dmg; return this; }
+        public MoveDef allyStr(String ally, int n) { guardAlly = ally; allyStrength = n; return this; }
+        public MoveDef fx3(Supplier<Holder<MobEffect>> e) { effect3 = e; return this; }
+        public MoveDef dread() { dreadBonus = true; return this; }
+        public MoveDef growHits() { growHits = true; return this; }
+        public MoveDef wound() { wound = true; return this; }
+        public MoveDef witherSand(int n) { witherSand = n; return this; }
     }
 
     static MoveDef melee(float dmg) { MoveDef m = new MoveDef(); m.kind = Kind.MELEE; m.damage = dmg; m.anim = Anim.STRIKE; m.windup = 12; return m; }
@@ -153,6 +188,26 @@ public final class ScriptedDefs {
         public Pick[] opener = {}, loop = {};
         public Picker picker;
         public int slippery, hitCap, shellCap, curlUp, skittish, plating, artifact, suck, sleep, revives, reviveTicks = 60, reviveHealth, fleeAfter, hatchAfter, burrowMove;
+        /** Glory G1: Paper Cuts (each landed hit takes this much max health); Galvanic (players near it carry the effect); immune to fire. */
+        public int paperCuts;
+        public boolean galvanic, fireproof;
+        /** Glory G2: an effect the players near it carry while it lives (Hex, Dampen); it does not move while an ally of
+         *  this name lives (the Queen on her throne); effects taken off the players near it when it dies (You're Mine). */
+        public Supplier<Holder<MobEffect>> aura;
+        public String stationaryWhile;
+        /** Glory G3: Stock (the Axebot: when killed, a new one is cast in its place, this many times); phases (the Test
+         *  Subject: max health of each form - "killed" it gets up as the next); Enrage (phase 0: stronger whenever its
+         *  target blocks, drinks or eats); Nemesis (from this phase on: 3 s of Intangible every 8 s). */
+        public int stock, nemesisPhase = -1;
+        public float[] phases;
+        public boolean enrageOnUse;
+        /** Glory v2 (2026-11-26, user: no altars - the boss waits in its room and the fight starts when you walk in): asleep
+         *  until a player it can see comes within this many blocks (and up to {@link #wakeAbove} above / 3 below it); then
+         *  the glory gates round it drop. With nobody near for 30 s it settles down again, healed, and the gates open. */
+        public int wakeRoom, wakeAbove = 8;
+        /** Glory v2: looks for a free Rhino Beetle and climbs on its back (the Frog Trainer). */
+        public boolean mountsBeetle;
+        public final List<Supplier<Holder<MobEffect>>> clearOnDeath = new ArrayList<>();
         public String leader, hatchInto;
         public final List<Companion> spawnWith = new ArrayList<>(), deathSummon = new ArrayList<>();
         public final List<Spawn> spawns = new ArrayList<>();
@@ -481,6 +536,275 @@ public final class ScriptedDefs {
                 .pattern(ids(1), m(2), m(3), m(4), m(2));
         ALL.get("insatiable").pitch = 0.6F;
         ALL.get("insatiable").drop(Items.SAND, 8, 16).drop(Items.GOLD_INGOT, 3, 6).drop(Items.SNIFFER_EGG, 0, 1);
+    }
+
+    // ============================================================================ Act 3: Glory, batch G1 (docs/design/glory.md)
+    // Health ≈ STS2 × 0.35 (elites × 0.45), damage ≈ × 0.4. None spawn naturally: they live in the Glory buildings
+    // (the brass works, the electromagnetic laboratory, the forbidden library), placed by the templates and spawners.
+    static final Supplier<Holder<MobEffect>> NAUSEA = vanilla(MobEffects.NAUSEA), DARKNESS = vanilla(MobEffects.DARKNESS);
+
+    /** Allies of the named kinds within 16 blocks (alive). */
+    static int allies(ScriptedMonster mob, String... names) {
+        java.util.Set<String> want = java.util.Set.of(names);
+        return mob.level().getEntitiesOfClass(ScriptedMonster.class, mob.getBoundingBox().inflate(16), s -> s != mob && s.isAlive() && want.contains(s.def.name)).size();
+    }
+
+    static {
+        // ---- the brass machines: the Fabricator and its bots
+        def("fabricator", "Fabricator", "制造机").hp(50).speed(0.22F).armor(6).size(1.6F, 1.6F, 1)
+                .moves(buff().summon("guardbot|noisebot+zapbot|stabbot", 1).sound(SoundEvents.ANVIL_USE),
+                        shot(7, Items.IRON_NUGGET, SpireBolt.Kind.IRON).summon("zapbot|stabbot", 1).anim(Anim.CAST).sound(SoundEvents.SMITHING_TABLE_USE),
+                        shot(4.5F, Items.REDSTONE, SpireBolt.Kind.FIRE).wind(18).sound(SoundEvents.BEACON_DEACTIVATE))
+                .pattern(seq(), m(1));
+        ALL.get("fabricator").picker = mob -> allies(mob, "zapbot", "stabbot", "guardbot", "noisebot") < 4 ? (mob.getRandom().nextBoolean() ? 1 : 2) : 3;
+        ALL.get("fabricator").drop(() -> ModItems.AUTOMATON_ALLOY_INGOT.get(), 1, 3).drop(Items.COPPER_INGOT, 1, 4).drop(Items.REDSTONE, 1, 3);
+        def("zapbot", "Zapbot", "电击机").hp(7).speed(0.3F).armor(2).size(0.7F, 0.9F, 1)
+                .moves(shot(5.5F, Items.LIGHTNING_ROD, SpireBolt.Kind.IRON).str(1).sound(SoundEvents.BEACON_POWER_SELECT)).pattern(seq(), m(1)).minionOf("fabricator");
+        ALL.get("zapbot").hover = true;
+        ALL.get("zapbot").drop(Items.COPPER_INGOT, 0, 1).drop(Items.REDSTONE, 0, 1);
+        def("stabbot", "Stabbot", "刺击机").hp(7).speed(0.32F).armor(2).size(0.7F, 0.8F, 1)
+                .moves(melee(4.5F).fx(FRAIL, 100).anim(Anim.LUNGE)).pattern(seq(), m(1)).minionOf("fabricator");
+        ALL.get("stabbot").drop(Items.IRON_NUGGET, 1, 3);
+        def("guardbot", "Guardbot", "护卫机").hp(6).speed(0.26F).armor(2).size(0.7F, 0.7F, 1)
+                .moves(buff().guard("fabricator", 6).sound(SoundEvents.BEACON_ACTIVATE)).pattern(seq(), m(1)).minionOf("fabricator");
+        ALL.get("guardbot").moves.get(0).cooldown = 80;
+        ALL.get("guardbot").hover = true;
+        ALL.get("guardbot").drop(Items.COPPER_INGOT, 0, 1).drop(Items.GLASS_PANE, 0, 1);
+        def("noisebot", "Noisebot", "噪音机").hp(7).speed(0.24F).armor(2).size(0.9F, 0.8F, 1)
+                .moves(aoe(0, 6).fx(NAUSEA, 60).fx2(DARKNESS).anim(Anim.CALL).particle(ParticleTypes.NOTE).sound(SoundEvents.NOTE_BLOCK_BASS.value())).pattern(seq(), m(1)).minionOf("fabricator");
+        ALL.get("noisebot").moves.get(0).cooldown = 100;
+        ALL.get("noisebot").drop(Items.NOTE_BLOCK, 0, 1).drop(Items.COPPER_INGOT, 0, 1);
+
+        // ---- the Turret Operator and the Living Shield (always a pair)
+        def("turret_operator", "Turret Operator", "炮塔操作员").hp(15).speed(0).armor(2).size(0.9F, 1.1F, 1)
+                .moves(shot(1.2F, Items.ARROW, SpireBolt.Kind.IRON).hits(5, 3).sound(SoundEvents.CROSSBOW_SHOOT), shot(1.2F, Items.ARROW, SpireBolt.Kind.IRON).hits(5, 3).sound(SoundEvents.CROSSBOW_SHOOT),
+                        buff().str(1).anim(Anim.SHAKE).sound(SoundEvents.CROSSBOW_LOADING_END.value()))
+                .pattern(seq(), m(1), m(2), m(3));
+        ALL.get("turret_operator").stationary = true;
+        ALL.get("turret_operator").drop(Items.ARROW, 2, 6).drop(Items.GUNPOWDER, 0, 2).drop(Items.IRON_NUGGET, 1, 3);
+        def("living_shield", "Living Shield", "活体盾牌").hp(20).speed(0.24F).armor(10).size(0.8F, 2.0F, 1)
+                .moves(buff().guard("turret_operator", 10).anim(Anim.SHAKE).sound(SoundEvents.SHIELD_BLOCK.value()), melee(2.5F).anim(Anim.STRIKE).sound(SoundEvents.SHIELD_BLOCK.value()),
+                        melee(6.5F).str(1).wind(16).anim(Anim.SLAM).sound(SoundEvents.ANVIL_LAND))
+                .pattern(seq(), m(1));
+        ALL.get("living_shield").picker = mob -> allies(mob, "turret_operator") == 0 ? 3 : (mob.lastMove() == 1 ? 2 : 1);
+        ALL.get("living_shield").drop(Items.IRON_INGOT, 0, 2).drop(Items.ARROW, 1, 4).drop(Items.STICK, 1, 3);
+
+        // ---- the Mecha Knight (elite): asleep on its repair rack until someone comes into its hall
+        def("mecha_knight", "Mecha Knight", "机甲骑士").hp(135).speed(0.24F).armor(12).size(1.2F, 2.6F, 1).elite()
+                .moves(dash(10).wind(24).sound(SoundEvents.IRON_GOLEM_ATTACK),
+                        aoe(3, 4.5F).ignite(4).embers(2).particle(ParticleTypes.FLAME).anim(Anim.CAST).sound(SoundEvents.BLAZE_SHOOT),
+                        buff().absorb(6).str(2).anim(Anim.SHAKE).sound(SoundEvents.IRON_GOLEM_REPAIR),
+                        melee(14).wind(30).reach(4.5F).anim(Anim.SLAM).sound(SoundEvents.ANVIL_LAND))
+                .pattern(ids(1), m(2), m(3), m(4));
+        ALL.get("mecha_knight").artifact = 3;
+        ALL.get("mecha_knight").sleep = 1;
+        ALL.get("mecha_knight").pitch = 0.7F;
+        ALL.get("mecha_knight").fireproof = true;
+        ALL.get("mecha_knight").drop(() -> ModItems.AUTOMATON_ALLOY_INGOT.get(), 3, 6).drop(Items.COPPER_INGOT, 2, 6).drop(Items.BLAZE_POWDER, 1, 2);
+
+        // ---- the Globe Head (the electromagnetic laboratory; a technician in each brass works)
+        def("globe_head", "Globe Head", "球头").hp(50).speed(0.24F).armor(4).size(0.7F, 2.0F, 1)
+                .moves(melee(5).fx(FRAIL, 120).sound(SoundEvents.TRIDENT_THUNDER.value()), shot(2.5F, Items.LIGHTNING_ROD, SpireBolt.Kind.IRON).hits(3, 8).lightning().anim(Anim.CALL),
+                        melee(6.5F).str(1).wind(18).anim(Anim.SLAM).sound(SoundEvents.BEACON_POWER_SELECT))
+                .pattern(seq(), m(1), m(2), m(3));
+        ALL.get("globe_head").galvanic = true;
+        ALL.get("globe_head").drop(Items.COPPER_INGOT, 1, 3).drop(Items.REDSTONE, 1, 3).rareDrop(Items.LIGHTNING_ROD, 0.25F);
+
+        // ---- the Scroll of Biting (the forbidden library), three or four together
+        def("scroll_of_biting", "Scroll of Biting", "咬人卷轴").hp(12).speed(0.3F).size(0.7F, 0.9F, 1)
+                .moves(melee(5.5F).wind(14).anim(Anim.LUNGE).sound(SoundEvents.BOOK_PAGE_TURN), buff().str(1).anim(Anim.SHAKE).sound(SoundEvents.BOOK_PUT), melee(2).hits(2, 6).sound(SoundEvents.BOOK_PAGE_TURN))
+                .pattern(seq(any(1, 2, 3)), m(1), m(2), m(3), weighted(new int[] {1, 3}, new int[] {1, 2}));
+        ALL.get("scroll_of_biting").hover = true;
+        ALL.get("scroll_of_biting").paperCuts = 1;
+        ALL.get("scroll_of_biting").drop(Items.PAPER, 1, 3).drop(Items.PURPLE_DYE, 0, 1).rareDrop(Items.BOOK, 0.2F);
+    }
+
+    // ============================================================================ Act 3: Glory, batch G2 (docs/design/glory.md)
+    static final Supplier<Holder<MobEffect>> HEX = spire(ModEffects.HEX), DAMPEN = spire(ModEffects.DAMPEN), BOUND = spire(ModEffects.BOUND);
+
+    static {
+        // ---- the Knight Gang (elite, three together in the Knights' Keep): asleep in their alcoves until someone comes in
+        def("flail_knight", "Flail Knight", "链枷骑士").hp(45).speed(0.24F).armor(10).size(1.0F, 2.1F, 1).elite()
+                .moves(dash(6).wind(18).sound(SoundEvents.IRON_GOLEM_ATTACK), buff().str(1).anim(Anim.SHAKE).sound(SoundEvents.ARMOR_EQUIP_IRON.value()),
+                        melee(3.6F).hits(2, 6).shieldBreak().reach(3).sound(SoundEvents.CHAIN_HIT))
+                .pattern(ids(1), any(1, 2, 3));
+        def("spectral_knight", "Spectral Knight", "幽灵骑士").hp(42).speed(0.26F).armor(4).size(0.9F, 2.1F, 1).elite()
+                .moves(aoe(0, 16).anim(Anim.CALL).particle(ParticleTypes.SOUL).sound(SoundEvents.SOUL_ESCAPE.value()), melee(6).wind(14).sound(SoundEvents.PLAYER_ATTACK_SWEEP),
+                        shot(1.2F, Items.SOUL_LANTERN, SpireBolt.Kind.FIRE).hits(3, 6).ignite(3).sound(SoundEvents.BLAZE_SHOOT))
+                .pattern(ids(1), m(2), m(3));
+        ALL.get("spectral_knight").aura = HEX;
+        ALL.get("spectral_knight").hover = true;
+        def("magi_knight", "Magi Knight", "法师骑士").hp(37).speed(0.24F).armor(6).size(0.8F, 2.2F, 1).elite()
+                .moves(melee(2.4F).absorb(4).sound(SoundEvents.SHIELD_BLOCK.value()), aoe(0, 16).anim(Anim.CALL).particle(ParticleTypes.ENCHANT).sound(SoundEvents.EVOKER_CAST_SPELL),
+                        melee(4).anim(Anim.LUNGE), buff().absorb(4).anim(Anim.SHAKE).sound(SoundEvents.ARMOR_EQUIP_CHAIN.value()),
+                        buff().bomb(14, 40).wind(30).anim(Anim.CAST).sound(SoundEvents.EVOKER_PREPARE_ATTACK))
+                .pattern(ids(1, 2), m(3), m(4), m(5));
+        ALL.get("magi_knight").moves.get(4).kind = Kind.SHOT;   // needs its target in sight to aim the bomb
+        ALL.get("magi_knight").moves.get(4).damage = 0;
+        ALL.get("magi_knight").aura = DAMPEN;
+        for (String k : new String[] {"flail_knight", "spectral_knight", "magi_knight"}) {
+            Def d = ALL.get(k);
+            d.sleep = 1;
+            d.relic = 0;   // the three together: each 30 % a relic, and the Royal Summons
+            d.rareDrop(Items.IRON_INGOT, 0.6F);
+        }
+
+        // ---- the Frog Knight (the frog outpost; two in the Queen's forecourt)
+        def("frog_knight", "Frog Knight", "蛙骑士").hp(65).speed(0.3F).armor(8).size(1.4F, 1.8F, 1)
+                .moves(melee(5).reach(6).pull().fx(FRAIL, 120).anim(Anim.LUNGE).sound(SoundEvents.FROG_TONGUE), melee(8.5F).wind(16).reach(3).anim(Anim.SLAM).sound(SoundEvents.TRIDENT_HIT),
+                        buff().str(2).anim(Anim.CALL).sound(SoundEvents.FROG_AMBIENT), dash(14).wind(26).once().sound(SoundEvents.RAVAGER_ROAR))
+                .pattern(seq(), m(1));
+        ALL.get("frog_knight").picker = mob -> {   // Tongue Lash, then Strike Down Evil - For the Queen - (Beetle Charge once, below half) - Tongue Lash
+            int last = mob.lastMove();
+            if (last == 0 || last == 4) return 1;
+            if (last == 1) return 2;
+            if (last == 2) return 3;
+            return mob.getHealth() < mob.getMaxHealth() / 2 && !mob.onceUsed() ? 4 : 1;
+        };
+        ALL.get("frog_knight").plating = 6;
+        ALL.get("frog_knight").platingDecays = true;
+        ALL.get("frog_knight").drop(Items.SLIME_BALL, 0, 2).drop(Items.IRON_NUGGET, 2, 6);
+        // ---- the Frog Trainer (Glory v2, the beetle training grounds): a Frog Knight without its mount - it climbs on any
+        // free Rhino Beetle near it and rides it at you (the beetle fights by itself; the frog lashes and stabs from its back)
+        def("frog_trainer", "Frog Trainer", "青蛙训练师").hp(40).speed(0.3F).armor(6).size(0.8F, 1.5F, 1)
+                .moves(melee(4).reach(6).pull().anim(Anim.LUNGE).sound(SoundEvents.FROG_TONGUE), melee(6).wind(14).reach(3.5F).anim(Anim.STRIKE).sound(SoundEvents.TRIDENT_HIT),
+                        buff().str(1).anim(Anim.CALL).sound(SoundEvents.FROG_AMBIENT))
+                .pattern(seq(), m(1), m(2), m(2), m(3));
+        ALL.get("frog_trainer").mountsBeetle = true;
+        ALL.get("frog_trainer").drop(Items.SLIME_BALL, 0, 2).drop(Items.LEAD, 0, 1).rareDrop(Items.SADDLE, 0.08F);
+
+        // ---- the Devoted Sculptor (the quarry): its incantation can be broken off by a heavy blow
+        def("devoted_sculptor", "Devoted Sculptor", "虔诚的雕刻师").hp(55).speed(0.26F).armor(2).size(0.8F, 2.0F, 1)
+                .moves(buff().ritual(1).wind(40).interruptAt(8).anim(Anim.CALL).sound(SoundEvents.PARROT_IMITATE_ILLUSIONER), melee(5).wind(14).anim(Anim.SLAM).sound(SoundEvents.WOOD_HIT))
+                .pattern(seq(), m(1));
+        ALL.get("devoted_sculptor").picker = mob -> mob.ritual() == 0 && mob.lastMove() != 1 ? 1 : 2;
+        ALL.get("devoted_sculptor").moves.get(1).cooldown = 40;
+        ALL.get("devoted_sculptor").drop(Items.FEATHER, 1, 3).drop(Items.STICK, 1, 3).rareDrop(Items.CLAY_BALL, 0.5F);
+
+        // ---- the Slimed Berserker (the old baths)
+        def("slimed_berserker", "Slimed Berserker", "黏液狂战士").hp(90).speed(0.2F).armor(2).size(2.2F, 1.6F, 1)
+                .moves(buff().cloud(160).fx(SLOW, 60, 1).anim(Anim.PUFF).sound(SoundEvents.SLIME_SQUISH), melee(1.6F).hits(4, 4).reach(3).anim(Anim.SHAKE).sound(SoundEvents.SLIME_ATTACK),
+                        melee(0.5F).fx(WEAK, 160).str(1).reach(3).anim(Anim.CALL).sound(SoundEvents.SLIME_SQUISH), melee(12).wind(24).reach(3.5F).anim(Anim.SLAM).sound(SoundEvents.SLIME_BLOCK_FALL))
+                .pattern(seq(), m(1), m(2), m(3), m(4));
+        ALL.get("slimed_berserker").pitch = 0.7F;
+        ALL.get("slimed_berserker").drop(Items.SLIME_BALL, 3, 8).rareDrop(Items.SLIME_BLOCK, 0.3F);
+
+        // ---- the Lost and the Forgotten (the forgotten ruins): the Lost always brings the Forgotten
+        def("the_lost", "The Lost", "迷失者").hp(33).speed(0.24F).armor(2).size(0.6F, 0.9F, 1)
+                .moves(aoe(0, 6).stealStr().anim(Anim.PUFF).particle(ParticleTypes.LARGE_SMOKE).sound(SoundEvents.FIRE_EXTINGUISH),
+                        shot(1.6F, Items.GLOWSTONE_DUST, SpireBolt.Kind.SPORE).hits(2, 6).sound(SoundEvents.ILLUSIONER_CAST_SPELL))
+                .pattern(seq(), m(1), m(2));   // v2 (user): only one of the pair in a hall
+        ALL.get("the_lost").hover = true;
+        ALL.get("the_lost").drop(Items.STICK, 1, 3).rareDrop(Items.CARVED_PUMPKIN, 0.2F);
+        def("the_forgotten", "The Forgotten", "遗忘者").hp(37).speed(0.24F).armor(4).size(0.7F, 0.7F, 1)
+                .moves(aoe(0, 6).stealDex().absorb(3).anim(Anim.PUFF).particle(ParticleTypes.CAMPFIRE_COSY_SMOKE).sound(SoundEvents.FIRE_EXTINGUISH),
+                        melee(5).dread().wind(16).anim(Anim.LUNGE).sound(SoundEvents.CHAIN_HIT))
+                .pattern(seq(), m(1), m(2));
+        ALL.get("the_forgotten").hover = true;
+        ALL.get("the_forgotten").drop(Items.IRON_NUGGET, 1, 4).rareDrop(Items.CHAINMAIL_HELMET, 0.1F);
+
+        // ---- the Queen (boss, her palace) and the Torch Head Amalgam she calls with her
+        def("queen", "Queen", "女王").hp(300).speed(0.24F).armor(8).size(0.9F, 2.8F, 1).boss(BossEvent.BossBarColor.PURPLE)
+                .moves(aoe(0, 24).fx(BOUND, 20 * 60 * 20).anim(Anim.CALL).particle(ParticleTypes.SOUL).sound(SoundEvents.CHAIN_PLACE),
+                        aoe(0, 24).fx(WEAK, 20 * 60 * 20).fx2(VULNERABLE).fx3(FRAIL).anim(Anim.CALL).particle(ParticleTypes.WITCH).sound(SoundEvents.EVOKER_PREPARE_WOLOLO),
+                        buff().absorb(8).allyStr("torch_head_amalgam", 1).anim(Anim.CAST).sound(SoundEvents.FIRECHARGE_USE),
+                        melee(1.6F).hits(5, 4).reach(3).anim(Anim.STRIKE).sound(SoundEvents.PLAYER_ATTACK_SWEEP),
+                        melee(6).wind(30).reach(3.5F).fx(SLOW, 60, 2).anim(Anim.SLAM).sound(SoundEvents.ANVIL_LAND),
+                        buff().str(1).anim(Anim.CALL).sound(SoundEvents.RAVAGER_ROAR))
+                .pattern(seq(), m(1)).with(1, "torch_head_amalgam");
+        ALL.get("queen").picker = mob -> {   // her two curses; Burn Bright for Me while her Amalgam lives; then Enrage - Off with Your Head - Execution
+            int last = mob.lastMove();
+            if (last == 0) return 1;
+            if (last == 1) return 2;
+            if (allies(mob, "torch_head_amalgam") > 0) return 3;
+            return last == 6 ? 4 : last == 4 ? 5 : 6;
+        };
+        ALL.get("queen").stationaryWhile = "torch_head_amalgam";
+        ALL.get("queen").clearOnDeath.addAll(List.of(BOUND, WEAK, VULNERABLE, FRAIL));
+        ALL.get("queen").pitch = 0.8F;
+        ALL.get("queen").sleep = 1;          // v2: she waits on the top floor of her keep; the fight starts when you walk in
+        ALL.get("queen").wakeRoom = 14;
+        ALL.get("queen").drop(Items.AMETHYST_SHARD, 4, 8).drop(Items.GOLD_INGOT, 3, 6).drop(Items.EMERALD, 2, 5);
+        def("torch_head_amalgam", "Torch Head Amalgam", "火炬头融合体").hp(150).speed(0.26F).armor(6).size(1.6F, 2.2F, 1).boss(BossEvent.BossBarColor.GREEN)
+                .moves(dash(10).wind(22).sound(SoundEvents.RAVAGER_ATTACK), melee(7).reach(3).anim(Anim.LUNGE).sound(SoundEvents.RAVAGER_ATTACK),
+                        shot(3.2F, Items.BLAZE_POWDER, SpireBolt.Kind.FIRE).hits(3, 6).ignite(2).sound(SoundEvents.BLAZE_SHOOT), melee(5.5F).reach(3).sound(SoundEvents.RAVAGER_ATTACK))
+                .pattern(ids(1, 2), m(3), m(4), m(4));
+        ALL.get("torch_head_amalgam").relic = 0;
+        ALL.get("torch_head_amalgam").minionOf("queen");
+        ALL.get("torch_head_amalgam").fireproof = true;
+        ALL.get("torch_head_amalgam").sleep = 1;
+        ALL.get("torch_head_amalgam").wakeRoom = 14;
+        ALL.get("torch_head_amalgam").drop(Items.STICK, 2, 6).drop(Items.SOUL_TORCH, 2, 5);
+    }
+
+    // ============================================================================ Act 3: Glory, batch G4 (docs/design/glory.md)
+    static {
+        // ---- the Owl Magistrate (the Owl Court, in the overworld): Scrutinize - Peck - Judicial Flight - Verdict
+        def("owl_magistrate", "Owl Magistrate", "枭法官").hp(80).speed(0.26F).armor(4).size(1.0F, 1.9F, 1)
+                .moves(shot(6.5F, Items.ENDER_EYE, SpireBolt.Kind.SPORE).wind(24).anim(Anim.CAST).sound(SoundEvents.ENDER_EYE_LAUNCH),
+                        melee(1.6F).hits(6, 4).reach(2.8F).anim(Anim.STRIKE).sound(SoundEvents.PARROT_IMITATE_VEX),
+                        buff().self(vanilla(MobEffects.RESISTANCE), 140, 2).anim(Anim.CALL).sound(SoundEvents.PHANTOM_FLAP),
+                        dash(13).wind(30).fx(VULNERABLE, 200).anim(Anim.LUNGE).sound(SoundEvents.PHANTOM_SWOOP))
+                .pattern(seq(), m(1), m(2), m(3), m(4));
+        ALL.get("owl_magistrate").drop(Items.FEATHER, 2, 5).drop(Items.PAPER, 1, 3).rareDrop(Items.BOOK, 0.3F);
+        // ---- the Aeonglass (boss, the top of the Aeon Spire in the End): floats in place and turns; Ebb - Gaze - Escalate;
+        // Wither presence: every sixth attack or item use near it pushes a grain of Wither Sand (GloryEffectEvents)
+        def("aeonglass", "Aeonglass", "永世沙漏").hp(380).speed(0).armor(10).size(1.8F, 3.0F, 1).boss(BossEvent.BossBarColor.BLUE)
+                .moves(aoe(9, 7).absorb(12).wind(26).anim(Anim.SLAM).particle(ParticleTypes.FALLING_DRIPSTONE_LAVA).sound(SoundEvents.SAND_FALL),
+                        shot(4.4F, Items.PRISMARINE_CRYSTALS, SpireBolt.Kind.SPORE).hits(2, 10).wind(24).anim(Anim.CAST).sound(SoundEvents.BEACON_ACTIVATE),
+                        buff().str(1).witherSand(1).anim(Anim.CALL).sound(SoundEvents.BELL_RESONATE))
+                .pattern(seq(), m(1), m(2), m(3));
+        ALL.get("aeonglass").artifact = 3;
+        ALL.get("aeonglass").stationary = true;
+        ALL.get("aeonglass").hover = true;
+        ALL.get("aeonglass").sleep = 1;
+        ALL.get("aeonglass").wakeRoom = 12;
+        ALL.get("aeonglass").drop(Items.GLASS, 4, 8).drop(Items.PRISMARINE_CRYSTALS, 4, 10).drop(Items.GOLD_INGOT, 4, 8).drop(Items.ENDER_PEARL, 2, 4);
+    }
+
+    // ============================================================================ Act 3: Glory, batch G3 - the Nether (docs/design/glory.md)
+    static {
+        // ---- the Axebot (the foundry): cast iron, fireproof; Stock 2 - killed, another is cast in its place
+        def("axebot", "Axebot", "斧头机器人").hp(25).speed(0.24F).armor(6).size(1.0F, 1.9F, 1)
+                .moves(melee(5.5F).wind(16).fx(WEAK, 100).fx2(FRAIL).anim(Anim.SLAM).sound(SoundEvents.ANVIL_LAND), melee(4).hits(2, 6).anim(Anim.STRIKE).sound(SoundEvents.IRON_GOLEM_ATTACK))
+                .pattern(seq(), m(1), m(2));
+        ALL.get("axebot").stock = 2;
+        ALL.get("axebot").fireproof = true;
+        // v2 (user): cast from netherite scrap - a little of it comes back out of the last one broken
+        ALL.get("axebot").drop(Items.IRON_NUGGET, 2, 6).rareDrop(Items.NETHERITE_SCRAP, 0.12F).rareDrop(Items.GOLD_NUGGET, 0.4F);
+
+        // ---- the Soul Nexus (elite, its sanctum in the soul sand valley): rooted, it never moves
+        def("soul_nexus", "Soul Nexus", "灵魂枢纽").hp(105).speed(0).armor(4).size(1.2F, 2.4F, 1).elite()
+                .moves(shot(11.6F, Items.REDSTONE, SpireBolt.Kind.FIRE).wind(24).anim(Anim.CAST).sound(SoundEvents.BEACON_DEACTIVATE),
+                        shot(2.4F, Items.AMETHYST_SHARD, SpireBolt.Kind.SPORE).hits(4, 5).anim(Anim.SHAKE).sound(SoundEvents.SOUL_ESCAPE.value()),
+                        melee(7).reach(10).fx(VULNERABLE, 160).fx2(WEAK).heal(7).anim(Anim.CAST).sound(SoundEvents.WITHER_AMBIENT))
+                .pattern(ids(1), any(1, 2, 3));
+        ALL.get("soul_nexus").stationary = true;
+        ALL.get("soul_nexus").hover = true;
+        ALL.get("soul_nexus").drop(Items.SOUL_SOIL, 1, 3).drop(Items.GHAST_TEAR, 0, 2).rareDrop(Items.NETHERITE_SCRAP, 0.25F);
+
+        // ---- the Test Subject (boss, the Proving Pit): three forms - it adapts, gets up bigger, with another head
+        def("test_subject", "Test Subject", "实验体").hp(80).speed(0.3F).armor(6).size(1.6F, 1.6F, 1).boss(BossEvent.BossBarColor.YELLOW)
+                .moves(melee(8).reach(3).anim(Anim.LUNGE).sound(SoundEvents.RAVAGER_ATTACK), melee(5.5F).reach(3).fx(VULNERABLE, 100).anim(Anim.SLAM).sound(SoundEvents.RAVAGER_ATTACK),
+                        melee(4).hits(8, 4).growHits().wound().reach(3).anim(Anim.SHAKE).sound(SoundEvents.PLAYER_ATTACK_SWEEP),
+                        melee(4).hits(3, 5).reach(3).anim(Anim.STRIKE).sound(SoundEvents.PLAYER_ATTACK_SWEEP), dash(18).wind(30).sound(SoundEvents.RAVAGER_ROAR),
+                        aoe(0, 5).ignite(4).embers(2).str(1).anim(Anim.CALL).particle(ParticleTypes.FLAME).sound(SoundEvents.BLAZE_SHOOT))
+                .pattern(seq(), m(1));
+        ALL.get("test_subject").picker = mob -> {   // form 1: Bite / Skull Bash; form 2: Multi-Claw; form 3: Lacerate - Big Pounce - Burning Growl
+            int last = mob.lastMove();
+            if (mob.phase == 0) return last == 1 ? 2 : 1;
+            if (mob.phase == 1) return 3;
+            return last == 4 ? 5 : last == 5 ? 6 : 4;
+        };
+        ALL.get("test_subject").phases = new float[] {80, 160, 240};
+        ALL.get("test_subject").enrageOnUse = true;
+        ALL.get("test_subject").nemesisPhase = 2;
+        ALL.get("test_subject").reviveTicks = 60;
+        ALL.get("test_subject").pitch = 0.8F;
+        ALL.get("test_subject").sleep = 1;   // v2: chained in its holding cell; it wakes when someone steps in
+        ALL.get("test_subject").wakeRoom = 9;
+        ALL.get("test_subject").wakeAbove = 6;
+        ALL.get("test_subject").drop(Items.LEATHER, 3, 6).drop(Items.TURTLE_SCUTE, 1, 3).drop(Items.GOLD_INGOT, 3, 6);
     }
 
     public static Def get(String name) {

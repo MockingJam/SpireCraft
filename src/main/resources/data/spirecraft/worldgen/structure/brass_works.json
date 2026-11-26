@@ -1,0 +1,14 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/brass_works",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_box",
+  "templates": [
+    "spirecraft:brass_works/fabrication_1",
+    "spirecraft:brass_works/turret_bastion_1",
+    "spirecraft:brass_works/mecha_hangar_1"
+  ],
+  "mode": "open_ground",
+  "sink": 1
+}

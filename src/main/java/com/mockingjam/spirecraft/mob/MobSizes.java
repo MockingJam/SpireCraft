@@ -87,6 +87,33 @@ public final class MobSizes {
         m.put("decimillipede", new float[] {1.19F, 1.84F, 1.11F});
         m.put("infested_prism", new float[] {0.86F, 1.05F, 1.72F});
         m.put("insatiable", new float[] {1.12F, 2.01F, 3.91F});
+        m.put("fabricator", new float[] {1.02F, 1.84F, 1.91F});
+        m.put("zapbot", new float[] {0.75F, 0.64F, 0.85F});
+        m.put("stabbot", new float[] {0.88F, 0.72F, 0.77F});
+        m.put("guardbot", new float[] {0.82F, 0.52F, 0.65F});
+        m.put("noisebot", new float[] {0.59F, 0.5F, 0.67F});
+        m.put("turret_operator", new float[] {0.52F, 0.63F, 0.9F});
+        m.put("living_shield", new float[] {0.63F, 0.71F, 1.81F});
+        m.put("mecha_knight", new float[] {0.66F, 0.88F, 2.21F});
+        m.put("globe_head", new float[] {0.4F, 0.5F, 1.29F});
+        m.put("scroll_of_biting", new float[] {0.58F, 0.5F, 0.66F});
+        m.put("queen", new float[] {0.68F, 0.69F, 2.35F});
+        m.put("torch_head_amalgam", new float[] {0.88F, 1F, 1.72F});
+        m.put("flail_knight", new float[] {0.69F, 0.84F, 1.7F});
+        m.put("spectral_knight", new float[] {0.45F, 0.5F, 1.52F});
+        m.put("magi_knight", new float[] {0.54F, 0.5F, 1.4F});
+        m.put("frog_knight", new float[] {0.61F, 0.8F, 1.48F});
+        m.put("devoted_sculptor", new float[] {0.81F, 0.85F, 1.78F});
+        m.put("slimed_berserker", new float[] {1.36F, 1.68F, 1.95F});
+        m.put("the_lost", new float[] {0.72F, 0.5F, 0.77F});
+        m.put("the_forgotten", new float[] {1.08F, 0.5F, 0.67F});
+        m.put("axebot", new float[] {0.92F, 0.99F, 1.66F});
+        m.put("soul_nexus", new float[] {0.93F, 0.65F, 1.61F});
+        m.put("test_subject", new float[] {0.98F, 1.3F, 1.03F});
+        m.put("rhino_beetle", new float[] {0.79F, 1.04F, 1F});
+        m.put("frog_trainer", new float[] {0.45F, 0.5F, 1.05F});
+        m.put("owl_magistrate", new float[] {0.84F, 0.87F, 1.8F});
+        m.put("aeonglass", new float[] {0.97F, 0.98F, 2.51F});
     }
 
     /** Draw scale of the model, or the fallback if the mob is not in the table. */

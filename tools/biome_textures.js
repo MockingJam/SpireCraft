@@ -2,11 +2,12 @@
 // Standalone (no Blockbench): reads vanilla PNGs, recolours them with palettes tuned to the STS2 act backgrounds, and
 // draws the few patterns vanilla has no shape for (hex tiles, chitin scales, flagstones, pipe).
 // Usage: node tools/biome_textures.js <extracted client-extra.jar dir> [preview.png]
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const zlib = require('zlib');
 
 const VANILLA = process.argv[2] + '/assets/minecraft/textures/';
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/';
 
 const { readPng, writePng } = require('./png');
 
@@ -217,7 +218,8 @@ block('cracked_ruin_stone_bricks', recolor(v('block/cracked_stone_bricks'), all(
 block('chiseled_ruin_stone_bricks', recolor(v('block/chiseled_stone_bricks'), all(P.ruin)));
 block('glowvine', recolor(v('block/cave_vines_lit'), [{ when: isWarm, ramp: P.glowBerry }, { ramp: P.vine }]));
 block('glowvine_plant', recolor(v('block/cave_vines_plant_lit'), [{ when: isWarm, ramp: P.glowBerry }, { ramp: P.vine }]));
-block('fogcap', recolor(v('block/red_mushroom'), [{ when: (r, g, b) => r > g + 30, ramp: P.fogcap }, { ramp: P.pale }]));
+// 2026-11-26: the fogcap itself is drawn by tools/fogcap_v2.js now
+// block('fogcap', recolor(v('block/red_mushroom'), [{ when: (r, g, b) => r > g + 30, ramp: P.fogcap }, { ramp: P.pale }]));
 block('fogcap_block', recolor(v('block/red_mushroom_block'), [{ when: (r, g, b) => r > g + 30, ramp: P.fogcap }, { ramp: P.pale }]));
 block('spire_fern_top', recolor(v('block/large_fern_top'), all(P.fern)));
 block('spire_fern_bottom', recolor(v('block/large_fern_bottom'), all(P.fern)));

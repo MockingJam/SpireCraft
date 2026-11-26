@@ -58,6 +58,28 @@ public final class ModEffects {
     public static final RegistryObject<MobEffect> RINGING = register("ringing", () -> new SpireEffect(MobEffectCategory.HARMFUL, 0x9AD0E0)
             .addAttributeModifier(Attributes.ATTACK_SPEED, SpireCraft.id("effect.ringing"), -0.5, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
+    // ---- Glory (docs/design/glory.md) ----
+    /** Paper Cuts (Scroll of Biting): −1 max health per stack (at most 6); gone after a night's sleep or death. */
+    public static final RegistryObject<MobEffect> PAPER_CUTS = register("paper_cuts", () -> new SpireEffect(MobEffectCategory.HARMFUL, 0xB49AE0)
+            .addAttributeModifier(Attributes.MAX_HEALTH, SpireCraft.id("effect.paper_cuts"), -1.0, AttributeModifier.Operation.ADD_VALUE));
+    /** Galvanic (Globe Head, while near it): every new beneficial effect - a potion, a golden apple - shocks you for 2.5. */
+    public static final RegistryObject<MobEffect> GALVANIC = register("galvanic", () -> new SpireEffect(MobEffectCategory.HARMFUL, 0x58A8F0));
+    /** Hex (Spectral Knight, while near it; STS2: every card turns Ethereal): your buffs run out twice as fast. */
+    public static final RegistryObject<MobEffect> HEX = register("hex", () -> new SpireEffect(MobEffectCategory.HARMFUL, 0x6ADCC0));
+    /** Dampen (Magi Knight, while near it; STS2: every card is Downgraded): your gear is worse - attack −20 %, armour −4. */
+    public static final RegistryObject<MobEffect> DAMPEN = register("dampen", () -> new SpireEffect(MobEffectCategory.HARMFUL, 0xA0784C)
+            .addAttributeModifier(Attributes.ATTACK_DAMAGE, SpireCraft.id("effect.dampen"), -0.2, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+            .addAttributeModifier(Attributes.ARMOR, SpireCraft.id("effect.dampen_armor"), -4.0, AttributeModifier.Operation.ADD_VALUE));
+    /** Bound (the Queen's Chains of Binding; STS2: only one Bound card a turn): after you change the item in your hand, 1.5 s before you can strike or use it. */
+    public static final RegistryObject<MobEffect> BOUND = register("bound", () -> new SpireEffect(MobEffectCategory.HARMFUL, 0x5A8A3A));
+    /** Stolen Strength / Stolen Speed (the Lost / the Forgotten took more than you had): −1 attack, −10 % speed per level, until the thief dies. */
+    public static final RegistryObject<MobEffect> STOLEN_STRENGTH = register("stolen_strength", () -> new SpireEffect(MobEffectCategory.HARMFUL, 0xC07A3A)
+            .addAttributeModifier(Attributes.ATTACK_DAMAGE, SpireCraft.id("effect.stolen_strength"), -1.0, AttributeModifier.Operation.ADD_VALUE));
+    /** Wound (the Test Subject's Painful Stabs): healing −20 % per stack (SpireEffectEvents / GloryEffectEvents). */
+    public static final RegistryObject<MobEffect> WOUND = register("wound", () -> new SpireEffect(MobEffectCategory.HARMFUL, 0x8A1A1A));
+    public static final RegistryObject<MobEffect> STOLEN_SPEED = register("stolen_speed", () -> new SpireEffect(MobEffectCategory.HARMFUL, 0x9A9AA4)
+            .addAttributeModifier(Attributes.MOVEMENT_SPEED, SpireCraft.id("effect.stolen_speed"), -0.1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
     /** Disintegration (Knowledge Demon): magic damage every 4 seconds. */
     public static final RegistryObject<MobEffect> DISINTEGRATION = register("disintegration", () -> new DisintegrationEffect(MobEffectCategory.HARMFUL, 0x8A9A6A));
 

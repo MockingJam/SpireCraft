@@ -44,6 +44,8 @@ public class ScriptedMonster extends SpireMonster {
     private static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(ScriptedMonster.class, EntityDataSerializers.INT);
     /** Synced state bits for the renderer. */
     public static final int ASLEEP = 1, BURROWED = 2, DOWN = 4;
+    /** The Test Subject's form (0-2) rides in bits 3-4 of the synced state, for the extra heads. */
+    public static final int PHASE_SHIFT = 3;
 
     public final ScriptedDefs.Def def;
     private final ServerBossEvent bossBar;
@@ -52,6 +54,16 @@ public class ScriptedMonster extends SpireMonster {
     private float shellTaken;
     private int shellWindow;
     private final List<ItemStack> stolen = new ArrayList<>();
+    /** Glory G2: what the Lost / the Forgotten took - real levels taken (given back on death) and "debt" levels laid on. */
+    private final java.util.Map<java.util.UUID, int[]> stolenStats = new java.util.HashMap<>();
+    /** Magi Knight bombs waiting to go off: {x, y, z, ticks left, damage}. */
+    private final List<double[]> bombs = new ArrayList<>();
+    /** Glory G3: Stock left (the Axebot) and the generation of this cast; the Test Subject's form; Multi-Claw's extra hits; was the target busy with an item last tick. */
+    public int stockLeft = -1, stockGen, phase, growCount;
+    private boolean targetWasUsing, reviveFull;
+    /** Placed by a structure template (its NBT has no state yet): set up like a fresh spawn on the first tick. */
+    private boolean fresh;
+    private int alone;
 
     public ScriptedMonster(EntityType<? extends Monster> type, Level level, ScriptedDefs.Def def) {
         super(type, level);
@@ -62,6 +74,41 @@ public class ScriptedMonster extends SpireMonster {
         this.bossBar = def.boss ? new ServerBossEvent(getDisplayName(), def.barColor, BossEvent.BossBarOverlay.PROGRESS) : null;
         xpReward = def.boss ? 200 : def.elite ? 30 : 5;
         if (def.boss || def.elite) setPersistenceRequired();
+        if (def.mountsBeetle) goalSelector.addGoal(1, new MountGoal());
+    }
+
+    /** The Frog Trainer: walks to the nearest free Rhino Beetle and climbs on. */
+    class MountGoal extends net.minecraft.world.entity.ai.goal.Goal {
+        private RhinoBeetle beetle;
+
+        MountGoal() {
+            setFlags(java.util.EnumSet.of(Flag.MOVE));
+        }
+
+        @Override
+        public boolean canUse() {
+            if (isPassenger() || tickCount % 10 != 0 || (state() & ASLEEP) != 0) return false;
+            var all = level().getEntitiesOfClass(RhinoBeetle.class, getBoundingBox().inflate(16), RhinoBeetle::free);
+            beetle = all.stream().min(java.util.Comparator.comparingDouble(ScriptedMonster.this::distanceToSqr)).orElse(null);
+            return beetle != null;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return !isPassenger() && beetle != null && beetle.free() && distanceToSqr(beetle) < 400;
+        }
+
+        @Override
+        public void tick() {
+            if (beetle == null) return;
+            getLookControl().setLookAt(beetle);
+            if (distanceToSqr(beetle) < 4.5) {
+                startRiding(beetle, true, false);
+                if (getTarget() != null) beetle.setTarget(getTarget());
+                level().playSound(null, blockPosition(), SoundEvents.FROG_LONG_JUMP, SoundSource.HOSTILE, 1.0F, 1.0F);
+                beetle = null;
+            } else if (tickCount % 10 == 0) getNavigation().moveTo(beetle, 1.2);
+        }
     }
 
     @Override
@@ -95,7 +142,15 @@ public class ScriptedMonster extends SpireMonster {
 
     @Override
     protected double chaseSpeed() {
+        if (def.stationaryWhile != null && ScriptedDefs.allies(this, def.stationaryWhile) > 0) return 0;   // the Queen keeps her throne
         return def.stationary ? 0 : 1.0;
+    }
+
+    /** Levels of Strength (0) / Dexterity (1) this thief holds, all players together (the Forgotten's Dread). */
+    int stolenTotal(int kind) {
+        int n = 0;
+        for (int[] v : stolenStats.values()) n += v[kind * 2] + v[kind * 2 + 1];
+        return n;
     }
 
     @Override
@@ -138,7 +193,8 @@ public class ScriptedMonster extends SpireMonster {
         boolean first = hitIndex() == 0, lastHit = hitIndex() == m.hits - 1;
         if (m.sound != null && first) level.playSound(null, blockPosition(), m.sound, SoundSource.HOSTILE, def.boss ? 2.0F : 1.0F, def.pitch);
         if (target != null && m.hits > 1) target.invulnerableTime = 0;
-        float dmg = m.damage;
+        float dmg = m.damage + (m.dreadBonus ? stolenTotal(1) : 0);
+        if (m.growHits && hitIndex() >= 3 + growCount) { if (lastHit) growCount++; return; }
         boolean landed = false;
         switch (m.kind) {
             case MELEE -> landed = dmg > 0 && strike(level, target, dmg, m.reach);
@@ -151,7 +207,10 @@ public class ScriptedMonster extends SpireMonster {
                 landed = strike(level, target, dmg, m.reach);
                 if (landed && target != null) target.knockback(1.0, getX() - target.getX(), getZ() - target.getZ());
             }
-            case SHOT -> { if (dmg > 0 || m.effect != null) shoot(level, target, new ItemStack(m.look.get()), m.bolt, dmg, 1.2F); }
+            case SHOT -> {
+                if (m.lightning) landed = lightning(level, target, dmg);
+                else if (dmg > 0 || m.effect != null) shoot(level, target, new ItemStack(m.look.get()), m.bolt, dmg, 1.2F);
+            }
             case LOB -> lob(level, target, new ItemStack(m.look.get()), m.bolt, dmg, getBbHeight() * 0.8);
             case AOE -> {
                 level.sendParticles(m.particle, getX(), getY() + 0.5, getZ(), 40, m.reach / 2, 0.5, m.reach / 2, 0.02);
@@ -166,6 +225,9 @@ public class ScriptedMonster extends SpireMonster {
         boolean reach = m.kind == ScriptedDefs.Kind.MELEE || m.kind == ScriptedDefs.Kind.DASH ? landed : true;
         if (lastHit && target != null && m.kind != ScriptedDefs.Kind.AOE && m.kind != ScriptedDefs.Kind.SHOT && m.kind != ScriptedDefs.Kind.LOB && reach) applyEffects(level, m, target);
         if (landed && def.suck > 0) addStrength(def.suck, 20 * 60 * 10);   // Suck: stronger with every wound it opens
+        // Paper Cuts (Scroll of Biting): every bite that lands takes a little of your max health
+        if (landed && m.wound && target != null) ModEffects.addStacks(target, ModEffects.WOUND, 1, 300, 5);   // Painful Stabs
+        if (landed && def.paperCuts > 0 && target instanceof Player) ModEffects.addStacks(target, ModEffects.PAPER_CUTS, def.paperCuts, 20 * 60 * 20, 6);
         if (!lastHit) return;
         // what it does for itself
         if (m.strength > 0) addStrength(m.strength, 20 * 60 * 10);
@@ -176,8 +238,41 @@ public class ScriptedMonster extends SpireMonster {
         if (m.selfEffect != null) addEffect(new MobEffectInstance(m.selfEffect.get(), m.selfTicks, m.selfAmp));
         if (m.thorns > 0) ModEffects.addStacks(this, ModEffects.THORNS, m.thorns, 200, 10);
         if (m.dropThorns) removeEffect(ModEffects.holder(ModEffects.THORNS));
-        if (m.summon != null) for (int i = 0; i < m.summonCount; i++) summon(level, m.summon, target);
+        // summons: "a|b+c|d" = one of a or b, and one of c or d (the Fabricator: a defensive and an aggressive bot)
+        if (m.summon != null) for (String group : m.summon.split("[+]")) {
+            String[] names = group.split("[|]");
+            for (int i = 0; i < m.summonCount; i++) summon(level, names[getRandom().nextInt(names.length)], target);
+        }
+        if (m.guardAlly != null) {   // the Guardbot / the Living Shield: a shield of absorption on the ally it serves
+            var ally = level.getEntitiesOfClass(ScriptedMonster.class, getBoundingBox().inflate(16), s -> s.isAlive() && s.def.name.equals(m.guardAlly)).stream().findFirst();
+            ally.ifPresent(a -> {
+                if (m.guardAmount > 0) a.setAbsorptionAmount(Math.max(a.getAbsorptionAmount(), m.guardAmount));
+                if (m.allyStrength > 0) a.addStrength(m.allyStrength, 20 * 60 * 10);   // the Queen's Burn Bright for Me
+                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, a.getX(), a.getY() + a.getBbHeight() * 0.6, a.getZ(), 12, 0.4, 0.4, 0.4, 0.05);
+            });
+        }
         if (m.steam > 0) steam += m.steam;
+        if (m.witherSand > 0) {   // Escalate: more sand into every player in the room, and each grain burns harder from now on
+            growCount++;
+            for (Player p : level.getEntitiesOfClass(Player.class, getBoundingBox().inflate(24), p -> p.isAlive() && !p.isSpectator()))
+                com.mockingjam.spirecraft.item.WitherSand.give(p, m.witherSand);
+        }
+        // the Slimed Berserker's ichor: a puddle that lingers where the target stands
+        if (m.cloudTicks > 0 && target != null && distanceTo(target) < 16) {
+            var cloud = new net.minecraft.world.entity.AreaEffectCloud(level, target.getX(), target.getY(), target.getZ());
+            cloud.setOwner(this);
+            cloud.setRadius(2.8F);
+            cloud.setDuration(m.cloudTicks);
+            cloud.setRadiusPerTick(-0.002F);
+            cloud.setCustomParticle(ParticleTypes.ITEM_SLIME);
+            if (m.effect != null) cloud.addEffect(new MobEffectInstance(m.effect.get(), 60, m.effectAmp));
+            level.addFreshEntity(cloud);
+        }
+        // the Magi Knight's bomb: it marks the spot now and goes off a little later
+        if (m.bombDelay > 0 && target != null) {
+            bombs.add(new double[] {target.getX(), target.getY(), target.getZ(), m.bombDelay, m.bombDamage});
+            level.sendParticles(ParticleTypes.ENCHANT, target.getX(), target.getY() + 0.1, target.getZ(), 60, 1.5, 0.05, 1.5, 0.2);
+        }
         if (m.burrow) { setState(BURROWED, true); setAbsorptionAmount(m.absorb); }
         if (m.flee) flee(level);
         if (m.explode) { level.sendParticles(ParticleTypes.EXPLOSION, getX(), getY() + 0.5, getZ(), 3, 0.5, 0.3, 0.5, 0); discard(); }
@@ -191,6 +286,65 @@ public class ScriptedMonster extends SpireMonster {
         if (m.poison > 0) ModEffects.addStacks(t, ModEffects.POISON, m.poison, 1200, 30);
         if (m.doom > 0) ModEffects.addStacks(t, ModEffects.DOOM, m.doom, 20 * 60, 99);
         if (m.steal > 0 && t instanceof Player p) steal(p, m.steal);
+        if (m.effect3 != null) t.addEffect(new MobEffectInstance(m.effect3.get(), m.effectTicks, 0), this);
+        if (m.pull) {   // the Frog Knight's tongue drags you in
+            t.setDeltaMovement(position().subtract(t.position()).normalize().scale(1.1).add(0, 0.35, 0));
+            if (t instanceof net.minecraft.server.level.ServerPlayer sp) sp.hurtMarked = true;
+        }
+        if (m.shieldBreak && t instanceof Player p && p.isBlocking()) {   // the flail wraps round the shield and tears it aside
+            p.getCooldowns().addCooldown(p.getUseItem(), 100);
+            p.stopUsingItem();
+            level().playSound(null, p.blockPosition(), SoundEvents.SHIELD_BREAK.value(), SoundSource.PLAYERS, 1.0F, 0.9F);
+        }
+        if ((m.stealStr || m.stealDex) && t instanceof Player p) stealStat(p, m.stealStr ? 0 : 1);
+        if (m.ignite > 0) t.igniteForSeconds(m.ignite);
+        if (m.embers > 0 && t instanceof Player p) com.mockingjam.spirecraft.item.SearingEmber.give(p, m.embers);
+    }
+
+    /** The Lost / the Forgotten: one level of Strength (0) or Dexterity (1) off the player - a real one if they have it, else a debt. */
+    private void stealStat(Player p, int kind) {
+        var real = kind == 0 ? ModEffects.STRENGTH : ModEffects.DEXTERITY;
+        var debt = kind == 0 ? ModEffects.STOLEN_STRENGTH : ModEffects.STOLEN_SPEED;
+        int[] v = stolenStats.computeIfAbsent(p.getUUID(), u -> new int[4]);
+        int have = ModEffects.stacks(p, real);
+        if (have > 0) {
+            var inst = p.getEffect(ModEffects.holder(real));
+            int dur = inst == null ? 600 : inst.getDuration();
+            p.removeEffect(ModEffects.holder(real));
+            if (have > 1) p.addEffect(new MobEffectInstance(ModEffects.holder(real), dur, have - 2));
+            v[kind * 2]++;
+        } else {
+            ModEffects.addStacks(p, debt, 1, 20 * 60 * 10, 5);
+            v[kind * 2 + 1]++;
+        }
+        if (kind == 0) addStrength(1, 20 * 60 * 10);
+        else ModEffects.addStacks(this, ModEffects.DEXTERITY, 1, 20 * 60 * 10, 99);
+    }
+
+    /** On the thief's death: the debts are cancelled and the real levels go back. */
+    private void returnStolen(ServerLevel level) {
+        for (var e : stolenStats.entrySet()) {
+            Player p = level.getPlayerByUUID(e.getKey());
+            if (p == null) continue;
+            int[] v = e.getValue();
+            if (v[1] > 0) p.removeEffect(ModEffects.holder(ModEffects.STOLEN_STRENGTH));
+            if (v[3] > 0) p.removeEffect(ModEffects.holder(ModEffects.STOLEN_SPEED));
+            if (v[0] > 0) ModEffects.addStacks(p, ModEffects.STRENGTH, v[0], 20 * 60 * 2, 99);
+            if (v[2] > 0) ModEffects.addStacks(p, ModEffects.DEXTERITY, v[2], 20 * 60 * 2, 99);
+        }
+        stolenStats.clear();
+    }
+
+    /** The Globe Head's thunder: a bolt of (harmless) lightning on the target, and the shock it gives. */
+    private boolean lightning(ServerLevel level, LivingEntity target, float dmg) {
+        if (target == null || distanceTo(target) > 16) return false;
+        var bolt = net.minecraft.world.entity.EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
+        if (bolt != null) {
+            bolt.snapTo(target.getX() + getRandom().nextGaussian() * 0.6, target.getY(), target.getZ() + getRandom().nextGaussian() * 0.6);
+            bolt.setVisualOnly(true);
+            level.addFreshEntity(bolt);
+        }
+        return target.hurtServer(level, damageSources().lightningBolt(), dmg);
     }
 
     /** A thief's hands: up to {@code max} of the first emeralds / gold / diamonds it finds (it drops them when killed). */
@@ -238,20 +392,87 @@ public class ScriptedMonster extends SpireMonster {
     }
 
     // ------------------------------------------------------------------------------------------- powers
+    /** Asleep it does not move (Glory v2 bosses wait in their rooms). */
+    @Override
+    public boolean isImmobile() {
+        return super.isImmobile() || (state() & ASLEEP) != 0;
+    }
+
+    /** Glory v2: a boss waiting in its room wakes when a player it can see walks in. */
+    public void watchRoom(ServerLevel level) {
+        if (def.wakeRoom <= 0) return;
+        boolean asleep = (state() & ASLEEP) != 0;
+        if (bossBar != null) bossBar.setVisible(!asleep);
+        if (tickCount % 10 != 0) return;
+        var box = getBoundingBox().inflate(def.wakeRoom * (asleep ? 1 : 2), def.wakeAbove, def.wakeRoom * (asleep ? 1 : 2));
+        var near = level.getEntitiesOfClass(Player.class, box, p -> p.isAlive() && !p.isSpectator() && !p.isCreative() && p.getY() > getY() - 3);
+        if (asleep) {
+            for (Player p : near) if (Math.hypot(p.getX() - getX(), p.getZ() - getZ()) <= def.wakeRoom && hasLineOfSight(p)) { setTarget(p); wake(level); return; }
+            return;
+        }
+        if (!near.isEmpty()) { alone = 0; return; }
+        if ((alone += 10) < 600) return;
+        // nobody left in the room for 30 s: it settles down again, healed, and lets the way open
+        alone = 0;
+        setTarget(null);
+        removeAllEffects();
+        setHealth(getMaxHealth());
+        setState(ASLEEP, true);
+        sleepHits = 0;
+        com.mockingjam.spirecraft.block.GloryGateBlock.setAll(level, blockPosition(), 40, false);
+    }
+
     @Override
     protected void customServerAiStep(ServerLevel level) {
+        if (fresh) {
+            fresh = false;
+            if (def.artifact > 0) ModEffects.addStacks(this, ModEffects.ARTIFACT, def.artifact, -1, def.artifact);
+            if (def.sleep > 0) setState(ASLEEP, true);
+        }
+        watchRoom(level);
         int before = moveId();
         super.customServerAiStep(level);
         if (before != 0 && moveId() == 0) onMoveDone();
         if (bossBar != null) bossBar.setProgress(getHealth() / getMaxHealth());
+        // bombs counting down: a ring of warning on the ground, then the blast
+        for (var it = bombs.iterator(); it.hasNext(); ) {
+            double[] b = it.next();
+            if (--b[3] % 5 == 0) level.sendParticles(ParticleTypes.WITCH, b[0], b[1] + 0.1, b[2], 12, 1.2, 0.02, 1.2, 0.01);
+            if (b[3] > 0) continue;
+            level.sendParticles(ParticleTypes.EXPLOSION, b[0], b[1] + 0.5, b[2], 3, 0.6, 0.3, 0.6, 0);
+            level.playSound(null, net.minecraft.core.BlockPos.containing(b[0], b[1], b[2]), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 1.5F, 1.2F);
+            for (Player p : level.getEntitiesOfClass(Player.class, new net.minecraft.world.phys.AABB(b[0] - 2.5, b[1] - 1, b[2] - 2.5, b[0] + 2.5, b[1] + 3, b[2] + 2.5)))
+                p.hurtServer(level, damageSources().indirectMagic(this, this), (float) b[4]);
+            it.remove();
+        }
+        // Enrage (the Test Subject's first form): it grows stronger whenever its target raises a shield, drinks or eats
+        if (def.enrageOnUse && phase == 0 && getTarget() != null) {
+            boolean using = getTarget().isUsingItem();
+            if (using && !targetWasUsing) addStrength(1, 20 * 60 * 10);
+            targetWasUsing = using;
+        }
+        // Nemesis (its last form): every 8 s it turns Intangible for 3 s
+        if (def.nemesisPhase >= 0 && phase >= def.nemesisPhase && tickCount % 160 == 0) {
+            addEffect(new MobEffectInstance(ModEffects.holder(ModEffects.INTANGIBLE), 60, 0));
+            level.sendParticles(ParticleTypes.REVERSE_PORTAL, getX(), getY() + 1, getZ(), 30, 0.6, 0.6, 0.6, 0.02);
+        }
+        // an aura the players near it carry while it lives (Hex, Dampen) - not while it sleeps
+        if (def.aura != null && tickCount % 20 == 0 && (state() & ASLEEP) == 0)
+            for (Player p : level.getEntitiesOfClass(Player.class, getBoundingBox().inflate(16), p -> !p.isSpectator() && !p.isCreative()))
+                p.addEffect(new MobEffectInstance(def.aura.get(), 40, 0, false, true, true), this);
+        // Galvanic (Globe Head): the players near it carry the charge (SpireEffectEvents: a new buff shocks them)
+        if (def.galvanic && tickCount % 20 == 0)
+            for (Player p : level.getEntitiesOfClass(Player.class, getBoundingBox().inflate(16), p -> !p.isSpectator() && !p.isCreative()))
+                p.addEffect(new MobEffectInstance(ModEffects.holder(ModEffects.GALVANIC), 40, 0, false, true, true), this);
         if (++shellWindow >= 100) { shellWindow = 0; shellTaken = 0; }
         // asleep: wakes when the target has been close a while (or when hit enough - see hurtServer)
-        if ((state() & ASLEEP) != 0 && getTarget() != null && tickCount % 20 == 0 && ++sleepHits > def.sleep * 5) wake(level);
+        if (def.wakeRoom <= 0 && (state() & ASLEEP) != 0 && getTarget() != null && tickCount % 20 == 0 && ++sleepHits > def.sleep * 5) wake(level);
         // knocked down (Illusion / Reattach): back up at full strength after a while
         if ((state() & DOWN) != 0 && --downTicks <= 0) {
             setState(DOWN, false);
             setInvisible(false);
-            setHealth(def.reviveHealth > 0 ? def.reviveHealth : getMaxHealth());
+            setHealth(reviveFull || def.reviveHealth <= 0 ? getMaxHealth() : def.reviveHealth);
+            reviveFull = false;
             level.sendParticles(ParticleTypes.ENCHANT, getX(), getY() + 1, getZ(), 30, 0.4, 0.6, 0.4, 0.5);
         }
         // eggs hatch on their own
@@ -278,11 +499,22 @@ public class ScriptedMonster extends SpireMonster {
         setState(ASLEEP, false);
         if (def.sleepPlatingLost) plating = 0;
         level.playSound(null, blockPosition(), SoundEvents.RAVAGER_ROAR, SoundSource.HOSTILE, def.boss ? 2.5F : 1.0F, def.pitch);
+        if (def.wakeRoom > 0) {   // the fight starts: the gates drop
+            alone = 0;
+            com.mockingjam.spirecraft.block.GloryGateBlock.setAll(level, blockPosition(), 40, true);
+        }
     }
 
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         if ((state() & DOWN) != 0) return false;
+        if (def.fireproof && source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE)) return false;   // cast in the foundry / built for its own flames
+        // a heavy blow breaks off a move that can be interrupted (the Sculptor's incantation)
+        int mid = moveId();
+        if (mid > 0 && mid <= def.moves.size() && def.moves.get(mid - 1).interruptAt > 0 && amount >= def.moves.get(mid - 1).interruptAt) {
+            startMove(move(0));
+            level.playSound(null, blockPosition(), SoundEvents.SHIELD_BLOCK.value(), SoundSource.HOSTILE, 1.0F, 0.6F);
+        }
         boolean bypass = source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY);
         if (!bypass) {
             if (slippery > 0) { slippery--; amount = Math.min(amount, 1); }          // Slippery: the next blows only graze it
@@ -308,6 +540,11 @@ public class ScriptedMonster extends SpireMonster {
     /** Lethal damage: Illusion / Reattach knock it down instead; the steam giant blows up. */
     @Override
     protected void actuallyHurt(ServerLevel level, DamageSource source, float amount) {
+        if (def.phases != null && phase < def.phases.length - 1 && amount >= getHealth() + getAbsorptionAmount()
+                && !source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            nextPhase(level);
+            return;
+        }
         if (amount >= getHealth() + getAbsorptionAmount() && !source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             boolean leaderAlive = def.leader == null || !level.getEntities(ModEntities.SCRIPTED.get(def.leader).get(), getBoundingBox().inflate(32), LivingEntity::isAlive).isEmpty();
             if ((def.illusion && leaderAlive) || revivals < def.revives) {
@@ -338,9 +575,49 @@ public class ScriptedMonster extends SpireMonster {
         stolen.clear();
     }
 
+    /** The Test Subject adapts: it falls, everything on it is cleared, and it rises as its next, bigger form. */
+    public void nextPhase(ServerLevel level) {
+        phase++;
+        removeAllEffects();
+        setAbsorptionAmount(0);
+        getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(def.phases[phase]);
+        setHealth(getMaxHealth());
+        entityData.set(STATE, (state() & ~(3 << PHASE_SHIFT)) | (phase << PHASE_SHIFT));
+        setState(DOWN, true);
+        downTicks = def.reviveTicks;
+        reviveFull = true;
+        startMove(move(0));
+        level.sendParticles(ParticleTypes.LARGE_SMOKE, getX(), getY() + 0.5, getZ(), 30, 0.6, 0.4, 0.6, 0.02);
+        level.playSound(null, blockPosition(), SoundEvents.RAVAGER_ROAR, SoundSource.HOSTILE, 2.0F, 0.6F + phase * 0.1F);
+    }
+
     @Override
     public void die(DamageSource source) {
+        // Stock (the Axebot): another is cast where this one fell, a little tougher, booting up angry
+        if (level() instanceof ServerLevel sl && def.stock > 0) {
+            int left = stockLeft < 0 ? def.stock : stockLeft;
+            if (left > 0) {
+                ScriptedMonster next = summon(sl, def.name, getTarget());
+                if (next != null) {
+                    next.stockLeft = left - 1;
+                    next.stockGen = stockGen + 1;
+                    var hp = next.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+                    hp.setBaseValue(hp.getBaseValue() + 4 * next.stockGen);
+                    next.setHealth(next.getMaxHealth());
+                    next.setAbsorptionAmount(4);
+                    next.addStrength(next.stockGen, 20 * 60 * 10);
+                    sl.sendParticles(ParticleTypes.LAVA, next.getX(), next.getY() + 1, next.getZ(), 12, 0.4, 0.6, 0.4, 0.1);
+                }
+            }
+        }
+        if (level() instanceof ServerLevel sl) {
+            returnStolen(sl);
+            if (!def.clearOnDeath.isEmpty()) for (Player p : sl.getEntitiesOfClass(Player.class, getBoundingBox().inflate(48)))
+                for (var e : def.clearOnDeath) p.removeEffect(e.get());
+        }
         if (level() instanceof ServerLevel level) for (var c : def.deathSummon) for (int i = 0; i < c.count(); i++) summon(level, c.pick(getRandom()), getTarget());
+        if (def.wakeRoom > 0 && phase >= (def.phases == null ? 0 : def.phases.length - 1) && level() instanceof ServerLevel level)
+            com.mockingjam.spirecraft.block.GloryGateBlock.setAll(level, blockPosition(), 40, false);   // the fight is won: the way out opens
         super.die(source);
     }
 
@@ -381,7 +658,9 @@ public class ScriptedMonster extends SpireMonster {
         super.readAdditionalSaveData(in);
         opener = in.getIntOr("Opener", 0);
         loop = in.getIntOr("Loop", 0);
-        entityData.set(STATE, in.getIntOr("State", 0) & ~DOWN);
+        int st = in.getIntOr("State", -1);
+        fresh = st < 0;   // placed by a structure: set up on the first tick
+        entityData.set(STATE, Math.max(0, st) & ~DOWN);
         ritual = in.getIntOr("Ritual", 0);
         steam = in.getIntOr("Steam", 0);
         plating = in.getIntOr("Plating", def.plating);

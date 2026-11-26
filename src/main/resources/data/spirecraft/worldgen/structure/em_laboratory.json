@@ -1,0 +1,12 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/em_laboratory",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_box",
+  "templates": [
+    "spirecraft:em_laboratory/1"
+  ],
+  "mode": "open_ground",
+  "sink": 1
+}

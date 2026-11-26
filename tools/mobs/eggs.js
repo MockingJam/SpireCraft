@@ -1,9 +1,10 @@
 // Spawn eggs and the Ceremonial Bell icon, recolored from vanilla 1.21.10 item art (vanilla style, no new shapes).
 // Egg: vanilla slime egg recolored by luminance into a ramp from the mob's main colour; its darker streaks take the
 // mob's accent colour. Usage: node tools/mobs/eggs.js <vanilla item texture dir>
+const REPO_ROOT = require('path').resolve(__dirname, '..', '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const { readPng, writePng } = require('../png');
 const SRC = process.argv[2];
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/item/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/item/';
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
 const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
@@ -21,8 +22,8 @@ const EGGS = {
   kaiser_crab: ['#4a3c70', '#788eae'], knowledge_demon: ['#c2c2bc', '#d6a232'],
 };
 // §11: the data-driven monsters take their two colours from their own model texture (most common, then the most different common one)
-const TEX = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/entity/';
-for (const name of Object.keys(require('./specs_scripted'))) {
+const TEX = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/entity/';
+for (const name of [...Object.keys(require('./specs_scripted')), ...Object.keys(require('./specs_glory')), ...Object.keys(require('./specs_glory2')), ...Object.keys(require('./specs_glory3')), ...Object.keys(require('./specs_glory_v2a')), ...Object.keys(require('./specs_glory_v2b'))]) {
   if (EGGS[name]) continue;
   const t = readPng(TEX + name + '.png'), count = new Map();
   for (let i = 0; i < t.w * t.h; i++) if (t.d[i * 4 + 3] > 100) { const k = [0, 1, 2].map(c => t.d[i * 4 + c] >> 4 << 4).join(); count.set(k, (count.get(k) || 0) + 1); }

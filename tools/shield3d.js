@@ -11,9 +11,10 @@
 // left, rim and face each in one hue (docs/design/art_style.md).
 // Writes: textures/item/<name>_3d.png, models/item/<name>_3d.json, models/item/<name>_3d_blocking.json
 // Usage: node tools/shield3d.js
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const { writePng } = require('./png');
-const RES = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/';
+const RES = REPO_ROOT + 'src/main/resources/assets/spirecraft/';
 const TEX = 64, U = 16 / TEX;          // 64×64 sheet; JSON uv units per texel
 
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));

@@ -177,15 +177,21 @@ public final class SelfTest {
             for (String t : List.of("byrdonis_nest/1", "byrdonis_nest/2", "camp/desert_1", "camp/desert_2", "camp/desert_3", "camp/plains_1", "camp/plains_2", "camp/plains_3", "camp/savanna_1", "camp/savanna_2", "camp/savanna_3", "camp/snowy_1", "camp/snowy_2", "camp/snowy_3", "camp/taiga_1", "camp/taiga_2", "camp/taiga_3", "ceremonial_ruins/11", "ceremonial_ruins/12", "dock_house/house_2", "dock_house/scriptorium_4", "dock_house/small_1", "dock_house/tall_3", "dock_pier/1", "dock_pier/2", "dock_pier/3", "hive/beekeeper_1", "hive/beekeeper_2", "hive/bowlbug_nest_1", "hive/bowlbug_nest_2", "hive/bowlbug_nest_3", "hive/holes_1", "hive/holes_2", "hive/scrap_pile_1", "hive/scrap_pile_2", "kin/hut_big_13", "kin/hut_oval_14", "kin/hut_ritual_16", "kin/hut_round_11", "kin/hut_round_15", "kin/hut_small_12", "kin/hut_small_17", "kin/path_1", "kin/path_2", "kin/path_3", "kin/path_4", "kin/path_5", "kin/plaza", "kin/tree_21", "kin/tree_22", "lighthouse/1", "lighthouse/2", "overgrowth_camp/1", "overgrowth_camp/2", "ruin_pile/ruin_5", "ruin_pile/ruin_6", "ruin_pile/ruin_7", "ruin_pile/vanilla_1", "ruin_pile/vanilla_2", "ruin_pile/vanilla_3", "ruin_pile/vanilla_4", "sailboat/1", "sailboat/2_w", "sailboat/3", "sea_ruins/1", "sea_ruins/2", "sea_ruins/3_big", "sunken_statue/1", "sunken_statue/2", "sword_statue/1", "sword_statue/2", "sword_statue/3", "wellspring/23", "wellspring/24", "wood_carvings/1",
                     // the ascender buildings (issue #30) and the 2026-11-25 additions
                     "ironclad_camp/1", "ironclad_ruin/1", "silent_gathering/1", "jungle_tribe/1", "necrobinder_giant/1", "forbidden_library/1",
-                    "defect_station/1", "automaton_factory/1", "regent_starship/1", "regent_starship/2", "regent_starship/3")) {
+                    "automaton_factory/1", "regent_starship/1", "regent_starship/2", "regent_starship/3",
+                    // Glory v2 (docs/design/glory.md)
+                    "brass_works/fabrication_1", "brass_works/turret_bastion_1", "brass_works/mecha_hangar_1", "em_laboratory/1",
+                    "queens_castle/1", "knights_keep/1", "statuary/1", "forgotten_ruins/surface_lost", "forgotten_ruins/surface_forgotten",
+                    "forgotten_ruins/crypt_lost", "forgotten_ruins/crypt_forgotten", "slime_jail/1", "beetle_grounds/1", "owl_court/1",
+                    "axebot_foundry/1", "prison_lab/1", "aeon_spire/1")) {
                 var tpl = manager.get(SpireCraft.id(t));
                 if (tpl.isEmpty() || tpl.get().getSize().getX() == 0) { bad++; SpireCraft.LOGGER.info("[SelfTest] template missing: {}", t); }
             }
-            check("structures: all 86 templates load", bad, 0);
+            check("structures: all 102 templates load", bad, 0);
             var reg = s.registryAccess().lookupOrThrow(Registries.STRUCTURE);
             for (String id : List.of("beekeeper", "beekeeper_hollow", "bowlbug_nest", "byrdonis_nest", "camp_desert", "camp_plains", "camp_savanna", "camp_snowy", "camp_taiga", "ceremonial_ruins", "dock_house", "dock_pier", "kaiser_crab_cave", "kin_village", "lighthouse", "man_sized_holes", "mycelium_shrine", "overgrowth_camp", "overgrowth_ruin_pile", "ruin_pile", "sailboat", "scrap_pile", "sea_ruins", "sunken_statue", "web_nest", "wellspring", "wood_carvings",
                     "ironclad_camp", "ironclad_ruin", "silent_gathering", "jungle_tribe", "regent_crater", "regent_starship", "necrobinder_giant",
-                    "forbidden_library", "defect_station", "automaton_factory", "sand_pit")) {
+                    "forbidden_library", "automaton_factory", "sand_pit", "brass_works", "em_laboratory",
+                    "queens_castle", "knights_keep", "statuary", "forgotten_ruins", "forgotten_crypt", "slime_jail", "beetle_grounds", "owl_court", "axebot_foundry", "prison_lab", "aeon_spire")) {
                 var holder = reg.get(ResourceKey.create(Registries.STRUCTURE, SpireCraft.id(id)));
                 report("structure " + id + " registered", holder.isPresent());
             }
@@ -487,6 +493,149 @@ public final class SelfTest {
             report("sand lure: calls the Insatiable", boss != null && boss.def.name.equals("insatiable"));
             report("sand lure: only one at a time", token.summon(s, player) == null);
             if (boss != null) boss.discard();
+            // ---- Glory G1 (docs/design/glory.md)
+            player.teleportTo(at.getX() + 4, at.getY(), at.getZ() + 3);
+            player.setHealth(player.getMaxHealth());
+            // Paper Cuts: a bite that lands takes 1 max health
+            float maxBefore = player.getMaxHealth();
+            var scroll = spawn.apply("scroll_of_biting");
+            player.invulnerableTime = 0;
+            scroll.forceMove(s, scroll.move(1), player);
+            check("scroll of biting: Paper Cuts takes 1 max health", maxBefore - player.getMaxHealth(), 1f);
+            player.removeEffect(com.mockingjam.spirecraft.effect.ModEffects.holder(com.mockingjam.spirecraft.effect.ModEffects.PAPER_CUTS));
+            scroll.discard();
+            // the Fabricator: with no bots about it fabricates (moves 1-2), with four it disintegrates (move 3)
+            var fab = spawn.apply("fabricator");
+            fab.forceMove(s, fab.move(1), player);
+            check("fabricator: Fabricate builds a defensive and an aggressive bot", s.getEntitiesOfClass(com.mockingjam.spirecraft.mob.ScriptedMonster.class, fab.getBoundingBox().inflate(8), m -> m.def.leader != null && m.def.leader.equals("fabricator")).size(), 2f);
+            fab.summon(s, "stabbot", null);
+            fab.summon(s, "stabbot", null);
+            check("fabricator: four bots about - Disintegrate", com.mockingjam.spirecraft.mob.ScriptedDefs.get("fabricator").picker.pick(fab), 3f);
+            // the Guardbot shields the Fabricator
+            fab.setAbsorptionAmount(0);
+            var guard = fab.summon(s, "guardbot", null);
+            guard.forceMove(s, guard.move(1), player);
+            check("guardbot: shields the Fabricator", fab.getAbsorptionAmount(), 6f);
+            for (var e : s.getEntitiesOfClass(com.mockingjam.spirecraft.mob.ScriptedMonster.class, fab.getBoundingBox().inflate(10))) e.discard();
+            // the Living Shield guards its Turret Operator, and smashes once he is gone
+            var op = spawn.apply("turret_operator");
+            var shield = spawn.apply("living_shield");
+            check("living shield: guards while the operator lives", com.mockingjam.spirecraft.mob.ScriptedDefs.get("living_shield").picker.pick(shield), 1f);
+            op.discard();
+            check("living shield: smashes when he is gone", com.mockingjam.spirecraft.mob.ScriptedDefs.get("living_shield").picker.pick(shield), 3f);
+            shield.discard();
+            // the Mecha Knight: Artifact 3, its flames leave searing embers; immune to fire
+            var mk = spawn.apply("mecha_knight");
+            check("mecha knight: artifact 3", com.mockingjam.spirecraft.effect.ModEffects.stacks(mk, com.mockingjam.spirecraft.effect.ModEffects.ARTIFACT), 3f);
+            player.getInventory().clearContent();
+            mk.forceMove(s, mk.move(2), player);
+            check("mecha knight: Flamethrower gives 2 searing embers", player.getInventory().countItem(com.mockingjam.spirecraft.registry.ModItems.SEARING_EMBER.get()), 2f);
+            report("mecha knight: Flamethrower sets you alight", player.getRemainingFireTicks() > 0);
+            player.clearFire();
+            report("mecha knight: fire does not hurt it", !mk.hurtServer(s, s.damageSources().inFire(), 5));
+            mk.discard();
+            player.getInventory().clearContent();
+            // ---- Glory G2
+            // the Lost steals a level of Strength, and gives it back when it dies
+            com.mockingjam.spirecraft.effect.ModEffects.addStacks(player, com.mockingjam.spirecraft.effect.ModEffects.STRENGTH, 2, 600, 99);
+            var lost = com.mockingjam.spirecraft.registry.ModEntities.SCRIPTED.get("the_lost").get().spawn(s, at.offset(5, 0, 3), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            lost.forceMove(s, lost.move(1), player);
+            check("the lost: steals a level of Strength", com.mockingjam.spirecraft.effect.ModEffects.stacks(player, com.mockingjam.spirecraft.effect.ModEffects.STRENGTH), 1f);
+            lost.kill(s);
+            check("the lost: gives it back when it dies", com.mockingjam.spirecraft.effect.ModEffects.stacks(player, com.mockingjam.spirecraft.effect.ModEffects.STRENGTH), 2f);
+            for (var e : s.getEntitiesOfClass(com.mockingjam.spirecraft.mob.ScriptedMonster.class, player.getBoundingBox().inflate(12))) e.discard();
+            player.removeEffect(com.mockingjam.spirecraft.effect.ModEffects.holder(com.mockingjam.spirecraft.effect.ModEffects.STRENGTH));
+            // v2: the Queen waits asleep in her room (with her Amalgam); a player walking in wakes her and the gates drop
+            BlockPos qPos = at.offset(-30, 0, -8), gatePos = qPos.offset(3, 0, 3);
+            s.setBlock(gatePos, com.mockingjam.spirecraft.registry.ModBlocks.GLORY_GATE.get().defaultBlockState(), 3);
+            var queen = com.mockingjam.spirecraft.registry.ModEntities.SCRIPTED.get("queen").get().spawn(s, qPos, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            report("queen: waits asleep", (queen.state() & com.mockingjam.spirecraft.mob.ScriptedMonster.ASLEEP) != 0);
+            report("queen: the Torch Head Amalgam comes with her", !s.getEntitiesOfClass(com.mockingjam.spirecraft.mob.ScriptedMonster.class, queen.getBoundingBox().inflate(6), m -> m.def.name.equals("torch_head_amalgam")).isEmpty());
+            var qp = player.position();
+            player.teleportTo(qPos.getX() + 6.5, qPos.getY(), qPos.getZ() + 0.5);
+            queen.tickCount = 10;
+            queen.watchRoom(s);
+            report("queen: wakes when a player walks into her room", (queen.state() & com.mockingjam.spirecraft.mob.ScriptedMonster.ASLEEP) == 0);
+            report("glory gate: drops when the boss wakes", s.getBlockState(gatePos).getValue(com.mockingjam.spirecraft.block.GloryGateBlock.CLOSED));
+            check("queen: opens with Puppet Strings", com.mockingjam.spirecraft.mob.ScriptedDefs.get("queen").picker.pick(queen), 1f);
+            queen.kill(s);
+            report("glory gate: open again once the boss is dead", !s.getBlockState(gatePos).getValue(com.mockingjam.spirecraft.block.GloryGateBlock.CLOSED));
+            for (var e : s.getEntitiesOfClass(com.mockingjam.spirecraft.mob.ScriptedMonster.class, queen.getBoundingBox().inflate(10))) e.discard();
+            player.teleportTo(qp.x, qp.y, qp.z);
+            s.setBlock(gatePos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+            // ---- Glory G3
+            // Stock: a killed Axebot is cast again, tougher
+            var axebot = com.mockingjam.spirecraft.registry.ModEntities.SCRIPTED.get("axebot").get().spawn(s, at.offset(6, 0, -6), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            axebot.kill(s);
+            var recast = s.getEntitiesOfClass(com.mockingjam.spirecraft.mob.ScriptedMonster.class, axebot.getBoundingBox().inflate(6), m -> m.isAlive() && m.def.name.equals("axebot"));
+            report("axebot: Stock - another is cast when it dies", recast.size() == 1);
+            if (!recast.isEmpty()) check("axebot: the new one is tougher (+4 max health)", recast.get(0).getMaxHealth(), 29f);
+            for (var e : recast) e.discard();
+            // the Test Subject adapts: a lethal blow raises its next form, 160 health
+            var subject = com.mockingjam.spirecraft.registry.ModEntities.SCRIPTED.get("test_subject").get().spawn(s, at.offset(-6, 0, 6), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            subject.hurtServer(s, s.damageSources().generic(), 500);
+            report("test subject: survives the first death", subject.isAlive());
+            check("test subject: second form", subject.phase, 1f);
+            check("test subject: second form's health", subject.getMaxHealth(), 160f);
+            subject.discard();
+            // Wound: healing reduced by a fifth per stack
+            player.setHealth(10);
+            com.mockingjam.spirecraft.effect.ModEffects.addStacks(player, com.mockingjam.spirecraft.effect.ModEffects.WOUND, 2, 200, 5);
+            player.heal(5);
+            check("wound: 2 stacks heal 60 %", player.getHealth(), 13f);
+            player.removeEffect(com.mockingjam.spirecraft.effect.ModEffects.holder(com.mockingjam.spirecraft.effect.ModEffects.WOUND));
+            // ---- Glory v2 / G4
+            // the Rhino Beetle: a free mount, commanded by a Frog Trainer near it
+            var beetle = com.mockingjam.spirecraft.registry.ModEntities.RHINO_BEETLE.get().spawn(s, at.offset(10, 0, 10), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            report("rhino beetle: spawns, free to ride", beetle != null && beetle.free());
+            report("rhino beetle: passive alone", !beetle.commanded());
+            var trainer = com.mockingjam.spirecraft.registry.ModEntities.SCRIPTED.get("frog_trainer").get().spawn(s, at.offset(12, 0, 10), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            report("rhino beetle: turned on players with a Frog Trainer near", beetle.commanded());
+            trainer.startRiding(beetle, true, false);
+            report("frog trainer: rides the beetle", trainer.getVehicle() == beetle && !beetle.free());
+            report("rhino beetle: the frog does not steer it", beetle.getControllingPassenger() == null);
+            trainer.discard();
+            beetle.tame(player);
+            report("rhino beetle: tamed, its owner steers it", !beetle.commanded());
+            beetle.discard();
+            // the Soul Nexus rises after 15 kills in the soul sand valley
+            for (int i = 0; i < com.mockingjam.spirecraft.mob.SoulNexusCall.NEEDED - 1; i++) com.mockingjam.spirecraft.mob.SoulNexusCall.count(s, player, player.blockPosition());
+            report("soul nexus: nothing yet after 14", s.getEntitiesOfClass(com.mockingjam.spirecraft.mob.ScriptedMonster.class, player.getBoundingBox().inflate(20), m -> m.def.name.equals("soul_nexus")).isEmpty());
+            com.mockingjam.spirecraft.mob.SoulNexusCall.count(s, player, player.blockPosition());
+            var nexus = s.getEntitiesOfClass(com.mockingjam.spirecraft.mob.ScriptedMonster.class, player.getBoundingBox().inflate(20), m -> m.def.name.equals("soul_nexus"));
+            report("soul nexus: rises on the fifteenth", nexus.size() == 1);
+            for (var e : nexus) e.discard();
+            // the Aeonglass: waits asleep; awake, every sixth attack or use near it gives a grain of Wither Sand
+            var aeon = com.mockingjam.spirecraft.registry.ModEntities.SCRIPTED.get("aeonglass").get().spawn(s, at.offset(-12, 0, -12), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            report("aeonglass: waits asleep", (aeon.state() & com.mockingjam.spirecraft.mob.ScriptedMonster.ASLEEP) != 0);
+            check("aeonglass: Artifact 3", com.mockingjam.spirecraft.effect.ModEffects.stacks(aeon, com.mockingjam.spirecraft.effect.ModEffects.ARTIFACT), 3f);
+            aeon.hurtServer(s, s.damageSources().playerAttack(player), 1);
+            report("aeonglass: wakes when struck", (aeon.state() & com.mockingjam.spirecraft.mob.ScriptedMonster.ASLEEP) == 0);
+            var ap = player.position();
+            player.teleportTo(aeon.getX() + 4, aeon.getY(), aeon.getZ());
+            for (int i = 0; i < 6; i++) com.mockingjam.spirecraft.effect.GloryEffectEvents.witherPresence(player);
+            report("aeonglass: Wither presence - a grain of sand after six actions", player.getInventory().countItem(com.mockingjam.spirecraft.registry.ModItems.WITHER_SAND.get()) == 1);
+            report("wither sand: cannot be poured out away from a light pillar", !com.mockingjam.spirecraft.item.WitherSand.inPillar(s, player));
+            s.setBlock(player.blockPosition().east(), net.minecraft.world.level.block.Blocks.END_ROD.defaultBlockState(), 3);
+            report("wither sand: can be poured out in a light pillar", com.mockingjam.spirecraft.item.WitherSand.inPillar(s, player));
+            s.setBlock(player.blockPosition().east(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+            player.getInventory().clearContent();
+            aeon.discard();
+            player.teleportTo(ap.x, ap.y, ap.z);
+            // the reed: breaking its top takes the bottom with it
+            BlockPos reedAt = at.offset(14, 0, -6);
+            s.setBlock(reedAt.below(), net.minecraft.world.level.block.Blocks.MUD.defaultBlockState(), 3);
+            net.minecraft.world.level.block.DoublePlantBlock.placeAt(s, com.mockingjam.spirecraft.registry.ModBlocks.REED.get().defaultBlockState(), reedAt, 3);
+            report("reed: placed two high", s.getBlockState(reedAt.above()).is(com.mockingjam.spirecraft.registry.ModBlocks.REED.get()));
+            player.gameMode.destroyBlock(reedAt.above());
+            report("reed: breaking the top takes the bottom", !s.getBlockState(reedAt).is(com.mockingjam.spirecraft.registry.ModBlocks.REED.get()));
+            // the bluebell cap grows into a giant bluebell with bone meal
+            BlockPos capAt = at.offset(-14, 0, 6);
+            for (int dx = -3; dx <= 3; dx++) for (int dz = -3; dz <= 3; dz++) s.setBlock(capAt.offset(dx, -1, dz), net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState(), 3);
+            var capState = com.mockingjam.spirecraft.registry.ModBlocks.BLUEBELL_CAP.get().defaultBlockState();
+            s.setBlock(capAt, capState, 3);
+            ((com.mockingjam.spirecraft.block.SpireMushroomBlock) capState.getBlock()).performBonemeal(s, net.minecraft.util.RandomSource.create(7), capAt, capState);
+            report("bluebell cap: bone meal grows a giant bluebell", !s.getBlockState(capAt).is(com.mockingjam.spirecraft.registry.ModBlocks.BLUEBELL_CAP.get()) && !s.getBlockState(capAt).isAir());
             s.getServer().getPlayerList().remove(player);
         });
     }

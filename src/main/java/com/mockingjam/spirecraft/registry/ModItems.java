@@ -246,6 +246,7 @@ public final class ModItems {
     public static final RegistryObject<Item> ENTOMANCER_SPAWN_EGG = egg("entomancer", ModEntities.ENTOMANCER);
     public static final RegistryObject<Item> KAISER_CRAB_SPAWN_EGG = egg("kaiser_crab", ModEntities.KAISER_CRAB);
     public static final RegistryObject<Item> KNOWLEDGE_DEMON_SPAWN_EGG = egg("knowledge_demon", ModEntities.KNOWLEDGE_DEMON);
+    public static final RegistryObject<Item> RHINO_BEETLE_SPAWN_EGG = egg("rhino_beetle", ModEntities.RHINO_BEETLE);
     /** §11: spawn eggs of the data-driven monsters (the entity type is looked up when the item is built). */
     public static final java.util.Map<String, RegistryObject<Item>> SCRIPTED_EGGS = new java.util.LinkedHashMap<>();
     static {
@@ -256,7 +257,7 @@ public final class ModItems {
     public static final java.util.List<RegistryObject<Item>> SPAWN_EGGS = withScripted(LEAF_SLIME_SPAWN_EGG, TWIG_SLIME_SPAWN_EGG,
             FUZZY_WURM_CRAWLER_SPAWN_EGG, FLYCONID_SPAWN_EGG, NIBBIT_SPAWN_EGG, SHRINKER_BEETLE_SPAWN_EGG, BYRDONIS_SPAWN_EGG, CEREMONIAL_BEAST_SPAWN_EGG, OSTY_SPAWN_EGG,
             CORPSE_SLUG_SPAWN_EGG, TOADPOLE_SPAWN_EGG, TWO_TAILED_RAT_SPAWN_EGG, SEAPUNK_SPAWN_EGG, TERROR_EEL_SPAWN_EGG, SOUL_FYSH_SPAWN_EGG,
-            BOWLBUG_ROCK_SPAWN_EGG, BOWLBUG_EGG_SPAWN_EGG, BOWLBUG_SILK_SPAWN_EGG, BOWLBUG_NECTAR_SPAWN_EGG, EXOSKELETON_SPAWN_EGG, CHOMPER_SPAWN_EGG, MYTE_SPAWN_EGG, ENTOMANCER_SPAWN_EGG, KAISER_CRAB_SPAWN_EGG, KNOWLEDGE_DEMON_SPAWN_EGG);
+            BOWLBUG_ROCK_SPAWN_EGG, BOWLBUG_EGG_SPAWN_EGG, BOWLBUG_SILK_SPAWN_EGG, BOWLBUG_NECTAR_SPAWN_EGG, EXOSKELETON_SPAWN_EGG, CHOMPER_SPAWN_EGG, MYTE_SPAWN_EGG, ENTOMANCER_SPAWN_EGG, KAISER_CRAB_SPAWN_EGG, KNOWLEDGE_DEMON_SPAWN_EGG, RHINO_BEETLE_SPAWN_EGG);
 
     private static java.util.List<RegistryObject<Item>> withScripted(RegistryObject<Item>... eggs) {
         var all = new java.util.ArrayList<>(java.util.List.of(eggs));
@@ -266,6 +267,12 @@ public final class ModItems {
     /** The Soul Fysh's Beckon (招引之魂): drains health while carried, dispelled with hunger. */
     public static final RegistryObject<Item> BECKONING_SOUL = register("beckoning_soul", com.mockingjam.spirecraft.item.BeckoningSoul::new,
             () -> new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON));
+    /** Glory G4: the Aeonglass's Wither - drains while carried, poured out only in its light pillars. */
+    public static final RegistryObject<Item> WITHER_SAND = register("wither_sand", com.mockingjam.spirecraft.item.WitherSand::new,
+            () -> new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON));
+    /** Glory: the Mecha Knight's Burn - burns while carried, cools down by itself. */
+    public static final RegistryObject<Item> SEARING_EMBER = register("searing_ember", com.mockingjam.spirecraft.item.SearingEmber::new,
+            () -> new Item.Properties().stacksTo(8).rarity(Rarity.UNCOMMON).fireResistant());
     /** Summons the Soul Fysh in the polluted sea. */
     public static final RegistryObject<Item> SOUL_BAIT = register("soul_bait", com.mockingjam.spirecraft.mob.SoulBait::new,
             () -> new Item.Properties().stacksTo(16).rarity(Rarity.RARE));

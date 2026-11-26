@@ -17,37 +17,42 @@ public final class ModMobs {
     public static void register() {
         CorpseSlug.register();   // Ravenous
         MerchantSpawner.register();   // the Merchant's visits
+        SoulNexusCall.register();     // Glory v2: the Soul Nexus rises after enough kills in the soul sand valley
         EntityAttributeCreationEvent.BUS.addListener(e -> {
-            e.put(LEAF_SLIME.get(), SpireSlime.attributes().build());
-            e.put(TWIG_SLIME.get(), SpireSlime.attributes().build());
-            e.put(FUZZY_WURM_CRAWLER.get(), FuzzyWurmCrawler.attributes().build());
-            e.put(FLYCONID.get(), Flyconid.attributes().build());
-            e.put(NIBBIT.get(), Nibbit.attributes().build());
-            e.put(SHRINKER_BEETLE.get(), ShrinkerBeetle.attributes().build());
-            e.put(BYRDONIS.get(), Byrdonis.attributes().build());
-            e.put(CEREMONIAL_BEAST.get(), CeremonialBeast.attributes().build());
-            e.put(OSTY.get(), Osty.attributes().build());
-            e.put(CORPSE_SLUG.get(), CorpseSlug.attributes().build());
-            e.put(TOADPOLE.get(), Toadpole.attributes().build());
-            e.put(TWO_TAILED_RAT.get(), TwoTailedRat.attributes().build());
-            e.put(SEAPUNK.get(), Seapunk.attributes().build());
-            e.put(TERROR_EEL.get(), TerrorEel.attributes().build());
-            e.put(SOUL_FYSH.get(), SoulFysh.attributes().build());
-            e.put(BOWLBUG_ROCK.get(), Bowlbug.attributes(Bowlbug.Kind.ROCK).build());
-            e.put(BOWLBUG_EGG.get(), Bowlbug.attributes(Bowlbug.Kind.EGG).build());
-            e.put(BOWLBUG_SILK.get(), Bowlbug.attributes(Bowlbug.Kind.SILK).build());
-            e.put(BOWLBUG_NECTAR.get(), Bowlbug.attributes(Bowlbug.Kind.NECTAR).build());
-            e.put(EXOSKELETON.get(), Exoskeleton.attributes().build());
-            e.put(CHOMPER.get(), Chomper.attributes().build());
-            e.put(MYTE.get(), Myte.attributes().build());
-            e.put(ENTOMANCER.get(), Entomancer.attributes().build());
-            e.put(KAISER_CRAB.get(), KaiserCrab.attributes().build());
-            e.put(KNOWLEDGE_DEMON.get(), KnowledgeDemon.attributes().build());
+            e.put(LEAF_SLIME.get(), SpireSlime.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(TWIG_SLIME.get(), SpireSlime.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(FUZZY_WURM_CRAWLER.get(), FuzzyWurmCrawler.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(FLYCONID.get(), Flyconid.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(NIBBIT.get(), Nibbit.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(SHRINKER_BEETLE.get(), ShrinkerBeetle.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(BYRDONIS.get(), Byrdonis.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(CEREMONIAL_BEAST.get(), CeremonialBeast.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(OSTY.get(), Osty.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(CORPSE_SLUG.get(), CorpseSlug.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(TOADPOLE.get(), Toadpole.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(TWO_TAILED_RAT.get(), TwoTailedRat.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(SEAPUNK.get(), Seapunk.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(TERROR_EEL.get(), TerrorEel.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(SOUL_FYSH.get(), SoulFysh.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(BOWLBUG_ROCK.get(), Bowlbug.attributes(Bowlbug.Kind.ROCK).add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(BOWLBUG_EGG.get(), Bowlbug.attributes(Bowlbug.Kind.EGG).add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(BOWLBUG_SILK.get(), Bowlbug.attributes(Bowlbug.Kind.SILK).add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(BOWLBUG_NECTAR.get(), Bowlbug.attributes(Bowlbug.Kind.NECTAR).add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(EXOSKELETON.get(), Exoskeleton.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(CHOMPER.get(), Chomper.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(MYTE.get(), Myte.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(ENTOMANCER.get(), Entomancer.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(KAISER_CRAB.get(), KaiserCrab.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(KNOWLEDGE_DEMON.get(), KnowledgeDemon.attributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
             for (var d : ScriptedDefs.ALL.values())
                 e.put(com.mockingjam.spirecraft.registry.ModEntities.SCRIPTED.get(d.name).get(), Monster.createMonsterAttributes()
                         .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, d.hp).add(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, d.speed)
                         .add(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR, d.armor).add(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE, d.kb)
-                        .add(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE, 2).add(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE, d.boss ? 40 : 20).build());
+                        .add(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE, 2).add(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE, d.boss ? 40 : 20)
+                        // 2026-11-26: vanilla caps absorption at MAX_ABSORPTION (0 by default) - without this every Plating, block
+                        // and shield move of the data-driven monsters gave nothing
+                        .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION, 40).build());
+            e.put(com.mockingjam.spirecraft.registry.ModEntities.RHINO_BEETLE.get(), RhinoBeetle.attributes().build());
             e.put(com.mockingjam.spirecraft.registry.ModEntities.MERCHANT.get(), net.minecraft.world.entity.Mob.createMobAttributes()
                     .add(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, 0.5).build());
         });

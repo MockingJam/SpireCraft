@@ -1,3 +1,4 @@
+const REPO_ROOT = require('path').resolve(__dirname, '..', '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 // Mob sizes against the player (user 2026-11-19: "match the STS2 size of each monster against a person").
 // The STS2 idle animations on slaythespire.wiki.gg (StS2_<Name>_Idle.webp) are exported at the in-game scale: the
@@ -25,6 +26,16 @@ const STS2 = {
   waterfall_giant: [513, 595], lagavulin_matriarch: [544, 736], ovicopter: [504, 520], tough_egg: [79, 96], hatchling: [118, 112], tunneler: [210, 242],
   thieving_hopper: [297, 258], hunter_killer: [293, 518], louse_progenitor: [357, 555], slumbering_beetle: [364, 710], spiny_toad: [360, 557],
   obscura: [295, 389], parafright: [348, 357], decimillipede: [320, 600], infested_prism: [381, 250], insatiable: [870, 862],
+  // Glory G1 (2026-11-26, idle sprites measured on slaythespire.wiki.gg)
+  fabricator: [424, 522], zapbot: [189, 196], stabbot: [172, 211], guardbot: [134, 206], noisebot: [150, 190], turret_operator: [201, 250],
+  living_shield: [403, 347], mecha_knight: [493, 659], globe_head: [291, 173], scroll_of_biting: [145, 144],
+  // Glory G2 (the Lost / Forgotten: mask only - their idle frames include the floating gap down to the shadow)
+  queen: [523, 307], torch_head_amalgam: [383, 316], flail_knight: [377, 372], spectral_knight: [335, 340], magi_knight: [311, 204],
+  frog_knight: [331, 286], devoted_sculptor: [397, 261], slimed_berserker: [335, 621], the_lost: [170, 109], the_forgotten: [110, 182],
+  // Glory G3 (the Soul Nexus ~ from its render: it has no idle sprite)
+  axebot: [369, 333], soul_nexus: [360, 250], test_subject: [260, 405],
+  // Glory v2 / G4 (~ the beetle and the trainer from the Frog Knight sprite; the owl and the hourglass from their renders)
+  rhino_beetle: [200, 330], frog_trainer: [235, 170], owl_magistrate: [400, 380], aeonglass: [560, 480],
 };
 // Bosses this big cannot move through caves at full width: their hitbox is capped (the model may reach past it).
 const HIT_CAP_W = 5.0, HIT_CAP_H = 5.0;
@@ -78,7 +89,7 @@ if (require.main === module) {
   console.log(JSON.stringify(out, null, 1));
   // the generated table the game reads (registry/ModEntities sizes the hitboxes, client/mob/SpireMobRenderer scales the models)
   const rows = Object.entries(out).filter(([, v]) => !v.error).map(([n, v]) => `        m.put("${n}", new float[] {${v.scale}F, ${v.hitW}F, ${v.hitH}F});`);
-  fs.writeFileSync('D:/MCmodev/SpireCraft/src/main/java/com/mockingjam/spirecraft/mob/MobSizes.java', `package com.mockingjam.spirecraft.mob;
+  fs.writeFileSync(REPO_ROOT + 'src/main/java/com/mockingjam/spirecraft/mob/MobSizes.java', `package com.mockingjam.spirecraft.mob;
 
 import java.util.HashMap;
 import java.util.Map;

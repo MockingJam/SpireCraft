@@ -98,6 +98,7 @@ public class ModModelProvider extends ModelProvider {
                 family(set.base.get()).generateFor(new BlockFamily.Builder(set.base.get())
                         .stairs(set.stairs.get()).slab(set.slab.get()).wall(set.wall.get()).getFamily());
             }
+            for (var block : List.of(ModBlocks.GLORY_GATE)) createTrivialCube(block.get());   // Glory
             for (var block : List.of(ModBlocks.CRACKED_RUIN_STONE_BRICKS, ModBlocks.CHISELED_RUIN_STONE_BRICKS, ModBlocks.CRACKED_DOCK_BRICKS,
                     ModBlocks.SLUDGE, ModBlocks.HIVE_SOIL, ModBlocks.JUNK_BLOCK)) {
                 createTrivialCube(block.get());
@@ -340,7 +341,7 @@ public class ModModelProvider extends ModelProvider {
             generateFlatItem(ModItems.CEREMONIAL_BELL.get(), ModelTemplates.FLAT_ITEM);
             for (var it : ModItems.BOSS_SUMMONS) generateFlatItem(it.get(), ModelTemplates.FLAT_ITEM);
             generateFlatItem(ModItems.RELIC_FRAGMENT.get(), ModelTemplates.FLAT_ITEM);
-            for (var it : List.of(ModItems.BECKONING_SOUL, ModItems.SOUL_BAIT, ModItems.SOUL_FYSH_BLADDER)) generateFlatItem(it.get(), ModelTemplates.FLAT_ITEM);
+            for (var it : List.of(ModItems.BECKONING_SOUL, ModItems.SOUL_BAIT, ModItems.SOUL_FYSH_BLADDER, ModItems.SEARING_EMBER, ModItems.WITHER_SAND)) generateFlatItem(it.get(), ModelTemplates.FLAT_ITEM);
 
             for (var item : List.of(ModItems.RAW_TUNGSTEN, ModItems.TUNGSTEN_INGOT, ModItems.TUNGSTEN_ALLOY_INGOT,
                     ModItems.RAW_ORICHALCUM, ModItems.ORICHALCUM_INGOT, ModItems.BRIMSTONE, ModItems.LAVA_ROCK_SHARD,

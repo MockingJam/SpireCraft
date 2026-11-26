@@ -677,11 +677,23 @@ public class SpireMobModel extends EntityModel<SpireMobRenderState> {
      * have their own poses.
      */
     private void scripted(SpireMobRenderState s, float walk, float amount, float age, float yaw, float pitch) {
-        if (def == null) return;
+        // def is null for the non-scripted mobs that share these generic animations (the Rhino Beetle)
         ModelPart body = p("body"), head = p("head"), root = body != null ? body : head;
         if (root == null) return;
+        boolean hover = def != null && def.hover;
+        if (s.sitting) root.y += 2;
+        if (s.riding) {   // sitting on a mount: thighs forward, shins down
+            for (String n : new String[] { "leg_l", "leg_r" }) { ModelPart l = p(n); if (l != null) { l.xRot = -1.35F; l.yRot = n.endsWith("l") ? 0.25F : -0.25F; } }
+            for (String n : new String[] { "leg_l_low", "leg_r_low" }) { ModelPart l = p(n); if (l != null) l.xRot = 1.2F; }
+            amount = 0;
+        }
+        // the Test Subject grows a head with each form it adapts into (Glory G3)
+        int form = (s.scriptedState >> com.mockingjam.spirecraft.mob.ScriptedMonster.PHASE_SHIFT) & 3;
+        ModelPart head2 = p("head_2"), head3 = p("head_3");
+        if (head2 != null) head2.visible = form >= 1;
+        if (head3 != null) head3.visible = form >= 2;
         if (head != null && head != root) { head.yRot += yaw * 0.6F; head.xRot += pitch * 0.5F + Mth.sin(age * 0.08F) * 0.04F; }
-        if (def.hover) root.y -= 2 + Mth.sin(age * 0.1F) * 1.2F;
+        if (hover) root.y -= 2 + Mth.sin(age * 0.1F) * 1.2F;
         else root.y += Mth.sin(age * 0.1F) * 0.25F - Math.abs(Mth.sin(walk * 0.6662F)) * 0.6F * amount;
         // legs
         swing(p("leg_l"), Mth.cos(walk * 0.6662F) * 1.1F * amount);
@@ -709,7 +721,7 @@ public class SpireMobModel extends EntityModel<SpireMobRenderState> {
         for (int i = 0; i < 8; i++) { ModelPart tent = p("tent_" + i); if (tent != null) { tent.xRot += Mth.sin(age * 0.09F + i * 1.3F) * 0.15F; tent.zRot += Mth.cos(age * 0.07F + i) * 0.12F; } }
         ModelPart cape = p("cape");
         if (cape != null) cape.xRot += 0.25F * amount + Mth.sin(age * 0.07F) * 0.05F;
-        float flap = Mth.sin(age * (def.hover ? 1.6F : 0.3F)) * (def.hover ? 0.5F : 0.08F);
+        float flap = Mth.sin(age * (hover ? 1.6F : 0.3F)) * (hover ? 0.5F : 0.08F);
         ModelPart wl = p("wing_l"), wr = p("wing_r");
         if (wl != null) wl.zRot -= flap;
         if (wr != null) wr.zRot += flap;
@@ -723,7 +735,7 @@ public class SpireMobModel extends EntityModel<SpireMobRenderState> {
         if ((st & com.mockingjam.spirecraft.mob.ScriptedMonster.BURROWED) != 0) root.y += 14 + Mth.sin(age * 0.3F) * 0.5F;
         if ((st & com.mockingjam.spirecraft.mob.ScriptedMonster.DOWN) != 0) { root.zRot += 1.4F; root.y += 3; return; }
         // the move being made
-        if (s.move <= 0 || s.move > def.moves.size()) return;
+        if (def == null || s.move <= 0 || s.move > def.moves.size()) return;
         var m = def.moves.get(s.move - 1);
         float wu = m.windup, w = wind(s, wu), hit = strike(s, wu, 6), f = settle(s, wu, 6);
         ModelPart al = p("arm_l"), ar = p("arm_r");

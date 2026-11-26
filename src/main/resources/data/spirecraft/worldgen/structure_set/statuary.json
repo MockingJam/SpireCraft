@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "spirecraft:statuary",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 44,
+    "separation": 15,
+    "salt": 1551396654
+  }
+}

@@ -3,9 +3,10 @@
 //   scrap      — a rusty iron nugget + a copper nugget + a bent bolt (junk; makes flak shells)
 //   flak_shell — a brass cartridge on the 45° diagonal (round-8 cylinder rules: lit edge, highlight stripe, dark edge)
 // Usage: node tools/ammo_art.js <vanilla item texture dir>
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const { readPng, writePng } = require('./png');
 const SRC = process.argv[2];
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/item/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/item/';
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const lum = p => 0.299 * p[0] + 0.587 * p[1] + 0.114 * p[2];
 const blank = () => ({ w: 16, h: 16, d: new Uint8Array(1024) });

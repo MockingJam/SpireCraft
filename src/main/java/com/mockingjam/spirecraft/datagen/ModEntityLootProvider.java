@@ -32,7 +32,7 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
     @Override
     protected Stream<EntityType<?>> getKnownEntityTypes() {
         return Stream.concat(Stream.of(ModEntities.LEAF_SLIME, ModEntities.TWIG_SLIME, ModEntities.FUZZY_WURM_CRAWLER, ModEntities.FLYCONID,
-                ModEntities.NIBBIT, ModEntities.SHRINKER_BEETLE, ModEntities.BYRDONIS, ModEntities.CEREMONIAL_BEAST, ModEntities.OSTY,
+                ModEntities.NIBBIT, ModEntities.SHRINKER_BEETLE, ModEntities.BYRDONIS, ModEntities.CEREMONIAL_BEAST, ModEntities.OSTY, ModEntities.RHINO_BEETLE,
                 ModEntities.CORPSE_SLUG, ModEntities.TOADPOLE, ModEntities.TWO_TAILED_RAT, ModEntities.SEAPUNK, ModEntities.TERROR_EEL, ModEntities.SOUL_FYSH,
                 ModEntities.BOWLBUG_ROCK, ModEntities.BOWLBUG_EGG, ModEntities.BOWLBUG_SILK, ModEntities.BOWLBUG_NECTAR, ModEntities.EXOSKELETON, ModEntities.CHOMPER,
                 ModEntities.MYTE, ModEntities.ENTOMANCER, ModEntities.KAISER_CRAB, ModEntities.KNOWLEDGE_DEMON)
@@ -73,6 +73,9 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(drop(Items.BONE, 3, 6))
                 .withPool(drop(Items.LEATHER, 3, 6)));
         add(ModEntities.OSTY.get(), LootTable.lootTable());
+        add(ModEntities.RHINO_BEETLE.get(), LootTable.lootTable().withPool(net.minecraft.world.level.storage.loot.LootPool.lootPool()
+                .add(net.minecraft.world.level.storage.loot.entries.LootItem.lootTableItem(net.minecraft.world.item.Items.LEATHER)
+                        .apply(net.minecraft.world.level.storage.loot.functions.SetItemCountFunction.setCount(net.minecraft.world.level.storage.loot.providers.number.UniformGenerator.between(0, 2))))));
         // batch 2: Underdocks
         add(ModEntities.CORPSE_SLUG.get(), LootTable.lootTable()
                 .withPool(drop(Items.SLIME_BALL, 0, 2))

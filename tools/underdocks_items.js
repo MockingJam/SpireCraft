@@ -3,8 +3,9 @@
 //   soul_bait         - rotten flesh with a ghostly teal sheen
 //   soul_fysh_bladder - the slime ball as a translucent teal bladder with an orange core
 // Usage: node tools/underdocks_items.js <vanilla item texture dir>
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const { readPng, writePng } = require('./png');
-const SRC = process.argv[2] + '/', OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/item/';
+const SRC = process.argv[2] + '/', OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/item/';
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
 function recolor(name, ramp, alpha) {

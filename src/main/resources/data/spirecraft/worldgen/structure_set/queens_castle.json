@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "spirecraft:queens_castle",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 72,
+    "separation": 28,
+    "salt": 1204202183
+  }
+}

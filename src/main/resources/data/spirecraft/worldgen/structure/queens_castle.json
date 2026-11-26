@@ -1,0 +1,12 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/queens_castle",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_box",
+  "templates": [
+    "spirecraft:queens_castle/1"
+  ],
+  "mode": "open_ground",
+  "sink": 6
+}

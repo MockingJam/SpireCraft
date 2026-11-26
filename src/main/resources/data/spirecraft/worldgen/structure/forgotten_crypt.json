@@ -1,0 +1,14 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/forgotten_crypt",
+  "step": "underground_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:forgotten_ruins/crypt_lost",
+    "spirecraft:forgotten_ruins/crypt_forgotten"
+  ],
+  "mode": "buried",
+  "min_y": -50,
+  "max_y": -16
+}
