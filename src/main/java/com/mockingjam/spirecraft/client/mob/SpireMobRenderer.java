@@ -57,7 +57,8 @@ public class SpireMobRenderer<T extends Mob> extends MobRenderer<T, SpireMobRend
             state.moveAge = 0;
         }
         state.small = mob instanceof SpireSlime slime && slime.isSmall();
-        state.sitting = mob instanceof Osty osty && osty.isInSittingPose();
+        state.sitting = mob instanceof net.minecraft.world.entity.TamableAnimal tame && tame.isInSittingPose();
+        state.riding = mob.isPassenger();
         state.attack = mob.getAttackAnim(partialTick);
         state.scriptedState = mob instanceof com.mockingjam.spirecraft.mob.ScriptedMonster sm ? sm.state() : 0;
         state.crusherBroken = mob instanceof com.mockingjam.spirecraft.mob.KaiserCrab crab && crab.crusherBroken();
@@ -111,7 +112,8 @@ public class SpireMobRenderer<T extends Mob> extends MobRenderer<T, SpireMobRend
     private static final Spec ENTOMANCER = new Spec("entomancer", SpireMobModel.Kind.ENTOMANCER, MobLayers::entomancer, 1.15F, 0.55F, false, false);
     private static final Spec KAISER_CRAB = new Spec("kaiser_crab", SpireMobModel.Kind.CRAB, MobLayers::kaiserCrab, 1.5F, 3.0F, false, true);
     private static final Spec KNOWLEDGE_DEMON = new Spec("knowledge_demon", SpireMobModel.Kind.DEMON, MobLayers::knowledgeDemon, 1.4F, 1.2F, false, false);
-    private static final Spec[] ALL = {LEAF_SLIME, TWIG_SLIME, WURM, FLYCONID, NIBBIT, BEETLE, BYRDONIS, BEAST, OSTY, SLUG, TOADPOLE, RAT, SEAPUNK, EEL, FYSH, MERCHANT,
+    private static final Spec RHINO_BEETLE = new Spec("rhino_beetle", SpireMobModel.Kind.SCRIPTED, MobLayers::rhinoBeetle, 1, 0.8F, false, false);
+    private static final Spec[] ALL = {RHINO_BEETLE, LEAF_SLIME, TWIG_SLIME, WURM, FLYCONID, NIBBIT, BEETLE, BYRDONIS, BEAST, OSTY, SLUG, TOADPOLE, RAT, SEAPUNK, EEL, FYSH, MERCHANT,
             BOWLBUG_ROCK, BOWLBUG_EGG, BOWLBUG_SILK, BOWLBUG_NECTAR, EXOSKELETON, CHOMPER, MYTE, ENTOMANCER, KAISER_CRAB, KNOWLEDGE_DEMON};
 
     /** §11: the data-driven monsters, one spec each (shadow from the hitbox, scale from the definition). */
@@ -141,6 +143,7 @@ public class SpireMobRenderer<T extends Mob> extends MobRenderer<T, SpireMobRend
         register(e, ModEntities.TERROR_EEL.get(), EEL);
         register(e, ModEntities.SOUL_FYSH.get(), FYSH);
         register(e, ModEntities.MERCHANT.get(), MERCHANT);
+        register(e, ModEntities.RHINO_BEETLE.get(), RHINO_BEETLE);
         for (Spec spec : SCRIPTED) register(e, ModEntities.SCRIPTED.get(spec.name).get(), spec);
         register(e, ModEntities.BOWLBUG_ROCK.get(), BOWLBUG_ROCK);
         register(e, ModEntities.BOWLBUG_EGG.get(), BOWLBUG_EGG);

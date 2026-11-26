@@ -17,4 +17,6 @@ public class SpireMobRenderState extends LivingEntityRenderState {
     public boolean crusherBroken, rocketBroken;
     /** Data-driven monsters: their state bits (ScriptedMonster.ASLEEP / BURROWED / DOWN). */
     public int scriptedState;
+    /** Glory v2: riding something (the Frog Trainer on its beetle) - legs forward. */
+    public boolean riding;
 }

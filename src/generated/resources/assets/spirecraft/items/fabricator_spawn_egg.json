@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "spirecraft:item/fabricator_spawn_egg"
+  }
+}

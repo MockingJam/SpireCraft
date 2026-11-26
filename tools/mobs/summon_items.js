@@ -1,9 +1,10 @@
 // §11 boss calling tokens, recoloured from vanilla 1.21.10 item art (vanilla shapes, our colours): each source pixel's
 // brightness picks a shade from a hue-shifted ramp (dark → light), keeping the vanilla shading and outline.
 // Usage: node tools/mobs/summon_items.js <vanilla item texture dir>
+const REPO_ROOT = require('path').resolve(__dirname, '..', '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const { readPng, writePng } = require('../png');
 const SRC = process.argv[2];
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/item/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/item/';
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
 const ITEMS = {

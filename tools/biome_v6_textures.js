@@ -7,10 +7,11 @@
 //   (the brass texture kept, its colour browning in blotches and overall, like vanilla copper weathering), paving
 //   stones (round cobbles covering the whole face), byrdonis_egg_side / _top (cream, big orange-red spots).
 // Usage: node tools/biome_v6_textures.js <vfull dir>
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const { readPng, writePng } = require('./png');
 const V = process.argv[2] + '/assets/minecraft/textures/';
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/';
 const v = n => readPng(V + n + '.png');
 const own = n => readPng(OUT + n + '.png');
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));

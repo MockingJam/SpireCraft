@@ -52,6 +52,7 @@ public final class BiomeBlocks {
         out.addAll(HIVE_SOIL_BRICKS.all());
         out.addAll(List.of(WEBBED_HIVE_SOIL, SILK_HIVE, TWIG_NEST, THATCH, THATCH_STAIRS, THATCH_SLAB));
         out.addAll(List.of(HIVE_COMB, HIVE_CACHE, HIVE_SHROOM, HIVE_SHROOM_BLOCK, HIVE_MYCELIUM, QUICKSAND));
+        out.add(GLORY_GATE);   // Glory
         return out;
     }
 

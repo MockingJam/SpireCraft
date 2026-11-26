@@ -1,0 +1,13 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/forgotten_ruins",
+  "step": "top_layer_modification",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_box",
+  "templates": [
+    "spirecraft:forgotten_ruins/surface_lost",
+    "spirecraft:forgotten_ruins/surface_forgotten"
+  ],
+  "mode": "open_ground",
+  "sink": 1
+}

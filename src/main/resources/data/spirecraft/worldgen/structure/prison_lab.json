@@ -1,0 +1,14 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/prison_lab",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:prison_lab/1"
+  ],
+  "mode": "cave_floor",
+  "sink": 1,
+  "min_y": 31,
+  "max_y": 80
+}

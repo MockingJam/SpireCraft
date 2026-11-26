@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "spirecraft:item/frog_knight_spawn_egg"
+  }
+}

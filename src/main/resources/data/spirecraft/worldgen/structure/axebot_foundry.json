@@ -1,0 +1,14 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/axebot_foundry",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:axebot_foundry/1"
+  ],
+  "mode": "cave_floor",
+  "sink": 1,
+  "min_y": 31,
+  "max_y": 70
+}

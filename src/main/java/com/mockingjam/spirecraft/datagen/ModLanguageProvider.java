@@ -41,7 +41,7 @@ public final class ModLanguageProvider {
 
         String[][] stones = { { "Ruin Stone", "遗迹石" }, { "Ruin Stone Bricks", "遗迹石砖" }, { "Dock Bricks", "港砖" },
                 { "Harbour Rock", "港岩" }, { "Polished Harbour Rock", "磨制港岩" }, 
-                { "Ink-Stained Stone", "墨染石" }, { "Deep Ink Stone", "深层墨石" }, { "Hive Rock", "巢岩" }, { "Deep Hive Rock", "深层巢岩" }, { "Polished Hive Rock", "磨制巢岩" }, { "Hive Rock Bricks", "巢岩砖" }, { "Hive Soil Bricks", "巢土砖" } };
+                { "Ink-Stained Stone", "墨染石" }, { "Hive Rock", "巢岩" }, { "Deep Hive Rock", "深层巢岩" }, { "Polished Hive Rock", "磨制巢岩" }, { "Hive Rock Bricks", "巢岩砖" }, { "Hive Soil Bricks", "巢土砖" } };
         var stoneSets = com.mockingjam.spirecraft.block.BiomeBlocks.stones();
         for (int i = 0; i < stoneSets.size(); i++) {
             var set = stoneSets.get(i);
@@ -65,6 +65,7 @@ public final class ModLanguageProvider {
         }
         Object[][] misc = { { ModBlocks.CRACKED_RUIN_STONE_BRICKS, "Cracked Ruin Stone Bricks", "裂纹遗迹石砖" },
                 { ModBlocks.CHISELED_RUIN_STONE_BRICKS, "Chiseled Ruin Stone Bricks", "雕纹遗迹石砖" },
+                { ModBlocks.GLORY_GATE, "Glory Gate", "荣耀闸门" },
                 { ModBlocks.PAVING_STONES, "Paving Stones", "铺路石" }, { ModBlocks.JUNK_BLOCK, "Machine Scrap Block", "机械碎片块" },
                 { ModBlocks.HIVE_MYCELIUM_LAYER, "Mycelium Mat", "菌丝层" }, { ModBlocks.MYCELIUM_THREAD, "Mycelium Thread", "菌丝线" },
                 { ModBlocks.BUG_CARCASS, "Bug Carcass", "虫尸" }, { ModBlocks.BYRDONIS_EGG, "Byrdonis Egg", "多尼斯异鸟蛋" }, { ModBlocks.GLOWVINE, "Glowvine", "萤光藤" },
@@ -269,6 +270,13 @@ public final class ModLanguageProvider {
             add("entity.spirecraft.ceremonial_beast", "Ceremonial Beast");
             add(ModItems.CEREMONIAL_BEAST_SPAWN_EGG.get(), "Ceremonial Beast Spawn Egg");
             add("entity.spirecraft.osty", "Osty");
+            add("entity.spirecraft.rhino_beetle", "Rhino Beetle");
+            add(ModItems.WITHER_SAND.get(), "Wither Sand");
+            add("item.spirecraft.wither_sand.desc", "Drains you while you carry it. Pour it out in one of the hourglass's light pillars.");
+            add("item.spirecraft.wither_sand.pillar", "The sand can only be poured out in a light pillar.");
+            add(ModItems.RHINO_BEETLE_SPAWN_EGG.get(), "Rhino Beetle Spawn Egg");
+            add("entity.spirecraft.soul_nexus.gathering", "The souls of the valley are gathering...");
+            add("entity.spirecraft.soul_nexus.risen", "A Soul Nexus rises from the soul sand!");
             add(ModItems.OSTY_SPAWN_EGG.get(), "Osty Spawn Egg");
             add("effect.spirecraft.shrink", "Shrink");
             add(ModItems.ROCKET_FIST.get(), "Rocket Fist");
@@ -297,6 +305,16 @@ public final class ModLanguageProvider {
             add(ModItems.BECKONING_SOUL.get(), "Beckoning Soul");
             add("item.spirecraft.beckoning_soul.desc", "Drains your health while you carry it. Right-click to dispel it (costs 3 hunger); thrown away, it comes back. (Beckon)");
             add("item.spirecraft.beckoning_soul.hungry", "You are too hungry to dispel the soul.");
+            add(ModItems.SEARING_EMBER.get(), "Searing Ember");
+            add("item.spirecraft.searing_ember.desc", "Burns you while you carry it; cools down by itself in 30 s. Throw it away and it fizzles out. (Burn)");
+            add("effect.spirecraft.paper_cuts", "Paper Cuts");
+            add("effect.spirecraft.galvanic", "Galvanic");
+            add("effect.spirecraft.hex", "Hex");
+            add("effect.spirecraft.dampen", "Dampen");
+            add("effect.spirecraft.bound", "Bound");
+            add("effect.spirecraft.stolen_strength", "Stolen Strength");
+            add("effect.spirecraft.stolen_speed", "Stolen Speed");
+            add("effect.spirecraft.wound", "Wound");
             add(ModItems.SOUL_BAIT.get(), "Soul Bait");
             add("item.spirecraft.soul_bait.desc", "Use it at the water of the Polluted Sea to summon the Soul Fysh.");
             add("item.spirecraft.soul_bait.wrong_place", "Nothing stirs. Use the bait in the Polluted Sea.");
@@ -657,6 +675,13 @@ public final class ModLanguageProvider {
             add("entity.spirecraft.ceremonial_beast", "仪式兽");
             add(ModItems.CEREMONIAL_BEAST_SPAWN_EGG.get(), "仪式兽刷怪蛋");
             add("entity.spirecraft.osty", "奥斯提");
+            add("entity.spirecraft.rhino_beetle", "犀角甲虫");
+            add(ModItems.WITHER_SAND.get(), "凋零之沙");
+            add("item.spirecraft.wither_sand.desc", "带在身上会不断失去生命。只能在沙漏的光柱里倒掉。");
+            add("item.spirecraft.wither_sand.pillar", "只能在光柱里倒掉凋零之沙。");
+            add(ModItems.RHINO_BEETLE_SPAWN_EGG.get(), "犀角甲虫刷怪蛋");
+            add("entity.spirecraft.soul_nexus.gathering", "峡谷里的灵魂正在聚集……");
+            add("entity.spirecraft.soul_nexus.risen", "一座灵魂枢纽从灵魂沙中升起！");
             add(ModItems.OSTY_SPAWN_EGG.get(), "奥斯提刷怪蛋");
             add("effect.spirecraft.shrink", "缩小");
             add(ModItems.ROCKET_FIST.get(), "火箭拳头");
@@ -684,6 +709,16 @@ public final class ModLanguageProvider {
             add(ModItems.BECKONING_SOUL.get(), "招引之魂");
             add("item.spirecraft.beckoning_soul.desc", "带在身上会不断损失生命。右键驱散（消耗 3 点饥饿值）；丢掉也会回来。（呼唤）");
             add("item.spirecraft.beckoning_soul.hungry", "你太饿了，无法驱散它。");
+            add(ModItems.SEARING_EMBER.get(), "灼热余烬");
+            add("item.spirecraft.searing_ember.desc", "带在身上会烫伤你；30 秒后自行冷却。丢掉会很快熄灭。（灼烧）");
+            add("effect.spirecraft.paper_cuts", "纸割");
+            add("effect.spirecraft.galvanic", "电偶");
+            add("effect.spirecraft.hex", "咒缚");
+            add("effect.spirecraft.dampen", "削弱");
+            add("effect.spirecraft.bound", "束缚");
+            add("effect.spirecraft.stolen_strength", "被夺之力");
+            add("effect.spirecraft.stolen_speed", "被夺之速");
+            add("effect.spirecraft.wound", "伤口");
             add(ModItems.SOUL_BAIT.get(), "灵魂异鱼饵");
             add("item.spirecraft.soul_bait.desc", "在污染海域的水边使用，召唤灵魂异鱼。");
             add("item.spirecraft.soul_bait.wrong_place", "没有动静。请在污染海域使用鱼饵。");

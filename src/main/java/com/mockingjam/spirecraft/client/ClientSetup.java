@@ -73,7 +73,7 @@ public final class ClientSetup {
             if (w.hasTree) net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(w.leaves.get(), net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT_MIPPED);
         }
         for (var b : java.util.List.of(ModBlocks.GLOWVINE, ModBlocks.GLOWVINE_PLANT, ModBlocks.FOGCAP, ModBlocks.SPIRE_FERN,
-                ModBlocks.BARNACLES, ModBlocks.HARBOUR_ROCK_SPIRE, ModBlocks.HIVE_MYCELIUM_LAYER, ModBlocks.MYCELIUM_THREAD, ModBlocks.PAVING_STONES, ModBlocks.BUG_CARCASS,
+                ModBlocks.BARNACLES, ModBlocks.HARBOUR_ROCK_SPIRE, ModBlocks.GLORY_GATE, ModBlocks.HIVE_MYCELIUM_LAYER, ModBlocks.MYCELIUM_THREAD, ModBlocks.PAVING_STONES, ModBlocks.BUG_CARCASS,
                 // biomes v2 plants
                 ModBlocks.REED, ModBlocks.ROTTEN_SHRUB, ModBlocks.POLLUTED_TUBE_CORAL, ModBlocks.POLLUTED_HORN_CORAL, ModBlocks.POLLUTED_CORAL_FAN,
                 ModBlocks.POLLUTED_CORAL_WALL_FAN, ModBlocks.POLLUTED_SEAGRASS, ModBlocks.POLLUTED_KELP, ModBlocks.POLLUTED_KELP_PLANT,

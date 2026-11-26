@@ -7,10 +7,11 @@
 //   webbed_hive_soil                 - hardened hive soil shot through with silk threads (outside the web nests)
 //   twig_nest                        - woven twigs (the Byrdonis nest)
 // Usage: node tools/biome_v4_textures.js <vfull dir>
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const { readPng, writePng } = require('./png');
 const V = process.argv[2] + '/assets/minecraft/textures/';
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/';
 const v = n => readPng(V + n + '.png');
 const own = n => readPng(OUT + n + '.png');
 

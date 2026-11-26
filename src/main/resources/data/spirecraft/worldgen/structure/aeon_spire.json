@@ -1,0 +1,12 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/aeon_spire",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:aeon_spire/1"
+  ],
+  "mode": "open_ground",
+  "sink": 1
+}

@@ -8,9 +8,10 @@
 //   ink_bubble  - a near-black glossy bubble with a small one beside it
 //   ink_bucket  - the vanilla bucket holding ink (the liquid is the lava bucket's liquid area, repainted flat)
 // Usage: node tools/ammo_v3.js <vanilla textures dir>
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const { readPng, writePng } = require('./png');
 const VAN = process.argv[2] + '/';
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/item/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/item/';
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const pick = (ramp, t) => hex(ramp[Math.max(0, Math.min(ramp.length - 1, Math.round(t * (ramp.length - 1))))]);
 const clamp = v => Math.max(0, Math.min(1, v));

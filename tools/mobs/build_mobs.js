@@ -3,12 +3,13 @@
 //   * src/main/resources/assets/spirecraft/textures/entity/<mob>.png (+ <mob>_glow.png for emissive parts)
 //   * <outDir>/<mob>.bb.js — a Blockbench risky_eval script that rebuilds the model for a preview screenshot
 // Usage: node tools/mobs/build_mobs.js [bbOutDir] [name filter]
+const REPO_ROOT = require('path').resolve(__dirname, '..', '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const path = require('path');
 const { writePng } = require('../png');
 const specs = require('./specs');
 
-const ROOT = 'D:/MCmodev/SpireCraft/';
+const ROOT = REPO_ROOT + '';
 const TEX = ROOT + 'src/main/resources/assets/spirecraft/textures/entity/';
 const JAVA = ROOT + 'src/main/java/com/mockingjam/spirecraft/client/model/MobLayers.java';
 const [bbOut, filter] = process.argv.slice(2);
@@ -16,6 +17,14 @@ const [bbOut, filter] = process.argv.slice(2);
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) ^ 0x5bd1e995; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
 const f = n => (Number.isInteger(n) ? n.toFixed(1) : String(n)) + 'F';
+const toHex = c => '#' + c.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+const lerpHex = (a, b, t) => { const x = hex(a), y = hex(b); return toHex(x.map((v, i) => v + (y[i] - v) * t)); };
+/** Glory v2 (2026-11-26, user: smooth gradients and colour transitions, not flat colours or per-pixel noise): a
+ *  "smooth" material blends between its ramp colours instead of snapping to the nearest one. */
+function rampAt(ramp, step) {
+  const n = ramp.length, fpos = Math.max(0, Math.min(n - 1, step * (n - 1) / 4)), i = Math.floor(fpos), t = fpos - i;
+  return i >= n - 1 ? ramp[n - 1] : lerpHex(ramp[i], ramp[i + 1], t);
+}
 
 /** Shelf-packs every cube's box-UV rectangle; returns texture size. */
 function pack(cubes) {
@@ -64,17 +73,22 @@ function paint(name, spec) {
         // v4: a smooth top-to-bottom gradient on every vertical face (and on planes, identically on both sides),
         // plus a lit top edge on solid faces — layered shading instead of flat blocks
         if (face !== 'up' && face !== 'down' && fh >= 3) {
-          step += (y / (fh - 1) - 0.4) * (plane ? 1.2 : 1.6);
+          step += (y / (fh - 1) - 0.4) * (plane ? 1.2 : 1.6) * (mat.smooth ? 0.8 : 1);
           if (!plane && y === 0) step -= 0.7;
         }
-        let col = null;
+        // smooth materials: the faces round off a little towards their side edges (a soft rim of shade)
+        if (mat.smooth && !plane && fw >= 4 && (x === 0 || x === fw - 1)) step += face === 'up' ? 0.25 : 0.45;
+        let col = null, mix = null;
         const det = c.detail && c.detail[plane ? (face === 'south' ? 'north' : face === 'west' ? 'east' : face) : face];
-        if (det) col = det(plane ? mx : x, y, fw, fh);
+        if (det) { const d = det(plane ? mx : x, y, fw, fh); if (d && typeof d === 'object') mix = d; else col = d; }
         if (!col && mat.pattern) {
           const pat = mat.pattern(plane ? (face === 'south' ? 'north' : face === 'west' ? 'east' : face) : face, plane ? mx : x, y, fw, fh);
-          if (typeof pat === 'string') col = pat; else step += pat;
+          if (typeof pat === 'string') col = pat;
+          else if (pat && typeof pat === 'object') { if (pat.step) step += pat.step; if (pat.color && !mix) mix = pat; }
+          else step += pat || 0;
         }
-        if (!col) col = mat.ramp[Math.max(0, Math.min(n - 1, Math.round(step * (n - 1) / 4)))];
+        if (!col) col = mat.smooth ? rampAt(mat.ramp, step) : mat.ramp[Math.max(0, Math.min(n - 1, Math.round(step * (n - 1) / 4)))];
+        if (mix && mix.color) col = lerpHex(col, mix.color, Math.max(0, Math.min(1, mix.t === undefined ? 1 : mix.t)));
         const i = ((v0 + y) * W + u0 + x) * 4;
         img.d.set([...hex(col), mat.alpha || 255], i);
         if (mat.emissive) { glow.d.set([...hex(col), 255], i); hasGlow = true; }

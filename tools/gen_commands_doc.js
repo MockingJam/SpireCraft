@@ -6,10 +6,10 @@ const ROOT = path.resolve(__dirname, '..'), D = path.join(ROOT, 'src/main/resour
 const ZH = {
   automaton_factory: '机器人生产厂（故障机器人）', beekeeper: '养蜂人窑洞', beekeeper_hollow: '养蜂人树洞', bowlbug_nest: '盛碗虫巢', byrdonis_nest: '多尼斯异鸟巢',
   camp_desert: '营地（沙漠）', camp_plains: '营地（平原）', camp_savanna: '营地（稀树草原）', camp_snowy: '营地（雪原）', camp_taiga: '营地（针叶林）',
-  ceremonial_ruins: '仪式遗迹', defect_station: '冰原散热站（故障机器人）', dock_house: '暗港小屋', dock_pier: '暗港码头', forbidden_library: '禁书库（亡灵契约师，末地）',
+  ceremonial_ruins: '仪式遗迹', dock_house: '暗港小屋', dock_pier: '暗港码头', forbidden_library: '禁书库（亡灵契约师，末地）',
   ironclad_camp: '铁甲军团营地（铁甲战士）', ironclad_ruin: '铁甲军团营地遗迹（铁甲战士）', jungle_tribe: '丛林部落（静默猎手）', kaiser_crab_cave: '帝王蟹洞', kin_village: '同族村落',
   lighthouse: '灯塔', man_sized_holes: '人形坑洞', mycelium_shrine: '盘根冥想室', necrobinder_giant: '巨人遗骸（亡灵契约师）', overgrowth_camp: '密林营地',
-  overgrowth_ruin_pile: '密林遗迹堆', regent_crater: '陨石坑（储君）', regent_starship: '坠落的飞碟（储君）', ruin_pile: '遗迹堆', sailboat: '帆船', sand_pit: '流沙坑（无厌沙虫）',
+  overgrowth_ruin_pile: '密林遗迹堆', regent_crater: '陨石坑（储君）', regent_starship: '坠落的飞碟（储君）', ruin_pile: '遗迹堆', sailboat: '帆船', sand_pit: '流沙坑（无厌沙虫）', brass_works: '黄铜工坊（荣耀：制造车间、炮塔堡垒、机甲车间）', em_laboratory: '电磁实验室（荣耀：球头）', knights_keep: '骑士城堡（荣耀：骑士团）', queens_castle: '女王城堡（荣耀 Boss：女王）', statuary: '雕像群（荣耀：虔诚的雕刻师）', forgotten_ruins: '遗忘遗迹（荣耀：迷失者或遗忘者）', forgotten_crypt: '遗忘地穴（荣耀：迷失者或遗忘者）', slime_jail: '黏液牢房（荣耀：黏液狂战士）', beetle_grounds: '甲虫训练场（荣耀：青蛙训练师、犀角甲虫）', owl_court: '枭之法庭（荣耀：枭法官）', axebot_foundry: '斧头机器人工厂（荣耀，下界）', prison_lab: '监狱实验室（荣耀 Boss：实验体，下界）', aeon_spire: '永世沙漏尖塔（荣耀 Boss：永世沙漏，末地）',
   scrap_pile: '废弃机械堆', sea_ruins: '海底遗迹', silent_gathering: '猎人的聚集地（静默猎手，红树林）', sunken_statue: '沉没雕像', web_nest: '盘丝巢穴', wellspring: '泉源', wood_carvings: '木雕',
 };
 const BIOME_ZH = {

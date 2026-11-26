@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "spirecraft:item/turret_operator_spawn_egg"
+  }
+}

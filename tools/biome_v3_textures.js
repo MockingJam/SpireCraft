@@ -10,10 +10,11 @@
 //   hive_rock, deep_hive_rock - vanilla grain in amber plus small honeycomb imprints and resin glints
 //   <family>_<kind>_ore - the hive rock / deep hive rock / sandstone ore variants
 // Usage: node tools/biome_v3_textures.js <extracted client-extra.jar dir> [preview.png]
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const { readPng, writePng } = require('./png');
 const VANILLA = process.argv[2] + '/assets/minecraft/textures/';
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/';
 const hex = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
 const lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
 const sat = (r, g, b) => { const mx = Math.max(r, g, b), mn = Math.min(r, g, b); return mx === 0 ? 0 : (mx - mn) / mx; };

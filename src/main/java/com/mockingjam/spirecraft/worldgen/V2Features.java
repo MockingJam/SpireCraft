@@ -113,7 +113,7 @@ public final class V2Features {
                 boulder(level, r, base, rock, 2.0F + r.nextFloat() * 1.8F, 3 + r.nextInt(3));
             }
             barnacles(level, r, rock);
-            spires(level, r, rock);   // 2026-11-25 (user): the stone cones are back - the harbour rock spire
+            if (kind < 8) spires(level, r, rock);   // the stone cones: on the pillars only (not the boulders, not the ground)
             return true;
         }
 
@@ -126,24 +126,27 @@ public final class V2Features {
          * the rock - its top, ledges and steps - a few hanging down from overhangs, and small groups round the foot.
          */
         private static void spires(WorldGenLevel level, RandomSource r, java.util.Set<BlockPos> rock) {
+            // 2026-11-26 (user: "the cones are all over the ground - they belong on the pillars, and there are too few on
+            // them"): only the rock's own open tops and ledges, and many more of them; none on the ground round the foot
             java.util.List<BlockPos> list = new java.util.ArrayList<>(rock);
             if (list.isEmpty()) return;
-            int up = 4 + r.nextInt(6), down = r.nextInt(3);
-            for (int i = 0; i < up * 3 && up > 0; i++) {
-                BlockPos p = list.get(r.nextInt(list.size())).above();
-                if (rock.contains(p) || !level.getBlockState(p).isAir() && !level.getBlockState(p).is(Blocks.WATER)) continue;
+            java.util.List<BlockPos> tops = new java.util.ArrayList<>();
+            int minY = list.stream().mapToInt(BlockPos::getY).min().orElse(0);
+            for (BlockPos p : list) {
+                BlockPos a = p.above();
+                if (p.getY() >= minY + 2 && !rock.contains(a) && (level.getBlockState(a).isAir() || level.getBlockState(a).is(Blocks.WATER))) tops.add(a);
+            }
+            int up = Math.min(tops.size(), 8 + r.nextInt(8) + tops.size() / 6), down = 1 + r.nextInt(3);
+            java.util.Collections.shuffle(tops, new java.util.Random(r.nextLong()));
+            for (BlockPos p : tops) {
+                if (up <= 0) break;
+                if (!level.getBlockState(p).isAir() && !level.getBlockState(p).is(Blocks.WATER)) continue;   // a neighbour's cone took it
                 if (spire(level, p, Direction.UP, 1 + r.nextInt(4))) up--;
             }
             for (int i = 0; i < down * 3 && down > 0; i++) {
                 BlockPos p = list.get(r.nextInt(list.size())).below();
                 if (rock.contains(p) || !level.getBlockState(p).isAir()) continue;
                 if (spire(level, p, Direction.DOWN, 1 + r.nextInt(3))) down--;
-            }
-            // a few short ones on the ground round the foot
-            BlockPos foot = list.get(0);
-            for (int i = 0; i < 4; i++) {
-                BlockPos g = level.getHeightmapPos(Heightmap.Types.OCEAN_FLOOR_WG, foot.offset(r.nextInt(9) - 4, 0, r.nextInt(9) - 4));
-                if (!rock.contains(g) && level.getBlockState(g.below()).isFaceSturdy(level, g.below(), Direction.UP)) spire(level, g, Direction.UP, 1 + r.nextInt(2));
             }
         }
 
@@ -846,8 +849,13 @@ public final class V2Features {
             int n = 1 + r.nextInt(3), placed = 0;
             for (int k = 0; k < n; k++) {
                 BlockPos base = ctx.origin().offset(k == 0 ? 0 : r.nextInt(7) - 3, 0, k == 0 ? 0 : r.nextInt(7) - 3);
-                base = level.getHeightmapPos(Heightmap.Types.WORLD_SURFACE_WG, base);
-                if (!solid(level, base.below())) continue;
+                // 2026-11-26 (user: "the blue mushroom can't be bone-mealed"): find the ground near the spot itself - the
+                // worldgen heightmap is the top of the canopy (or missing) once the world is running, so bone meal under
+                // trees always failed
+                BlockPos ground = null;
+                for (int dy = 3; dy >= -3 && ground == null; dy--) { BlockPos q = base.above(dy); if (replaceable(level, q) && solid(level, q.below())) ground = q; }
+                if (ground == null) continue;
+                base = ground;
                 int h = 7 + r.nextInt(5);
                 Direction lean = Direction.Plane.HORIZONTAL.getRandomDirection(r);
                 boolean clear = true;

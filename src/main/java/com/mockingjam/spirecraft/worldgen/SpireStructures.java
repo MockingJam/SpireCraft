@@ -330,12 +330,24 @@ public final class SpireStructures {
         @Override
         public void postProcess(WorldGenLevel level, StructureManager sm, ChunkGenerator gen, RandomSource random, BoundingBox box, ChunkPos chunk, BlockPos pos) {
             boolean tribe = templateName.contains("jungle_tribe"), giant = templateName.contains("necrobinder_giant");
-            if (tribe || giant) fellTrees(level, box, chunk);
+            boolean gloryGround = templateName.contains("queens_castle") || templateName.contains("knights_keep") || templateName.contains("owl_court")
+                    || templateName.contains("statuary") || templateName.contains("slime_jail") || templateName.contains("beetle_grounds") || templateName.contains("brass_works");
+            if (tribe || giant || gloryGround) fellTrees(level, box, chunk);
             super.postProcess(level, sm, gen, random, box, chunk, pos);
             if (templateName.contains("regent_starship")) scorch(level, box);
             if (tribe) tidy(level, box, (x, z) -> Math.hypot(x - 22, z - 22) <= 21.5, 1);
             if (giant) tidy(level, box, TemplatePiece::giantClearing, 10);
             if (templateName.contains("forbidden_library")) foundation(level, box, Blocks.END_STONE.defaultBlockState());
+            // Glory v2 (2026-11-26): the big glory sites stand on a filled foundation (never over a gap, nothing natural
+            // inside them) and leave no half-cut trees hanging over their ground
+            BlockState base = gloryFoundation(templateName);
+            if (base != null) {
+                foundation(level, box, base);
+                if (templateName.contains("queens_castle") || templateName.contains("knights_keep") || templateName.contains("owl_court")
+                        || templateName.contains("brass_works") || templateName.contains("statuary") || templateName.contains("slime_jail")
+                        || templateName.contains("beetle_grounds") || templateName.contains("forgotten_ruins/surface") || templateName.contains("em_laboratory"))
+                    tidy(level, box, (x, z) -> true, templateName.contains("queens_castle") ? 6 : 1);
+            }
         }
 
         /**
@@ -426,6 +438,18 @@ public final class SpireStructures {
                         level.setBlock(p, fill, 2);
                     }
                 }
+        }
+
+        /** The fill under a Glory v2 site (null: not one of them). */
+        private static BlockState gloryFoundation(String name) {
+            if (name.contains("queens_castle") || name.contains("knights_keep")) return Blocks.COBBLED_DEEPSLATE.defaultBlockState();
+            if (name.contains("owl_court")) return Blocks.TUFF.defaultBlockState();
+            if (name.contains("brass_works") || name.contains("statuary") || name.contains("slime_jail") || name.contains("beetle_grounds")
+                    || name.contains("forgotten_ruins/surface") || name.contains("em_laboratory")) return Blocks.DIRT.defaultBlockState();
+            if (name.contains("axebot_foundry")) return Blocks.BLACKSTONE.defaultBlockState();
+            if (name.contains("prison_lab")) return Blocks.NETHER_BRICKS.defaultBlockState();
+            if (name.contains("aeon_spire")) return Blocks.END_STONE.defaultBlockState();
+            return null;
         }
 
         /** The giant's cleared ground in its template's own columns (tools/structures/build.js necrobinderGiant). */

@@ -4,11 +4,11 @@
     "spirecraft:tarnished_automaton_alloy_block",
     "spirecraft:derelict_automaton_alloy_block",
     "spirecraft:polished_automaton_alloy",
-    "spirecraft:hive_rock_iron_ore",
-    "spirecraft:deep_hive_rock_copper_ore",
-    "spirecraft:deep_hive_rock_lapis_ore",
     "spirecraft:hive_rock_copper_ore",
+    "spirecraft:deep_hive_rock_lapis_ore",
+    "spirecraft:hive_rock_lapis_ore",
     "spirecraft:deep_hive_rock_iron_ore",
-    "spirecraft:hive_rock_lapis_ore"
+    "spirecraft:hive_rock_iron_ore",
+    "spirecraft:deep_hive_rock_copper_ore"
   ]
 }

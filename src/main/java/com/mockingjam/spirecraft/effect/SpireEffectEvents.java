@@ -49,6 +49,19 @@ public final class SpireEffectEvents {
         TickEvent.ServerTickEvent.Post.BUS.addListener(e -> StackChanges.flush());
         LivingDamageEvent.BUS.addListener(SpireEffectEvents::onHpLoss);
         LivingDropsEvent.BUS.addListener(SpireEffectEvents::onDrops);
+        GloryEffectEvents.register();
+        // Glory: Galvanic shocks every fresh buff; a night's sleep heals the paper cuts
+        MobEffectEvent.Added.BUS.addListener(e -> {
+            var who = e.getEntity();
+            if (who.level().isClientSide() || e.getOldEffectInstance() != null || GloryEffectEvents.rewriting) return;
+            var added = e.getEffectInstance().getEffect();
+            if (added.value().getCategory() != net.minecraft.world.effect.MobEffectCategory.BENEFICIAL || !who.hasEffect(ModEffects.holder(ModEffects.GALVANIC))) return;
+            if (who.level() instanceof net.minecraft.server.level.ServerLevel sl) {
+                sl.getServer().execute(() -> who.hurtServer(sl, who.damageSources().lightningBolt(), 2.5F));
+                sl.sendParticles(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK, who.getX(), who.getY() + 1, who.getZ(), 15, 0.3, 0.5, 0.3, 0.1);
+            }
+        });
+        net.minecraftforge.event.entity.player.PlayerWakeUpEvent.BUS.addListener(e -> e.getEntity().removeEffect(ModEffects.holder(ModEffects.PAPER_CUTS)));
     }
 
     /** Intangible: the HP actually lost (after armor and absorption) is at most 1. Doom and /kill go through. */

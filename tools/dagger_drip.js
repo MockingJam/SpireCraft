@@ -5,9 +5,10 @@
 // (perpendicular distance from the 45° blade axis x + y = 31) inside a per-dagger region; idle erases them and
 // re-outlines the blade, the drip frames grow them back and let drops fall from their lowest points.
 // Usage: node tools/dagger_drip.js
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const { readPng, writePng } = require('./png');
-const ROOT = 'D:/MCmodev/SpireCraft/';
+const ROOT = REPO_ROOT + '';
 const TEX = ROOT + 'src/main/resources/assets/spirecraft/textures/item/';
 const SRC = ROOT + 'art/dagger_src/';
 const DAGGERS = {

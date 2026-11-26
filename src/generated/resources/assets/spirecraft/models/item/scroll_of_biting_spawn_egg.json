@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "spirecraft:item/scroll_of_biting_spawn_egg"
+  }
+}

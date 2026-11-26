@@ -6,16 +6,16 @@
     "spirecraft:orichalcum_ore",
     "spirecraft:orichalcum_block",
     "spirecraft:lava_rock_ore",
+    "spirecraft:deep_hive_rock_orichalcum_ore",
+    "spirecraft:deep_hive_rock_redstone_ore",
+    "spirecraft:deep_hive_rock_diamond_ore",
+    "spirecraft:hive_rock_wolframite_ore",
+    "spirecraft:hive_rock_gold_ore",
     "spirecraft:deep_hive_rock_gold_ore",
-    "spirecraft:hive_rock_diamond_ore",
     "spirecraft:deep_hive_rock_emerald_ore",
     "spirecraft:hive_rock_redstone_ore",
-    "spirecraft:deep_hive_rock_redstone_ore",
     "spirecraft:deep_hive_rock_wolframite_ore",
-    "spirecraft:deep_hive_rock_orichalcum_ore",
-    "spirecraft:hive_rock_gold_ore",
-    "spirecraft:hive_rock_emerald_ore",
-    "spirecraft:hive_rock_wolframite_ore",
-    "spirecraft:deep_hive_rock_diamond_ore"
+    "spirecraft:hive_rock_diamond_ore",
+    "spirecraft:hive_rock_emerald_ore"
   ]
 }

@@ -16,11 +16,12 @@
 //            (colourful) | ore (coloured/bright specks on grey rock) | diff (pixels differing from diffBase) | red.
 //            bg: paint the recoloured selection onto another texture (ore pattern on a different host rock).
 //            overlay: extra detail drawn only on opaque pixels.
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const path = require('path');
 const V = process.argv[2] + '/assets/minecraft/textures/';
 const filter = process.argv[3];
-const OUT = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/';
+const OUT = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/';
 const b64 = p => fs.readFileSync(V + p).toString('base64').split('/').join('_');
 
 const jobs = require(path.join(__dirname, 'pixel_art_defs.js'))
@@ -244,7 +245,7 @@ for (const j of jobs) {
   Blockbench.writeFile(OUT + j.out, {content: url, savetype: 'image'});
   done.push(j.name);
 }
-const p = 'D:/MCmodev/SpireCraft/art/pixel_art.bbmodel';
+const p = REPO_ROOT + 'art/pixel_art.bbmodel';
 Blockbench.writeFile(p, {content: Codecs.project.compile({compressed: false})});
 Project.save_path = p; Project.saved = true;
 return done.length + ' textures: ' + done.join(',');

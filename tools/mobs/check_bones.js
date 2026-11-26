@@ -2,9 +2,10 @@
 // (tools/mobs/specs.js). Hand-written kinds call p("name") without null checks, so a missing bone is a crash at render
 // time; the data-driven monsters (Kind.SCRIPTED) only need a 'body' or 'head' root.
 // Usage: node tools/mobs/check_bones.js   (exit code 1 on a problem)
+const REPO_ROOT = require('path').resolve(__dirname, '..', '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const fs = require('fs');
 const specs = require('./specs');
-const ROOT = 'D:/MCmodev/SpireCraft/src/main/java/com/mockingjam/spirecraft/';
+const ROOT = REPO_ROOT + 'src/main/java/com/mockingjam/spirecraft/';
 const model = fs.readFileSync(ROOT + 'client/mob/SpireMobModel.java', 'utf8');
 const renderer = fs.readFileSync(ROOT + 'client/mob/SpireMobRenderer.java', 'utf8');
 

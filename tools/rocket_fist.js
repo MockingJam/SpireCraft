@@ -1,8 +1,9 @@
 // Rocket Punch v2.1 art: the launcher with its fist fired (rocket_punch_empty) and the fist's own 16×16 texture
 // (used by the 3D rocket_fist item model the projectile renders). Colours come from rocket_punch.png.
 // Usage: node tools/rocket_fist.js
+const REPO_ROOT = require('path').resolve(__dirname, '..').split(require('path').sep).join('/') + '/';   // this checkout (was hard-coded to D:/MCmodev/SpireCraft)
 const { readPng, writePng } = require('./png');
-const T = 'D:/MCmodev/SpireCraft/src/main/resources/assets/spirecraft/textures/item/';
+const T = REPO_ROOT + 'src/main/resources/assets/spirecraft/textures/item/';
 const src = readPng(T + 'rocket_punch.png');
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const at = (img, x, y) => img.d.subarray((y * img.w + x) * 4, (y * img.w + x) * 4 + 4);
