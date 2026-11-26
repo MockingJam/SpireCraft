@@ -2548,5 +2548,8 @@ require('./glory_sites')({ Struct, rng, loot, special });
 require('./glory_nether')({ Struct, rng, loot, special });
 require('./glory_end')({ Struct, rng, loot, special });
 
+// The Ancient Tree (issue #15, docs/design/structures.md section 16)
+require('./ancient_tree')({ Struct, rng, loot, special });
+
 // template ids used by worldgen/TemplateFeature placements (see BiomeData)
 console.log('ok', JSON.stringify(hiveTemplates), pierTemplates);

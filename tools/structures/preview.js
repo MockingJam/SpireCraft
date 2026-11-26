@@ -15,6 +15,7 @@ const special = () => {}, loot = () => {};
 require(path.resolve(mod))({ Struct: lib.Struct, rng: lib.rng, loot, special, jigsaw: () => {} });
 
 const COL = [
+  [/gnarlwood_leaves/, [78, 118, 52]], [/stripped_gnarlwood/, [150, 128, 96]], [/gnarlwood_(planks|slab|stairs|door|trapdoor|fence)/, [126, 112, 84]], [/gnarlwood/, [84, 70, 58]], [/resin/, [226, 120, 32]], [/glowvine/, [150, 230, 140]], [/^vine|lichen/, [60, 120, 60]],
   [/lava|magma/, [235, 110, 25]], [/water/, [60, 95, 205]], [/soul_(campfire|lantern|torch|fire)/, [90, 220, 230]], [/campfire|lantern|torch|glowstone|shroomlight|froglight|sea_lantern|copper_bulb|redstone_lamp|end_rod/, [255, 215, 110]],
   [/grass_block|moss/, [96, 150, 66]], [/^snow/, [240, 246, 250]], [/ice/, [170, 200, 245]], [/gravel/, [132, 126, 122]], [/grass_block|moss/, [96, 150, 66]], [/dirt|podzol|mud(?!_brick)|farmland/, [122, 86, 58]], [/sand(?!stone)/, [218, 206, 150]],
   [/sandstone/, [210, 190, 130]], [/cobbled_deepslate/, [82, 82, 88]], [/polished_deepslate|chiseled_deepslate/, [64, 64, 72]], [/deepslate_tile/, [52, 52, 60]], [/deepslate/, [74, 74, 82]],

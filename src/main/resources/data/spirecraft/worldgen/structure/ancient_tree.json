@@ -1,0 +1,13 @@
+{
+  "type": "spirecraft:cave_template",
+  "biomes": "#spirecraft:has_structure/ancient_tree",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "templates": [
+    "spirecraft:ancient_tree/1"
+  ],
+  "mode": "open_ground",
+  "sink": 10,
+  "footprint": 23
+}
