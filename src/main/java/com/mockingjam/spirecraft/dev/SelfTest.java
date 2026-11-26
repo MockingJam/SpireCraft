@@ -156,6 +156,7 @@ public final class SelfTest {
         scriptedChecks();
         biomeV2Checks();
         structureChecks();
+        ancientTreeChecks();
         orbChecks();
 
         // Doom: stacks >= health kills.
@@ -182,20 +183,22 @@ public final class SelfTest {
                     "brass_works/fabrication_1", "brass_works/turret_bastion_1", "brass_works/mecha_hangar_1", "em_laboratory/1",
                     "queens_castle/1", "knights_keep/1", "statuary/1", "forgotten_ruins/surface_lost", "forgotten_ruins/surface_forgotten",
                     "forgotten_ruins/crypt_lost", "forgotten_ruins/crypt_forgotten", "slime_jail/1", "beetle_grounds/1", "owl_court/1",
-                    "axebot_foundry/1", "prison_lab/1", "aeon_spire/1")) {
+                    "axebot_foundry/1", "prison_lab/1", "aeon_spire/1",
+                    // the Ancient Tree (issue #15)
+                    "ancient_tree/1")) {
                 var tpl = manager.get(SpireCraft.id(t));
                 if (tpl.isEmpty() || tpl.get().getSize().getX() == 0) { bad++; SpireCraft.LOGGER.info("[SelfTest] template missing: {}", t); }
             }
-            check("structures: all 102 templates load", bad, 0);
+            check("structures: all 103 templates load", bad, 0);
             var reg = s.registryAccess().lookupOrThrow(Registries.STRUCTURE);
             for (String id : List.of("beekeeper", "beekeeper_hollow", "bowlbug_nest", "byrdonis_nest", "camp_desert", "camp_plains", "camp_savanna", "camp_snowy", "camp_taiga", "ceremonial_ruins", "dock_house", "dock_pier", "kaiser_crab_cave", "kin_village", "lighthouse", "man_sized_holes", "mycelium_shrine", "overgrowth_camp", "overgrowth_ruin_pile", "ruin_pile", "sailboat", "scrap_pile", "sea_ruins", "sunken_statue", "web_nest", "wellspring", "wood_carvings",
                     "ironclad_camp", "ironclad_ruin", "silent_gathering", "jungle_tribe", "regent_crater", "regent_starship", "necrobinder_giant",
                     "forbidden_library", "automaton_factory", "sand_pit", "brass_works", "em_laboratory",
-                    "queens_castle", "knights_keep", "statuary", "forgotten_ruins", "forgotten_crypt", "slime_jail", "beetle_grounds", "owl_court", "axebot_foundry", "prison_lab", "aeon_spire")) {
+                    "queens_castle", "knights_keep", "statuary", "forgotten_ruins", "forgotten_crypt", "slime_jail", "beetle_grounds", "owl_court", "axebot_foundry", "prison_lab", "aeon_spire", "ancient_tree")) {
                 var holder = reg.get(ResourceKey.create(Registries.STRUCTURE, SpireCraft.id(id)));
                 report("structure " + id + " registered", holder.isPresent());
             }
-            for (String id : List.of("camp_plains", "ruin_pile", "lighthouse", "sea_ruins", "kin_village", "ceremonial_ruins", "wellspring", "sailboat", "dock_house", "sunken_statue", "byrdonis_nest", "overgrowth_camp", "beekeeper", "dock_pier", "web_nest", "kaiser_crab_cave", "scrap_pile", "mycelium_shrine", "beekeeper_hollow", "man_sized_holes")) {
+            for (String id : List.of("camp_plains", "ruin_pile", "lighthouse", "sea_ruins", "kin_village", "ceremonial_ruins", "wellspring", "sailboat", "dock_house", "sunken_statue", "byrdonis_nest", "overgrowth_camp", "beekeeper", "dock_pier", "web_nest", "kaiser_crab_cave", "scrap_pile", "mycelium_shrine", "beekeeper_hollow", "man_sized_holes", "ancient_tree")) {
                 var holder = reg.get(ResourceKey.create(Registries.STRUCTURE, SpireCraft.id(id)));
                 if (holder.isEmpty()) continue;
                 var found = s.getChunkSource().getGenerator().findNearestMapStructure(s, net.minecraft.core.HolderSet.direct(holder.get()), b.blockPosition(), 200, false);
@@ -242,6 +245,94 @@ public final class SelfTest {
     }
 
     /** Biomes v2 (docs/design/biomes_v2.md): blocks, the ink fluid, polluted water, quicksand, the tall gnarlwood. */
+    private static BlockPos treeLever, treeDoor, treePlate, treeDispenser, treeSpawner;
+    private static int treeArrows;
+
+    /**
+     * Issue #15, the Ancient Tree's mechanisms, in a template placed in the air: the lever on the back of the vault opens
+     * its iron door (and shuts it again), a mob on a pressure plate makes the dispenser behind it shoot, and a guard
+     * room's spawner spawns its monster in the room's dim light (custom spawn rules) with a player near.
+     */
+    private static void ancientTreeChecks() {
+        step(0, s -> {
+            var tpl = s.getServer().getStructureManager().get(SpireCraft.id("ancient_tree/1"));
+            if (tpl.isEmpty()) { report("ancient tree: template", false); return; }
+            BlockPos spawn = s.getRespawnData().pos();
+            int cx = (spawn.getX() & ~15) + 8 + 192, cz = (spawn.getZ() & ~15) + 8;
+            for (int dx = -3; dx <= 3; dx++) for (int dz = -3; dz <= 3; dz++) s.setChunkForced((cx >> 4) + dx, (cz >> 4) + dz, true);
+            var size = tpl.get().getSize();
+            BlockPos origin = new BlockPos(cx - size.getX() / 2, 170, cz - size.getZ() / 2);
+            tpl.get().placeInWorld(s, origin, origin, new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings(), s.getRandom(), 2);
+            treeLever = treeDoor = treePlate = treeDispenser = treeSpawner = null;
+            int spawners = 0, chests = 0, plates = 0;
+            for (BlockPos q : BlockPos.betweenClosed(origin, origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1))) {
+                var st = s.getBlockState(q);
+                if (st.is(Blocks.LEVER)) treeLever = q.immutable();
+                else if (st.is(Blocks.IRON_DOOR) && st.getValue(net.minecraft.world.level.block.DoorBlock.HALF) == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER) treeDoor = q.immutable();
+                else if (st.is(Blocks.CHEST)) chests++;
+                else if (st.is(Blocks.SPAWNER)) {
+                    spawners++;
+                    if (s.getBlockEntity(q) instanceof net.minecraft.world.level.block.entity.SpawnerBlockEntity sp
+                            && sp.saveWithoutMetadata(s.registryAccess()).toString().contains("leaf_slime")) treeSpawner = q.immutable();
+                } else if (st.is(Blocks.STONE_PRESSURE_PLATE)) {
+                    plates++;
+                    for (var d : net.minecraft.core.Direction.Plane.HORIZONTAL) if (treePlate == null && s.getBlockState(q.relative(d)).is(Blocks.DISPENSER)) {
+                        treePlate = q.immutable();
+                        treeDispenser = q.relative(d).immutable();
+                    }
+                }
+            }
+            check("ancient tree: 6 spawners", spawners, 6);
+            check("ancient tree: 7 chests", chests, 7);
+            check("ancient tree: 3 pressure plates", plates, 3);
+            report("ancient tree: lever, vault door, trap and slime spawner found", treeLever != null && treeDoor != null && treePlate != null && treeSpawner != null);
+            if (treeDispenser != null && s.getBlockEntity(treeDispenser) instanceof net.minecraft.world.level.block.entity.DispenserBlockEntity d) {
+                treeArrows = d.getItem(0).getCount();
+                report("ancient tree: the trap's dispenser holds arrows (" + d.getItem(0) + ")", d.getItem(0).is(Items.ARROW) && treeArrows > 0);
+            }
+            if (treeDoor != null) report("ancient tree: the vault door starts shut", !s.getBlockState(treeDoor).getValue(net.minecraft.world.level.block.DoorBlock.OPEN));
+        });
+        step(5, s -> {
+            if (treeLever == null) return;
+            var st = s.getBlockState(treeLever);
+            ((net.minecraft.world.level.block.LeverBlock) st.getBlock()).pull(st, s, treeLever, null);
+        });
+        step(8, s -> {
+            if (treeLever == null || treeDoor == null) return;
+            report("ancient tree: the lever opens the vault door", s.getBlockState(treeDoor).getValue(net.minecraft.world.level.block.DoorBlock.OPEN));
+            var st = s.getBlockState(treeLever);
+            ((net.minecraft.world.level.block.LeverBlock) st.getBlock()).pull(st, s, treeLever, null);
+        });
+        step(8, s -> {
+            if (treeDoor != null) report("ancient tree: the lever shuts it again", !s.getBlockState(treeDoor).getValue(net.minecraft.world.level.block.DoorBlock.OPEN));
+            if (treePlate != null) {
+                zombie = EntityType.ZOMBIE.spawn(s, treePlate, EntitySpawnReason.COMMAND);
+                zombie.setSilent(true);
+            }
+        });
+        step(15, s -> {
+            if (treeDispenser == null) return;
+            int left = s.getBlockEntity(treeDispenser) instanceof net.minecraft.world.level.block.entity.DispenserBlockEntity d ? d.getItem(0).getCount() : -1;
+            int arrows = s.getEntitiesOfClass(net.minecraft.world.entity.projectile.AbstractArrow.class, new AABB(treePlate).inflate(8)).size();
+            SpireCraft.LOGGER.info("[SelfTest] ancient tree trap: arrows in the dispenser {} -> {}, arrows about {}", treeArrows, left, arrows);
+            report("ancient tree: a mob on the plate makes the dispenser shoot", left >= 0 && left < treeArrows);
+            if (zombie != null) zombie.discard();
+            if (treeSpawner != null) {
+                SpireCraft.LOGGER.info("[SelfTest] ancient tree spawner room: block light {}, sky light {}", s.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, treeSpawner.above()),
+                        s.getBrightness(net.minecraft.world.level.LightLayer.SKY, treeSpawner.above()));
+                player = mockPlayer(s);
+                player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);   // a spectator does not wake a spawner
+                player.teleportTo(treeSpawner.getX() + 0.5, treeSpawner.getY() + 3, treeSpawner.getZ() + 0.5);
+            }
+        });
+        step(120, s -> {
+            if (treeSpawner == null) return;
+            int slimes = s.getEntitiesOfClass(LivingEntity.class, new AABB(treeSpawner).inflate(8), e -> e.getType().toShortString().contains("leaf_slime")).size();
+            report("ancient tree: the spawner spawns leaf slimes in the dim room (" + slimes + ")", slimes > 0);
+            s.getEntitiesOfClass(LivingEntity.class, new AABB(treeSpawner).inflate(60), e -> !(e instanceof ServerPlayer)).forEach(net.minecraft.world.entity.Entity::discard);
+        });
+    }
+
     private static void biomeV2Checks() {
         step(0, s -> {
             reset(s);

@@ -116,7 +116,8 @@ public final class SpireStructures {
                 Codec.INT.optionalFieldOf("sink", 1).forGetter(s -> s.sink),
                 Codec.INT.optionalFieldOf("min_y", -50).forGetter(s -> s.minY),
                 Codec.INT.optionalFieldOf("max_y", 40).forGetter(s -> s.maxY),
-                Codec.BOOL.optionalFieldOf("ignore_waterlogging", false).forGetter(s -> s.dry)).apply(i, CaveTemplate::new));
+                Codec.BOOL.optionalFieldOf("ignore_waterlogging", false).forGetter(s -> s.dry),
+                Codec.INT.optionalFieldOf("footprint", 0).forGetter(s -> s.footprint)).apply(i, CaveTemplate::new));
 
         final List<ResourceLocation> templates;
         final String mode;
@@ -124,8 +125,11 @@ public final class SpireStructures {
         /** Issue #37 (the Silent's vault flooded): place without taking in the ground water - blocks that can hold water
          * stay dry instead of waterlogging (and spilling) where the template meets an aquifer or the swamp. */
         final boolean dry;
+        /** Issue #15 (the Ancient Tree: a slender trunk under a crown 60 wide): the radius "open_ground" checks for flat
+         * dry land, when it is smaller than the template - only the roots need the ground, not the crown. 0 = the template. */
+        final int footprint;
 
-        CaveTemplate(StructureSettings settings, List<ResourceLocation> templates, String mode, int sink, int minY, int maxY, boolean dry) {
+        CaveTemplate(StructureSettings settings, List<ResourceLocation> templates, String mode, int sink, int minY, int maxY, boolean dry, int footprint) {
             super(settings);
             this.templates = templates;
             this.mode = mode;
@@ -133,6 +137,7 @@ public final class SpireStructures {
             this.minY = minY;
             this.maxY = maxY;
             this.dry = dry;
+            this.footprint = footprint;
         }
 
         @Override
@@ -237,7 +242,7 @@ public final class SpireStructures {
          * direction whose ground in front of the gate rises least above the camp.
          */
         private Optional<GenerationStub> openGround(GenerationContext ctx, ResourceLocation id, net.minecraft.core.Vec3i size, int x, int z) {
-            int r = Math.max(size.getX(), size.getZ()) / 2 - 1;
+            int r = footprint > 0 ? footprint : Math.max(size.getX(), size.getZ()) / 2 - 1;
             int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE, sum = 0, n = 0;
             for (int dx = -r; dx <= r; dx += 4) for (int dz = -r; dz <= r; dz += 4) {
                 if (dx * dx + dz * dz > r * r) continue;
