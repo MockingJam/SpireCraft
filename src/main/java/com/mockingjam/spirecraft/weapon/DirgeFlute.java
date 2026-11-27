@@ -112,7 +112,7 @@ public class DirgeFlute extends SpireWeapon {
         for (int i = 0; i < n && !foes.isEmpty(); i++) {
             LivingEntity target = foes.get(level.random.nextInt(foes.size()));
             target.invulnerableTime = 0;
-            target.hurtServer(level, player.damageSources().indirectMagic(player, player), SOUL_DAMAGE);
+            target.hurtServer(level, player.damageSources().indirectMagic(null, player), SOUL_DAMAGE);
             level.sendParticles(ParticleTypes.SOUL, target.getX(), target.getY() + target.getBbHeight() / 2, target.getZ(), 6, 0.2, 0.3, 0.2, 0.03);
             hits++;
             if (!target.isAlive()) foes.remove(target);

@@ -160,7 +160,7 @@ public final class Orbs {
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(DARK_RADIUS),
                 e -> e instanceof Enemy && e.isAlive() && e.distanceTo(player) <= DARK_RADIUS + e.getBbWidth() / 2)) {
             e.invulnerableTime = 0;
-            e.hurtServer(level, player.damageSources().indirectMagic(player, player), DARK_DAMAGE);
+            e.hurtServer(level, player.damageSources().indirectMagic(null, player), DARK_DAMAGE);
             hit++;
         }
         var shell = new DustParticleOptions(COLORS[2], 1.6F);

@@ -110,7 +110,8 @@ public final class WeaponEvents {
             }
         }
 
-        if (!(event.getSource().getDirectEntity() instanceof Player player) || event.getSource().getEntity() != player) return;
+        // Only the player's own melee hits trigger main-hand effects: ability damage (no direct entity) and thorns do not.
+        if (!(event.getSource().getDirectEntity() instanceof Player player) || !com.mockingjam.spirecraft.effect.SpireEffectEvents.isAttack(event.getSource())) return;
         ItemStack weapon = player.getMainHandItem();
         boolean charged = CHARGED.getOrDefault(player, false);
 
