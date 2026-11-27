@@ -155,21 +155,22 @@ public abstract class SpireMonster extends Monster {
     }
 
     /** Fires a small bolt at the target (rendered as {@code look}). */
-    public void shoot(ServerLevel level, LivingEntity target, ItemStack look, SpireBolt.Kind kind, float damage, float speed) {
-        if (target == null) return;
+    public SpireBolt shoot(ServerLevel level, LivingEntity target, ItemStack look, SpireBolt.Kind kind, float damage, float speed) {
+        if (target == null) return null;
         SpireBolt bolt = new SpireBolt(level, this, look, kind, damage);
         Vec3 to = target.getEyePosition().subtract(getEyePosition());
         bolt.setPos(getX(), getEyeY() - 0.1, getZ());
         bolt.shoot(to.x, to.y + to.horizontalDistance() * 0.08, to.z, speed, 1.0F);
         level.addFreshEntity(bolt);
+        return bolt;
     }
 
     /**
      * Lob a projectile in a high arc that comes down on the target (v5: the Wurm's acid): from {@code height} blocks
      * above the feet, with the horizontal speed fixed and the vertical speed solved for the projectile's gravity.
      */
-    public void lob(ServerLevel level, LivingEntity target, ItemStack look, SpireBolt.Kind kind, float damage, double height) {
-        if (target == null) return;
+    public SpireBolt lob(ServerLevel level, LivingEntity target, ItemStack look, SpireBolt.Kind kind, float damage, double height) {
+        if (target == null) return null;
         SpireBolt bolt = new SpireBolt(level, this, look, kind, damage);
         bolt.setPos(getX(), getY() + height, getZ());
         Vec3 to = target.position().add(0, target.getBbHeight() * 0.5, 0).subtract(bolt.position());
@@ -177,6 +178,7 @@ public abstract class SpireMonster extends Monster {
         double vy = (to.y + 0.5 * g * t * t) / t;
         bolt.setDeltaMovement(to.x / Math.max(0.01, dist) * vh, vy, to.z / Math.max(0.01, dist) * vh);
         level.addFreshEntity(bolt);
+        return bolt;
     }
 
     /** Walks toward the target until the planned move is in range; stands still while acting. */

@@ -2,6 +2,8 @@ package com.mockingjam.spirecraft.weapon.projectile;
 
 import com.mockingjam.spirecraft.effect.ModEffects;
 import com.mockingjam.spirecraft.registry.ModEntities;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -39,6 +41,16 @@ public class SpireBolt extends ThrowableItemProjectile {
 
     private Kind kind = Kind.PEBBLE;
     private float damage;
+    /** A scripted monster's move with effects of its own (ScriptedMonster.carry): its bolts skip this kind's default
+     *  effect, and the move's last bolt applies the move's effects on impact. Not saved. */
+    @Nullable private Consumer<LivingEntity> moveEffects;
+    private boolean replaceKindEffect;
+
+    public SpireBolt carry(@Nullable Consumer<LivingEntity> effects, boolean replaceKindEffect) {
+        this.moveEffects = effects;
+        this.replaceKindEffect = replaceKindEffect;
+        return this;
+    }
 
     public SpireBolt(EntityType<? extends SpireBolt> type, Level level) {
         super(type, level);
@@ -88,7 +100,7 @@ public class SpireBolt extends ThrowableItemProjectile {
         if (kind == Kind.SNOW) amount *= target instanceof net.minecraft.world.entity.monster.Blaze ? SNOW_BLAZE : SNOW_RATIO;
         target.invulnerableTime = 0;
         target.hurtServer(level, damageSources().thrown(this, getOwner()), amount);
-        switch (kind) {
+        if (!replaceKindEffect) switch (kind) {
             case INK -> {
                 target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, INK_BLIND, 0), getOwner());
                 target.addEffect(new MobEffectInstance(ModEffects.holder(ModEffects.WEAK), INK_WEAK, 0), getOwner());
@@ -108,6 +120,7 @@ public class SpireBolt extends ThrowableItemProjectile {
             case ACID -> ModEffects.addStacks(target, ModEffects.POISON, ACID_POISON, 1200, 30);
             case SPORE -> target.addEffect(new MobEffectInstance(ModEffects.holder(ModEffects.FRAIL), SPORE_FRAIL, 0), getOwner());
         }
+        if (moveEffects != null) moveEffects.accept(target);
     }
 
     @Override

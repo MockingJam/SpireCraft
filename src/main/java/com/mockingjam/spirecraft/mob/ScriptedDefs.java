@@ -69,6 +69,11 @@ public final class ScriptedDefs {
         public String summon;
         public Supplier<Holder<MobEffect>> effect, effect2, selfEffect;
 
+        public boolean hasTargetEffects() {
+            return effect != null || effect2 != null || effect3 != null || poison > 0 || doom > 0 || steal > 0
+                    || ignite > 0 || embers > 0 || pull || shieldBreak || stealStr || stealDex;
+        }
+
         double range() {
             return switch (kind) { case MELEE -> reach; case DASH -> 10; case SHOT, LOB -> 12; case AOE -> reach; case SELF -> 64; };
         }
