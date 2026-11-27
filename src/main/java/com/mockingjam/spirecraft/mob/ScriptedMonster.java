@@ -190,7 +190,8 @@ public class ScriptedMonster extends SpireMonster {
     /** Does what one move says: its damage (melee, shot, lobbed, all round, a charge), then its side effects. */
     private void perform(ServerLevel level, ScriptedDefs.MoveDef m, LivingEntity target) {
         if (m.once) onceUsed = true;
-        boolean first = hitIndex() == 0, lastHit = hitIndex() == m.hits - 1;
+        int count = m.hitTicks().length;
+        boolean first = hitIndex() == 0, lastHit = hitIndex() == count - 1;
         if (m.sound != null && first) level.playSound(null, blockPosition(), m.sound, SoundSource.HOSTILE, def.boss ? 2.0F : 1.0F, def.pitch);
         if (target != null && m.hits > 1) target.invulnerableTime = 0;
         float dmg = m.damage + (m.dreadBonus ? stolenTotal(1) : 0);
@@ -209,9 +210,9 @@ public class ScriptedMonster extends SpireMonster {
             }
             case SHOT -> {
                 if (m.lightning) landed = lightning(level, target, dmg);
-                else if (dmg > 0 || m.effect != null) shoot(level, target, new ItemStack(m.look.get()), m.bolt, dmg, 1.2F);
+                else if (dmg > 0 || m.hasTargetEffects()) carry(level, m, lastHit, shoot(level, target, new ItemStack(m.look.get()), m.bolt, dmg, 1.2F));
             }
-            case LOB -> lob(level, target, new ItemStack(m.look.get()), m.bolt, dmg, getBbHeight() * 0.8);
+            case LOB -> carry(level, m, lastHit, lob(level, target, new ItemStack(m.look.get()), m.bolt, dmg, getBbHeight() * 0.8));
             case AOE -> {
                 level.sendParticles(m.particle, getX(), getY() + 0.5, getZ(), 40, m.reach / 2, 0.5, m.reach / 2, 0.02);
                 for (Player p : level.getEntitiesOfClass(Player.class, getBoundingBox().inflate(m.reach, 2, m.reach), p -> !p.isSpectator())) {
@@ -221,9 +222,9 @@ public class ScriptedMonster extends SpireMonster {
             }
             case SELF -> { }
         }
-        // what goes on the target: once per move, on the last hit (only if it landed, for melee and charges)
-        boolean reach = m.kind == ScriptedDefs.Kind.MELEE || m.kind == ScriptedDefs.Kind.DASH ? landed : true;
-        if (lastHit && target != null && m.kind != ScriptedDefs.Kind.AOE && m.kind != ScriptedDefs.Kind.SHOT && m.kind != ScriptedDefs.Kind.LOB && reach) applyEffects(level, m, target);
+        // Lightning applies on a direct hit; other shots and lobs apply on impact, and AOE applies to each player above.
+        boolean direct = switch (m.kind) { case MELEE, DASH -> landed; case SHOT -> m.lightning && landed; case SELF -> true; case LOB, AOE -> false; };
+        if (lastHit && target != null && direct) applyEffects(level, m, target);
         if (landed && def.suck > 0) addStrength(def.suck, 20 * 60 * 10);   // Suck: stronger with every wound it opens
         // Paper Cuts (Scroll of Biting): every bite that lands takes a little of your max health
         if (landed && m.wound && target != null) ModEffects.addStacks(target, ModEffects.WOUND, 1, 300, 5);   // Painful Stabs
@@ -280,12 +281,18 @@ public class ScriptedMonster extends SpireMonster {
         if (m.hatch) hatchNow(level);
     }
 
+    /** A shot or lob with effects of its own: they ride on the bolt (the last one of the move) instead of the bolt kind's. */
+    private void carry(ServerLevel level, ScriptedDefs.MoveDef m, boolean lastHit, @Nullable SpireBolt bolt) {
+        if (bolt == null || !m.hasTargetEffects()) return;
+        bolt.carry(lastHit ? t -> applyEffects(level, m, t) : null, true);
+    }
+
     private void applyEffects(ServerLevel level, ScriptedDefs.MoveDef m, LivingEntity t) {
         if (m.effect != null) t.addEffect(new MobEffectInstance(m.effect.get(), m.effectTicks, m.effectAmp), this);
         if (m.effect2 != null) t.addEffect(new MobEffectInstance(m.effect2.get(), m.effectTicks, 0), this);
         if (m.poison > 0) ModEffects.addStacks(t, ModEffects.POISON, m.poison, 1200, 30);
         if (m.doom > 0) ModEffects.addStacks(t, ModEffects.DOOM, m.doom, 20 * 60, 99);
-        if (m.steal > 0 && t instanceof Player p) steal(p, m.steal);
+        if (m.steal > 0 && t instanceof Player p && !isRemoved()) steal(p, m.steal);
         if (m.effect3 != null) t.addEffect(new MobEffectInstance(m.effect3.get(), m.effectTicks, 0), this);
         if (m.pull) {   // the Frog Knight's tongue drags you in
             t.setDeltaMovement(position().subtract(t.position()).normalize().scale(1.1).add(0, 0.35, 0));
@@ -617,8 +624,16 @@ public class ScriptedMonster extends SpireMonster {
         }
         if (level() instanceof ServerLevel level) for (var c : def.deathSummon) for (int i = 0; i < c.count(); i++) summon(level, c.pick(getRandom()), getTarget());
         if (def.wakeRoom > 0 && phase >= (def.phases == null ? 0 : def.phases.length - 1) && level() instanceof ServerLevel level)
-            com.mockingjam.spirecraft.block.GloryGateBlock.setAll(level, blockPosition(), 40, false);   // the fight is won: the way out opens
+            releaseRoom(level);
         super.die(source);
+    }
+
+    /** Glory v2: the way out opens only when no other boss of the room is still alive, asleep or not (the Queen outlives
+     *  her Amalgam; they share the throne room). Its own minions do not hold the gates: without their leader they run off. */
+    private void releaseRoom(ServerLevel level) {
+        boolean another = !level.getEntitiesOfClass(ScriptedMonster.class, getBoundingBox().inflate(40),
+                s -> s != this && s.isAlive() && s.def.wakeRoom > 0 && !def.name.equals(s.def.leader)).isEmpty();
+        if (!another) com.mockingjam.spirecraft.block.GloryGateBlock.setAll(level, blockPosition(), 40, false);
     }
 
     // ------------------------------------------------------------------------------------------- boss bar, saving
@@ -651,6 +666,22 @@ public class ScriptedMonster extends SpireMonster {
         out.putInt("Slippery", slippery);
         out.putInt("Revivals", revivals);
         out.putBoolean("Once", onceUsed);
+        out.putInt("Phase", phase);
+        out.putInt("StockLeft", stockLeft);
+        out.putInt("StockGen", stockGen);
+        out.putInt("GrowCount", growCount);
+        out.putInt("Curl", curl);
+        out.putInt("DownTicks", downTicks);
+        out.putBoolean("ReviveFull", reviveFull);
+        out.putInt("Hatch", hatch);
+        var items = out.list("Stolen", ItemStack.CODEC);
+        for (ItemStack item : stolen) if (!item.isEmpty()) items.add(item);
+        var stats = out.childrenList("StolenStats");
+        stolenStats.forEach((uuid, v) -> {
+            var child = stats.addChild();
+            child.store("Player", net.minecraft.core.UUIDUtil.CODEC, uuid);
+            child.putIntArray("Levels", v);
+        });
     }
 
     @Override
@@ -660,7 +691,23 @@ public class ScriptedMonster extends SpireMonster {
         loop = in.getIntOr("Loop", 0);
         int st = in.getIntOr("State", -1);
         fresh = st < 0;   // placed by a structure: set up on the first tick
-        entityData.set(STATE, Math.max(0, st) & ~DOWN);
+        entityData.set(STATE, Math.max(0, st));
+        phase = in.getIntOr("Phase", st < 0 ? 0 : (st >> PHASE_SHIFT) & 3);
+        stockLeft = in.getIntOr("StockLeft", -1);
+        stockGen = in.getIntOr("StockGen", 0);
+        growCount = in.getIntOr("GrowCount", 0);
+        curl = in.getIntOr("Curl", def.curlUp);
+        downTicks = in.getIntOr("DownTicks", def.reviveTicks);
+        reviveFull = in.getBooleanOr("ReviveFull", false);
+        hatch = in.getIntOr("Hatch", def.hatchAfter);
+        stolen.clear();
+        in.listOrEmpty("Stolen", ItemStack.CODEC).forEach(stolen::add);
+        stolenStats.clear();
+        for (var child : in.childrenListOrEmpty("StolenStats")) {
+            var uuid = child.read("Player", net.minecraft.core.UUIDUtil.CODEC);
+            var levels = child.getIntArray("Levels");
+            if (uuid.isPresent() && levels.isPresent() && levels.get().length == 4) stolenStats.put(uuid.get(), levels.get());
+        }
         ritual = in.getIntOr("Ritual", 0);
         steam = in.getIntOr("Steam", 0);
         plating = in.getIntOr("Plating", def.plating);

@@ -32,6 +32,7 @@ public final class ModDataGenerators {
                         new LootTableProvider.SubProviderEntry(ModEntityLootProvider::new, LootContextParamSets.ENTITY)), lookup));
         gen.addProvider(event.includeServer(), new ModBlockTagsProvider(output, lookup, existing));
         gen.addProvider(event.includeServer(), new ModItemTagsProvider(output, lookup, existing));
+        gen.addProvider(event.includeServer(), new ModEntityTypeTagsProvider(output, lookup, existing));
 
         // Phase 7 worldgen: features + biomes (registry JSON), biome tags, and the overworld preset override
         var worldgen = gen.addProvider(event.includeServer(), new net.minecraftforge.common.data.DatapackBuiltinEntriesProvider(

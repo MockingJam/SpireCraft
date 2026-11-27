@@ -110,7 +110,7 @@ public final class Abilities {
         while (next != null && hit.size() < jumps) {
             hit.add(next);
             next.invulnerableTime = 0;
-            next.hurtServer(level, player.damageSources().indirectMagic(player, player), TESLA_DAMAGE);
+            next.hurtServer(level, player.damageSources().indirectMagic(null, player), TESLA_DAMAGE);
             Vec3 to = next.position().add(0, next.getBbHeight() / 2, 0);
             for (int i = 0; i <= 8; i++) {
                 Vec3 p = from.lerp(to, i / 8.0);

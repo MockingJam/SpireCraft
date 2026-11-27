@@ -36,6 +36,9 @@ public final class ModMaterials {
     /** Bosses affected by Lava Rock (and any future boss-only rule). */
     public static final TagKey<EntityType<?>> BOSSES = TagKey.create(Registries.ENTITY_TYPE, SpireCraft.id("bosses"));
 
+    /** Elite entities (#26 一-11). */
+    public static final TagKey<EntityType<?>> ELITES = TagKey.create(Registries.ENTITY_TYPE, SpireCraft.id("elites"));
+
     // ---- Tungsten: iron-level defense, flat damage reduction, heavy ----
     public static final ResourceKey<EquipmentAsset> TUNGSTEN_ASSET = asset("tungsten");
     public static final ArmorMaterial TUNGSTEN_ARMOR_MATERIAL = new ArmorMaterial(

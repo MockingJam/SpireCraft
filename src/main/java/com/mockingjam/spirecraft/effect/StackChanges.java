@@ -48,7 +48,8 @@ public final class StackChanges {
         if (old == null || !entity.isAlive()) return;
         int newAmplifier = old.getAmplifier() - amount;
         entity.removeEffect(effect);
-        if (newAmplifier < 0 || old.getDuration() <= 0) return;
+        // an infinite effect (duration -1, e.g. a monster's Artifact) keeps its remaining stacks, still infinite
+        if (newAmplifier < 0 || (old.getDuration() <= 0 && !old.isInfiniteDuration())) return;
         internalApply = true;
         try {
             entity.addEffect(new MobEffectInstance(effect, old.getDuration(), newAmplifier, old.isAmbient(), old.isVisible(), old.showIcon()));
