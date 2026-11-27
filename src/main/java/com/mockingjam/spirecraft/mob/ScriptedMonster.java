@@ -126,7 +126,29 @@ public class ScriptedMonster extends SpireMonster {
     }
 
     @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (!STATE.equals(key) || !(level() instanceof ServerLevel)) return;
+        updateControlFlags();
+        if ((state() & ASLEEP) != 0) { getNavigation().stop(); getMoveControl().setWait(); }
+    }
+
+    /** Asleep it does not walk, jump or look round (Glory v2 bosses wait in their rooms). Its AI still runs, so it can
+     *  see a player walk in and wake (LivingEntity#aiStep skips the whole AI of an {@code isImmobile()} mob). */
+    @Override
+    protected void updateControlFlags() {
+        super.updateControlFlags();
+        if ((state() & ASLEEP) == 0) return;
+        goalSelector.setControlFlag(net.minecraft.world.entity.ai.goal.Goal.Flag.MOVE, false);
+        goalSelector.setControlFlag(net.minecraft.world.entity.ai.goal.Goal.Flag.JUMP, false);
+        goalSelector.setControlFlag(net.minecraft.world.entity.ai.goal.Goal.Flag.LOOK, false);
+    }
+
+    @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData data) {
+        // set up here, so the structure setup on the first tick must not run as well: a /summon with no NBT loads it
+        // from an empty tag first (fresh), and a sleeper woken before that tick would fall asleep again
+        fresh = false;
         if (def.artifact > 0) ModEffects.addStacks(this, ModEffects.ARTIFACT, def.artifact, -1, def.artifact);
         if (def.sleep > 0) setState(ASLEEP, true);
         if (def.hatchAfter > 0) hatch = def.hatchAfter;
@@ -399,12 +421,6 @@ public class ScriptedMonster extends SpireMonster {
     }
 
     // ------------------------------------------------------------------------------------------- powers
-    /** Asleep it does not move (Glory v2 bosses wait in their rooms). */
-    @Override
-    public boolean isImmobile() {
-        return super.isImmobile() || (state() & ASLEEP) != 0;
-    }
-
     /** Glory v2: a boss waiting in its room wakes when a player it can see walks in. */
     public void watchRoom(ServerLevel level) {
         if (def.wakeRoom <= 0) return;
@@ -437,8 +453,9 @@ public class ScriptedMonster extends SpireMonster {
             if (def.sleep > 0) setState(ASLEEP, true);
         }
         watchRoom(level);
+        boolean asleep = (state() & ASLEEP) != 0;
         int before = moveId();
-        super.customServerAiStep(level);
+        if (!asleep) super.customServerAiStep(level);   // asleep: no intents (its pause would only turn its head to you)
         if (before != 0 && moveId() == 0) onMoveDone();
         if (bossBar != null) bossBar.setProgress(getHealth() / getMaxHealth());
         // bombs counting down: a ring of warning on the ground, then the blast
@@ -453,18 +470,18 @@ public class ScriptedMonster extends SpireMonster {
             it.remove();
         }
         // Enrage (the Test Subject's first form): it grows stronger whenever its target raises a shield, drinks or eats
-        if (def.enrageOnUse && phase == 0 && getTarget() != null) {
+        if (def.enrageOnUse && phase == 0 && !asleep && getTarget() != null) {
             boolean using = getTarget().isUsingItem();
             if (using && !targetWasUsing) addStrength(1, 20 * 60 * 10);
             targetWasUsing = using;
         }
         // Nemesis (its last form): every 8 s it turns Intangible for 3 s
-        if (def.nemesisPhase >= 0 && phase >= def.nemesisPhase && tickCount % 160 == 0) {
+        if (def.nemesisPhase >= 0 && phase >= def.nemesisPhase && !asleep && tickCount % 160 == 0) {
             addEffect(new MobEffectInstance(ModEffects.holder(ModEffects.INTANGIBLE), 60, 0));
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, getX(), getY() + 1, getZ(), 30, 0.6, 0.6, 0.6, 0.02);
         }
         // an aura the players near it carry while it lives (Hex, Dampen) - not while it sleeps
-        if (def.aura != null && tickCount % 20 == 0 && (state() & ASLEEP) == 0)
+        if (def.aura != null && tickCount % 20 == 0 && !asleep)
             for (Player p : level.getEntitiesOfClass(Player.class, getBoundingBox().inflate(16), p -> !p.isSpectator() && !p.isCreative()))
                 p.addEffect(new MobEffectInstance(def.aura.get(), 40, 0, false, true, true), this);
         // Galvanic (Globe Head): the players near it carry the charge (SpireEffectEvents: a new buff shocks them)
@@ -536,7 +553,8 @@ public class ScriptedMonster extends SpireMonster {
             if (def.slowStacks && ModEffects.stacks(this, ModEffects.VULNERABLE) == 0) addEffect(new MobEffectInstance(ModEffects.holder(ModEffects.VULNERABLE), 100, 0));
         }
         boolean hurt = super.hurtServer(level, source, amount);
-        if (hurt && (state() & ASLEEP) != 0 && ++sleepHits >= def.sleep) wake(level);
+        // not when that blow killed it: die() has already opened the gates, and wake() would drop them again
+        if (hurt && isAlive() && (state() & ASLEEP) != 0 && ++sleepHits >= def.sleep) wake(level);
         if (hurt && (state() & BURROWED) != 0 && getAbsorptionAmount() <= 0) {        // dug out: dazed
             setState(BURROWED, false);
             startMove(move(0));
@@ -659,7 +677,9 @@ public class ScriptedMonster extends SpireMonster {
         super.addAdditionalSaveData(out);
         out.putInt("Opener", opener);
         out.putInt("Loop", loop);
-        out.putInt("State", state());
+        // still fresh: worldgen saves a template's entities into the proto-chunk before they ever tick; without State
+        // they are set up (asleep, Artifact) on their first tick once the chunk loads, instead of waking up as State 0
+        if (!fresh) out.putInt("State", state());
         out.putInt("Ritual", ritual);
         out.putInt("Steam", steam);
         out.putInt("Plating", plating);
